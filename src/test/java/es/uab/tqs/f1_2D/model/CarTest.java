@@ -1,18 +1,25 @@
 package es.uab.tqs.f1_2D.model;
-import static org.junit.jupiter.api.Assertions.*;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 
 
-
+@ExtendWith(MockitoExtension.class)
 class CarTest
 {
     Car car;
+
+    @Mock
+    private BufferedImage mapImageMock;
 
     //Constants
     public static final double maxVelocity = 10;
@@ -323,6 +330,117 @@ class CarTest
         car.update();
         assertEquals(0, car.getX());
         assertEquals(testMapHeight, car.getY());
+    }
+    /* 
+      =============================================================================
+        Pairwise Testing
+      =============================================================================
+    */
+
+    public void testPairwiseMovement()
+    {
+        int[] keys = {
+            KeyEvent.VK_W, KeyEvent.VK_S, 
+            KeyEvent.VK_A, KeyEvent.VK_D
+        };
+
+        double[] initialVelocities = {0, 2, -1};  
+        double[] initialAngles = {0, 90, 180};    
+
+        for (int key : keys) {
+            for (double v : initialVelocities) {
+                Car car1 = new Car(50, 50, 0, v, 5, -2, 0.5, 100, 100);
+
+                boolean moved = car.movement(key);
+                car1.update();
+
+                switch (key) {
+                    case KeyEvent.VK_W:
+                        assertTrue(moved);
+                        assertTrue(car1.getVelocity() >= v);
+                        break;
+                    case KeyEvent.VK_S:
+                        assertTrue(moved);
+                        assertTrue(car1.getVelocity() <= v);
+                        break;
+                    case KeyEvent.VK_A:
+                        assertTrue(moved);
+                        assertTrue(car1.getAngle() < 0);
+                        break;
+                    case KeyEvent.VK_D:
+                        assertTrue(moved);
+                        assertTrue(car1.getAngle() > 0);
+                        break;
+                }
+            }
+
+            for (double angle : initialAngles) {
+                Car car2 = new Car(50, 50, angle, 1, 5, -2, 0.5, 100, 100);
+                boolean moved = car2.movement(key);
+                car2.update();
+
+                assertTrue(moved);
+
+                assertTrue(car2.getX() >= 0 && car2.getX() <= 100);
+                assertTrue(car2.getY() >= 0 && car2.getY() <= 100);
+
+                switch (key) {
+                    case KeyEvent.VK_W:
+                        assertTrue(moved);
+                        switch((int)angle)
+                        {
+                            case 0: assertTrue(car2.getX() > 50); break;
+                            case 90: assertTrue(car2.getY() > 50); break;
+                            case 180: assertTrue(car2.getX() < 50); break;
+                        }
+                        break;
+                    case KeyEvent.VK_S:
+                        assertTrue(moved);
+                        switch((int)angle)
+                        {
+                            case 0: assertTrue(car2.getX() < 50); break;
+                            case 90: assertTrue(car2.getY() < 50); break;
+                            case 180: assertTrue(car2.getX() > 50); break;
+                        }
+                        break;
+                    case KeyEvent.VK_A:
+                        assertTrue(moved);
+                        assertTrue(car2.getAngle() < angle);
+                        break;
+                    case KeyEvent.VK_D:
+                        assertTrue(moved);
+                        assertTrue(car2.getAngle() > angle);
+                        break;
+                }
+            }
+        }
+    }
+    
+
+    /* 
+      =============================================================================
+        Mock Object
+      =============================================================================
+    */
+
+    @Test
+    public void testTrackLimitsFalse() {
+        when(mapImageMock.getRGB(0, 0)).thenReturn(Color.GRAY.getRGB());
+
+        car.setX(0);
+        car.setY(0);
+
+        assertFalse(car.trackLimits(mapImageMock));
+    }
+
+    @Test
+    public void testTrackLimitsTrue() {
+        when(mapImageMock.getRGB(0, 0)).thenReturn(Color.GREEN.getRGB());
+
+        car.setX(0);
+        car.setY(0);
+
+        assertTrue(car.trackLimits(mapImageMock));
     }
 
 
