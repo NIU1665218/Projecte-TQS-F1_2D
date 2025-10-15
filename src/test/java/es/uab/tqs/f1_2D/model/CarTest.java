@@ -131,6 +131,86 @@ class CarTest
         car.setX(9);
         car.setY(9);
         assertFalse(car.trackLimits(map));
+
+        car.setX(2);
+        car.setY(2);
+        
+        map.setRGB(2, 2, Color.RED.getRGB());
+        assertTrue(car.trackLimits(map));
+        
+        map.setRGB(2, 2, Color.BLUE.getRGB());
+        assertTrue(car.trackLimits(map));
+        
+        map.setRGB(2, 2, Color.BLACK.getRGB());
+        assertTrue(car.trackLimits(map));
+        
+        // Color gris (pista)
+        map.setRGB(2, 2, Color.GRAY.getRGB());
+        assertFalse(car.trackLimits(map));
+        }
+
+
+    @Test
+    void testSingleKeyMovement() {
+
+        boolean moved = car.movement(KeyEvent.VK_W);
+        car.update();
+
+        assertTrue(moved);
+        assertTrue(car.getVelocity() > 0);
+        assertTrue(car.getX() > 0); 
+    }
+
+    @Test
+    void testMovementWD() {
+
+        car.movement(KeyEvent.VK_W);
+        car.movement(KeyEvent.VK_D);
+        car.update();
+
+        assertTrue(car.getVelocity() > 0);
+        assertTrue(car.getAngle() > 0); 
+        assertTrue(car.getX() > 0);
+        assertTrue(car.getY() >= 0); 
+    }
+
+    @Test
+    void testMovementWA() {
+      
+        car.movement(KeyEvent.VK_W);
+        car.movement(KeyEvent.VK_A);
+        car.update();
+
+        assertTrue(car.getVelocity() > 0);
+        assertTrue(car.getAngle() < 0);
+        assertTrue(car.getX() > 0);
+    }
+
+    @Test
+    void testMovementSD() {
+
+        car.movement(KeyEvent.VK_S);
+        car.movement(KeyEvent.VK_D);
+        car.update();
+
+        assertTrue(car.getVelocity() < 0);
+        assertTrue(car.getAngle() > 0);
+    }
+
+    @Test
+    void testFrictionMovement() {
+        car.setVelocity(5);
+        car.update(); 
+        assertTrue(car.getVelocity() < 5);
+    }
+
+    @Test
+    void testBoundaryLimit() {
+        car.setAngle(180);
+        car.setVelocity(5);
+        car.update();
+        assertTrue(car.getX() >= 0);
+        assertTrue(car.getY() >= 0);
     }
 
     /* 
@@ -331,6 +411,34 @@ class CarTest
         assertEquals(0, car.getX());
         assertEquals(testMapHeight, car.getY());
     }
+
+    @Test
+    public void testMovementVelocityBoundaries() {
+       
+        car.setVelocity(maxVelocity);
+        car.movement(KeyEvent.VK_W);
+        assertEquals(maxVelocity, car.getVelocity());
+        
+        
+        car.setVelocity(backwardsMaxVelocity);
+        car.movement(KeyEvent.VK_S);
+        assertEquals(backwardsMaxVelocity, car.getVelocity());
+    }
+
+    @Test
+    public void testVelocitySignChange() {
+        
+        car.setVelocity(1.0);
+        car.movement(KeyEvent.VK_S);
+        assertTrue(car.getVelocity() < 0);
+        
+        
+        car.setVelocity(-1.0);
+        car.movement(KeyEvent.VK_W);
+        assertTrue(car.getVelocity() > 0);
+    }
+
+
     /* 
       =============================================================================
         Pairwise Testing
@@ -415,7 +523,123 @@ class CarTest
             }
         }
     }
+
+    /* 
+    =============================================================================
+    EDGE CASES 
+    =============================================================================
+    */
+
+    @Test
+    public void testEdgeVelocityBoundary() {
+       
+        car.setVelocity(maxVelocity);
+        car.movement(KeyEvent.VK_W);
+        assertEquals(maxVelocity, car.getVelocity());
+
+        car.setVelocity(maxVelocity - 0.001);
+        car.movement(KeyEvent.VK_W);
+        assertEquals(maxVelocity, car.getVelocity());
+
+        car.setVelocity(maxVelocity + 0.001);
+        car.movement(KeyEvent.VK_W);
+        assertEquals(maxVelocity, car.getVelocity());
+        
+       
+        car.setVelocity(backwardsMaxVelocity);
+        car.movement(KeyEvent.VK_S);
+        assertEquals(backwardsMaxVelocity, car.getVelocity());
+
+        car.setVelocity(backwardsMaxVelocity - 0.001);
+        car.movement(KeyEvent.VK_S);
+        assertEquals(backwardsMaxVelocity, car.getVelocity());
+
+        car.setVelocity(maxVelocity + 0.001);
+        car.movement(KeyEvent.VK_S);
+        assertEquals(backwardsMaxVelocity, car.getVelocity());
+    }
+
+    @Test
+    public void testEdgeMapBoundaries() {
+
+        car.setX(0);
+        car.setY(0);
+        car.setAngle(225); 
+        car.setVelocity(5);
+        car.update();
+        assertTrue(car.getX() >= 0);
+        assertTrue(car.getY() >= 0);
+
+        car.setX(0.1);
+        car.setY(0.1);
+        car.setAngle(225); 
+        car.setVelocity(5);
+        car.update();
+        assertTrue(car.getX() >= 0);
+        assertTrue(car.getY() >= 0);
+
+        car.setX(-0.1);
+        car.setY(-0.1);
+        car.setAngle(225); 
+        car.setVelocity(5);
+        car.update();
+        assertTrue(car.getX() >= 0);
+        assertTrue(car.getY() >= 0);
+        
+        car.setX(testMapWidth);
+        car.setY(testMapHeight);
+        car.setAngle(45); 
+        car.setVelocity(5);
+        car.update();
+        assertTrue(car.getX() <= testMapWidth);
+        assertTrue(car.getY() <= testMapHeight);
+
+        car.setX(testMapWidth - 0.1);
+        car.setY(testMapHeight - 0.1);
+        car.setAngle(45); 
+        car.setVelocity(5);
+        car.update();
+        assertTrue(car.getX() <= testMapWidth);
+        assertTrue(car.getY() <= testMapHeight);
+
+        car.setX(testMapWidth + 0.1);
+        car.setY(testMapHeight + 0.1);
+        car.setAngle(45); 
+        car.setVelocity(5);
+        car.update();
+        assertTrue(car.getX() <= testMapWidth);
+        assertTrue(car.getY() <= testMapHeight);
+    }
+
+    @Test
+    public void testEdgeExtremeValues() {
     
+        car.setX(Double.MAX_VALUE);
+        car.setY(Double.MAX_VALUE);
+        car.update();
+        assertTrue(car.getX() <= testMapWidth);
+        assertTrue(car.getY() <= testMapHeight);
+
+       
+        car.setX(-Double.MAX_VALUE);
+        car.setY(-Double.MAX_VALUE);
+        car.update();
+        assertTrue(car.getX() >= 0);
+        assertTrue(car.getY() >= 0);
+       
+    }
+
+    // Fricción con velocidades muy pequeñas
+    @Test
+    public void testEdgeFriction() {
+        car.setVelocity(0.0001);
+        car.update();
+        assertEquals(0.0, car.getVelocity());
+        
+        car.setVelocity(-0.0001);
+        car.update();
+        assertEquals(0.0, car.getVelocity());
+    }    
 
     /* 
       =============================================================================
