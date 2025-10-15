@@ -122,7 +122,7 @@ public class CarDisplay extends JPanel {
         int mapWidth = (largeMap != null) ? largeMap.getWidth() : 2000;
         int mapHeight = (largeMap != null) ? largeMap.getHeight() : 2000;
 
-        Car car = new Car(2050, 2670, 180, 0, 10, -5, 2, mapHeight - 150, mapWidth - 200);
+        Car car = new Car(2050, 2670, 180, 0, 15, -5, 2, mapHeight - 150, mapWidth - 200);
         CarController controller = new CarController(car);
 
         
