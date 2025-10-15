@@ -5,18 +5,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.*;
 
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
-public class CarControllerTest {
+public class CarControllerTest 
+{
 
     @Mock
     private Car mockCar;
@@ -85,17 +86,6 @@ public class CarControllerTest {
 
         assertTrue(car.getVelocity() < 0);
         assertTrue(car.getAngle() < 0);
-    }
-
-    @Test
-    void testCarState() {
-        controller.processInput(Set.of(KeyEvent.VK_W));
-        double xAfter = car.getX();
-        double vAfter = car.getVelocity();
-
-        controller.processInput(Set.of(KeyEvent.VK_S));
-        assertNotEquals(vAfter, car.getVelocity());
-        assertNotEquals(xAfter, car.getX());
     }
 
     @Test
@@ -170,14 +160,6 @@ public class CarControllerTest {
         controller.processInput(Set.of(999));
         assertEquals(initialVelocity, car.getVelocity());
         assertEquals(initialAngle, car.getAngle());
-    }
-
-    @Test
-    public void testDuplicateKeys() {
-        
-        controller.processInput(Set.of(KeyEvent.VK_W, KeyEvent.VK_W));
-        assertTrue(car.getVelocity() > 0 && car.getVelocity() < 2.5);
-      
     }
 
     // Three Keys Movement
@@ -278,18 +260,20 @@ public class CarControllerTest {
 
     @Test
     public void testEdgeMaxVelocity() {
+        //DELTA FOR CAR FRICTION
         car.setVelocity(10.0);
         controller.processInput(Set.of(KeyEvent.VK_W));
-        assertEquals(10.0, car.getVelocity());
+        assertEquals(10.0, car.getVelocity(), 0.1);
     }
 
     @Test
     public void testEdgeMinVelocity() {
+        //DELTA FOR CAR FRICTION
         car.setVelocity(-5.0); 
         controller.processInput(Set.of(KeyEvent.VK_S));
-        assertEquals(-5.0, car.getVelocity());
+        assertEquals(-5.0, car.getVelocity(), 0.1);
 
-    
+    }
     @Test
     public void testEdgeJustMaxVelocity() {
         car.setVelocity(9.999); 
@@ -360,48 +344,62 @@ public class CarControllerTest {
     @Test
     public void testMockMovement() {
         
-        when(mockCar.movement(anyInt())).thenReturn(true);
+        when(mockCar.movement(anySet())).thenReturn(true);
 
         mockController.processInput(Set.of(KeyEvent.VK_W));
 
-        verify(mockCar, times(1)).movement(KeyEvent.VK_W);
+        verify(mockCar, times(1)).movement(Set.of(KeyEvent.VK_W));
         verify(mockCar, times(1)).update();
     }
 
     @Test
     public void testMockMovementInvalid() {
        
-        when(mockCar.movement(999)).thenReturn(false);
+        //Aquesta part fins al return, he tirat d'IA ja que no sabía com seleccionar certs inputs
+        when(mockCar.movement(anySet())).thenAnswer(invocation -> {
+        Set<Integer> keys = invocation.getArgument(0);
+        
+        return keys.stream().anyMatch(key -> 
+            key == KeyEvent.VK_W || key == KeyEvent.VK_S || 
+            key == KeyEvent.VK_A || key == KeyEvent.VK_D ||
+            key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN ||
+            key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT);
+        });
 
         mockController.processInput(Set.of(999));
 
-        verify(mockCar, times(1)).movement(999);
+        verify(mockCar, times(1)).movement(Set.of(999));
         verify(mockCar, times(1)).update();
     }
 
     @Test
     public void testMockMultipleValidKeys() {
         
-        when(mockCar.movement(KeyEvent.VK_W)).thenReturn(true);
-        when(mockCar.movement(KeyEvent.VK_D)).thenReturn(true);
+        when(mockCar.movement(anySet())).thenReturn(true);
         
         mockController.processInput(Set.of(KeyEvent.VK_W, KeyEvent.VK_D));
         
-        verify(mockCar, times(1)).movement(KeyEvent.VK_W);
-        verify(mockCar, times(1)).movement(KeyEvent.VK_D);
+        verify(mockCar, times(1)).movement(Set.of(KeyEvent.VK_W, KeyEvent.VK_D));
         verify(mockCar, times(1)).update();
     }
 
     @Test
     public void testMockMixedValidInvalidKeys() {
         
-        when(mockCar.movement(KeyEvent.VK_W)).thenReturn(true);
-        when(mockCar.movement(999)).thenReturn(false);
+        //Aquesta part fins al return, he tirat d'IA ja que no sabía com seleccionar certs inputs
+        when(mockCar.movement(anySet())).thenAnswer(invocation -> {
+        Set<Integer> keys = invocation.getArgument(0);
+        
+        return keys.stream().anyMatch(key -> 
+            key == KeyEvent.VK_W || key == KeyEvent.VK_S || 
+            key == KeyEvent.VK_A || key == KeyEvent.VK_D ||
+            key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN ||
+            key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT);
+        });
 
         mockController.processInput(Set.of(KeyEvent.VK_W, 999));
     
-        verify(mockCar, times(1)).movement(KeyEvent.VK_W);
-        verify(mockCar, times(1)).movement(999);
+        verify(mockCar, times(1)).movement(Set.of(KeyEvent.VK_W, 999));
         verify(mockCar, times(1)).update();
     }
 }

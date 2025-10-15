@@ -1,6 +1,7 @@
 package es.uab.tqs.f1_2D.controlador;
-
 import es.uab.tqs.f1_2D.model.Car;
+
+import java.util.Set;
 
 public class CarController {
     private Car car;
@@ -9,8 +10,8 @@ public class CarController {
         this.car = car;
     }
 
-    public void processInput(int keyCode) {
-        car.movement(keyCode);
+    public void processInput(Set<Integer> keys) {
+        car.movement(keys);
         car.update();
     }
 

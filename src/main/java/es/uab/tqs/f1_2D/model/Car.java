@@ -1,6 +1,7 @@
 package es.uab.tqs.f1_2D.model;
 
 import java.awt.image.BufferedImage;
+import java.util.Set;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
@@ -31,37 +32,32 @@ public class Car
         this.mapWidth = mapWidth;
     }
 
-    public Boolean movement(int inputKey)
+    public Boolean movement(Set<Integer> keys)
     {
-        switch (inputKey) {
-            case KeyEvent.VK_W:
-            case KeyEvent.VK_UP:
-                velocity += acceleration;
-                if (velocity > maxVelocity)
-                    velocity = maxVelocity;
-                break;
+        boolean moved = false;
 
-            case KeyEvent.VK_S:
-            case KeyEvent.VK_DOWN:
-                velocity -= acceleration;
-                if (velocity < backwardsMaxVelocity)
-                    velocity = backwardsMaxVelocity;
-                break;
-            
-            case KeyEvent.VK_A:
-            case KeyEvent.VK_LEFT:
-                angle -= 15;
-                break;
-
-            case KeyEvent.VK_D:
-            case KeyEvent.VK_RIGHT:
-                angle += 15;
-                break;
-        
-            default:
-                return false;
+        if (keys.contains(KeyEvent.VK_W) || keys.contains(KeyEvent.VK_UP)) {
+            velocity += acceleration;
+            if (velocity > maxVelocity) velocity = maxVelocity;
+            moved = true;
+        } 
+        if (keys.contains(KeyEvent.VK_S) || keys.contains(KeyEvent.VK_DOWN)) {
+            velocity -= acceleration;
+            if (velocity < backwardsMaxVelocity) velocity = backwardsMaxVelocity;
+            moved = true;
         }
-        return true;
+
+        // Rotación
+        if (keys.contains(KeyEvent.VK_A) || keys.contains(KeyEvent.VK_LEFT)) {
+            angle -= 5;
+            moved = true;
+        } 
+        if (keys.contains(KeyEvent.VK_D) || keys.contains(KeyEvent.VK_RIGHT)) {
+            angle += 5;
+            moved = true;
+        }
+
+        return moved;
     }
 
     public boolean trackLimits(BufferedImage mapImage)

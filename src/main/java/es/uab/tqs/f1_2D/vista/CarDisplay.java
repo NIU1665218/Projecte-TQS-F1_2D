@@ -10,6 +10,8 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -17,6 +19,7 @@ public class CarDisplay extends JPanel {
     private CarController controller;
     private BufferedImage carImage;
     private BufferedImage largerMap;  
+    private Set<Integer> keysPressed = new HashSet<>();
 
     public CarDisplay(CarController controller, BufferedImage map) {
         this.controller = controller;
@@ -43,11 +46,16 @@ public class CarDisplay extends JPanel {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                controller.processInput(e.getKeyCode());
+                keysPressed.add(e.getKeyCode());
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                keysPressed.remove(e.getKeyCode());
             }
         });
 
-        new Timer(16, e -> { controller.getCar().update(); repaint();}).start();
+        new Timer(16, e -> { controller.processInput(keysPressed);; repaint();}).start();
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.Set;
 import java.awt.Color;
 
 
@@ -25,7 +26,7 @@ class CarTest
     public static final double maxVelocity = 10;
     public static final double backwardsMaxVelocity = -5;
     public static final double acceleration = 2;
-    public static final int angleMovement = 15;
+    public static final int angleMovement = 5;
     public static final int testMapHeight = 400;
     public static final int testMapWidth = 400;
 
@@ -80,38 +81,38 @@ class CarTest
     public void MovimentTest()
     {
         //Test moviment endavant amb tecles W o flecha superior
-        car.movement(KeyEvent.VK_W);
+        car.movement(Set.of(KeyEvent.VK_W));
         assertEquals(2, car.getVelocity());
-        car.movement(KeyEvent.VK_UP);
+        car.movement(Set.of(KeyEvent.VK_UP));
         assertEquals(4, car.getVelocity());
 
         //Test moviment parar/ fre amb tecles S o flecha inferior
         car.setVelocity(8);
-        car.movement(KeyEvent.VK_S);
+        car.movement(Set.of(KeyEvent.VK_S));
         assertEquals(6, car.getVelocity());
-        car.movement(KeyEvent.VK_DOWN);
+        car.movement(Set.of(KeyEvent.VK_DOWN));
         assertEquals(4, car.getVelocity());
 
         //Test moviment enrere (car.getVelocity <= 0)
         car.setVelocity(0);
-        car.movement(KeyEvent.VK_S);
+        car.movement(Set.of(KeyEvent.VK_S));
         assertEquals(-2, car.getVelocity());
-        car.movement(KeyEvent.VK_S);
+        car.movement(Set.of(KeyEvent.VK_S));
         assertEquals(-4, car.getVelocity());
         car.setVelocity(0);
-        car.movement(KeyEvent.VK_DOWN);
+        car.movement(Set.of(KeyEvent.VK_DOWN));
         assertEquals(-2, car.getVelocity());
-        car.movement(KeyEvent.VK_DOWN);
+        car.movement(Set.of(KeyEvent.VK_DOWN));
         assertEquals(-4, car.getVelocity());
 
         //Test moviment lateral amb tecles A/D o fleches laterals
-        car.movement(KeyEvent.VK_A);
-        assertEquals(-15, car.getAngle());
-        car.movement(KeyEvent.VK_LEFT);
-        assertEquals(-30, car.getAngle());
-        car.movement(KeyEvent.VK_D);
-        assertEquals(-15, car.getAngle());
-        car.movement(KeyEvent.VK_RIGHT);
+        car.movement(Set.of(KeyEvent.VK_A));
+        assertEquals(-5, car.getAngle());
+        car.movement(Set.of(KeyEvent.VK_LEFT));
+        assertEquals(-10, car.getAngle());
+        car.movement(Set.of(KeyEvent.VK_D));
+        assertEquals(-5, car.getAngle());
+        car.movement(Set.of(KeyEvent.VK_RIGHT));
         assertEquals(0, car.getAngle());
 
     }
@@ -153,7 +154,7 @@ class CarTest
     @Test
     void testSingleKeyMovement() {
 
-        boolean moved = car.movement(KeyEvent.VK_W);
+        boolean moved = car.movement(Set.of(KeyEvent.VK_W));
         car.update();
 
         assertTrue(moved);
@@ -164,8 +165,8 @@ class CarTest
     @Test
     void testMovementWD() {
 
-        car.movement(KeyEvent.VK_W);
-        car.movement(KeyEvent.VK_D);
+        car.movement(Set.of(KeyEvent.VK_W));
+        car.movement(Set.of(KeyEvent.VK_D));
         car.update();
 
         assertTrue(car.getVelocity() > 0);
@@ -177,8 +178,8 @@ class CarTest
     @Test
     void testMovementWA() {
       
-        car.movement(KeyEvent.VK_W);
-        car.movement(KeyEvent.VK_A);
+        car.movement(Set.of(KeyEvent.VK_W));
+        car.movement(Set.of(KeyEvent.VK_A));
         car.update();
 
         assertTrue(car.getVelocity() > 0);
@@ -189,8 +190,8 @@ class CarTest
     @Test
     void testMovementSD() {
 
-        car.movement(KeyEvent.VK_S);
-        car.movement(KeyEvent.VK_D);
+        car.movement(Set.of(KeyEvent.VK_S));
+        car.movement(Set.of(KeyEvent.VK_D));
         car.update();
 
         assertTrue(car.getVelocity() < 0);
@@ -274,14 +275,14 @@ class CarTest
         car.setVelocity(backwardsMaxVelocity);
         for(double i = backwardsMaxVelocity + acceleration; i < maxVelocity; i+= acceleration)
         {
-            car.movement(KeyEvent.VK_W);
+            car.movement(Set.of(KeyEvent.VK_W));
             assertEquals(i, car.getVelocity());      
         }
 
         car.setVelocity(backwardsMaxVelocity);
         for(double i = backwardsMaxVelocity + acceleration; i < maxVelocity; i+= acceleration)
         {
-            car.movement(KeyEvent.VK_UP);
+            car.movement(Set.of(KeyEvent.VK_UP));
             assertEquals(i, car.getVelocity());
         }
     }
@@ -293,14 +294,14 @@ class CarTest
         car.setVelocity(maxVelocity);
         for(double i = maxVelocity - acceleration; i > backwardsMaxVelocity; i-= acceleration)
         {
-            car.movement(KeyEvent.VK_S);
+            car.movement(Set.of(KeyEvent.VK_S));
             assertEquals(i, car.getVelocity());         
         }
 
         car.setVelocity(maxVelocity);
         for(double i = maxVelocity - acceleration; i > backwardsMaxVelocity; i-= acceleration)
         {
-            car.movement(KeyEvent.VK_DOWN);
+            car.movement(Set.of(KeyEvent.VK_DOWN));
             assertEquals(i, car.getVelocity());
         }
     }
@@ -312,14 +313,14 @@ class CarTest
         car.setAngle(360);
         for(double i = 360 - angleMovement; i > 0; i-= angleMovement)
         {
-            car.movement(KeyEvent.VK_A);
+            car.movement(Set.of(KeyEvent.VK_A));
             assertEquals(i, car.getAngle());         
         }
 
         car.setAngle(360);
         for(double i = 360 - angleMovement; i > 0; i-= angleMovement)
         {
-            car.movement(KeyEvent.VK_LEFT);
+            car.movement(Set.of(KeyEvent.VK_LEFT));
             assertEquals(i, car.getAngle());  
         }
     }
@@ -331,14 +332,14 @@ class CarTest
         car.setAngle(0);
         for(double i = 0 + angleMovement; i < 360; i+= angleMovement)
         {
-           car.movement(KeyEvent.VK_D);
+           car.movement(Set.of(KeyEvent.VK_D));
             assertEquals(i, car.getAngle());         
         }
 
         car.setAngle(0);
         for(double i = 0 + angleMovement; i < 360; i+= angleMovement)
         {
-            car.movement(KeyEvent.VK_RIGHT);
+            car.movement(Set.of(KeyEvent.VK_RIGHT));
             assertEquals(i, car.getAngle());
         }
     }
@@ -347,8 +348,8 @@ class CarTest
     public void NoMovementKeyPartitionTest()
     {
         //Test for other keys not binded
-        assertFalse(car.movement(KeyEvent.VK_F));
-        assertFalse(car.movement(KeyEvent.VK_E));
+        assertFalse(car.movement(Set.of(KeyEvent.VK_F)));
+        assertFalse(car.movement(Set.of(KeyEvent.VK_E)));
         //...
     }
 
@@ -416,12 +417,12 @@ class CarTest
     public void testMovementVelocityBoundaries() {
        
         car.setVelocity(maxVelocity);
-        car.movement(KeyEvent.VK_W);
+        car.movement(Set.of(KeyEvent.VK_W));
         assertEquals(maxVelocity, car.getVelocity());
         
         
         car.setVelocity(backwardsMaxVelocity);
-        car.movement(KeyEvent.VK_S);
+        car.movement(Set.of(KeyEvent.VK_S));
         assertEquals(backwardsMaxVelocity, car.getVelocity());
     }
 
@@ -429,12 +430,12 @@ class CarTest
     public void testVelocitySignChange() {
         
         car.setVelocity(1.0);
-        car.movement(KeyEvent.VK_S);
+        car.movement(Set.of(KeyEvent.VK_S));
         assertTrue(car.getVelocity() < 0);
         
         
         car.setVelocity(-1.0);
-        car.movement(KeyEvent.VK_W);
+        car.movement(Set.of(KeyEvent.VK_W));
         assertTrue(car.getVelocity() > 0);
     }
 
@@ -459,7 +460,7 @@ class CarTest
             for (double v : initialVelocities) {
                 Car car1 = new Car(50, 50, 0, v, 5, -2, 0.5, 100, 100);
 
-                boolean moved = car.movement(key);
+                boolean moved = car.movement(Set.of(key));
                 car1.update();
 
                 switch (key) {
@@ -484,7 +485,7 @@ class CarTest
 
             for (double angle : initialAngles) {
                 Car car2 = new Car(50, 50, angle, 1, 5, -2, 0.5, 100, 100);
-                boolean moved = car2.movement(key);
+                boolean moved = car2.movement(Set.of(key));
                 car2.update();
 
                 assertTrue(moved);
@@ -534,28 +535,28 @@ class CarTest
     public void testEdgeVelocityBoundary() {
        
         car.setVelocity(maxVelocity);
-        car.movement(KeyEvent.VK_W);
+        car.movement(Set.of(KeyEvent.VK_W));
         assertEquals(maxVelocity, car.getVelocity());
 
         car.setVelocity(maxVelocity - 0.001);
-        car.movement(KeyEvent.VK_W);
+        car.movement(Set.of(KeyEvent.VK_W));
         assertEquals(maxVelocity, car.getVelocity());
 
         car.setVelocity(maxVelocity + 0.001);
-        car.movement(KeyEvent.VK_W);
+        car.movement(Set.of(KeyEvent.VK_W));
         assertEquals(maxVelocity, car.getVelocity());
         
        
         car.setVelocity(backwardsMaxVelocity);
-        car.movement(KeyEvent.VK_S);
+        car.movement(Set.of(KeyEvent.VK_S));
         assertEquals(backwardsMaxVelocity, car.getVelocity());
 
         car.setVelocity(backwardsMaxVelocity - 0.001);
-        car.movement(KeyEvent.VK_S);
+        car.movement(Set.of(KeyEvent.VK_S));
         assertEquals(backwardsMaxVelocity, car.getVelocity());
 
-        car.setVelocity(maxVelocity + 0.001);
-        car.movement(KeyEvent.VK_S);
+        car.setVelocity(backwardsMaxVelocity + 0.001);
+        car.movement(Set.of(KeyEvent.VK_S));
         assertEquals(backwardsMaxVelocity, car.getVelocity());
     }
 
