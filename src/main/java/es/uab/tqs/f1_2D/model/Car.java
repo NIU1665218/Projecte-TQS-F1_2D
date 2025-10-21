@@ -12,13 +12,14 @@ public class Car
     private double velocity;
     private double maxVelocity;
     private double acceleration;
+    private double backwardsAcceleration;
     private double friction;
     private double backwardsMaxVelocity;
     private int mapHeight;
     private int mapWidth;
     private BufferedImage sprite;
 
-    public Car(double x, double y, double angle, double velocity, double maxVelocity, double backwardsMaxVelocity, double acceleration, int mapHeight, int mapWidth) 
+    public Car(double x, double y, double angle, double velocity, double maxVelocity, double backwardsMaxVelocity, double acceleration, double backwardsAcceleration, int mapHeight, int mapWidth) 
     {
         this.x = x;
         this.y = y;
@@ -42,7 +43,7 @@ public class Car
             moved = true;
         } 
         if (keys.contains(KeyEvent.VK_S) || keys.contains(KeyEvent.VK_DOWN)) {
-            velocity -= acceleration;
+            velocity -= backwardsAcceleration;
             if (velocity < backwardsMaxVelocity) velocity = backwardsMaxVelocity;
             moved = true;
         }

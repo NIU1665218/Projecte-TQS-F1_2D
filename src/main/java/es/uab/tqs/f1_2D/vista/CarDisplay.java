@@ -106,7 +106,7 @@ public class CarDisplay extends JPanel {
         double scaleFactor = 4.0;
 
         try {
-            backgroundImage = ImageIO.read(CarDisplay.class.getResource("/track/bahrain.jpg"));
+            backgroundImage = ImageIO.read(CarDisplay.class.getResource("/track/monaco.jpg"));
             int bigWidth = (int) (backgroundImage.getWidth() * scaleFactor);
             int bigHeight = (int) (backgroundImage.getHeight() * scaleFactor);
 
@@ -122,7 +122,7 @@ public class CarDisplay extends JPanel {
         int mapWidth = (largeMap != null) ? largeMap.getWidth() : 2000;
         int mapHeight = (largeMap != null) ? largeMap.getHeight() : 2000;
 
-        Car car = new Car(2050, 2670, 180, 0, 15, -5, 2, mapHeight - 150, mapWidth - 200);
+        Car car = new Car(2050, 2670, 180, 0, 15, -5, 2, 0.5, mapHeight - 150, mapWidth - 200);
         CarController controller = new CarController(car);
 
         

@@ -26,6 +26,7 @@ class CarTest
     public static final double maxVelocity = 10;
     public static final double backwardsMaxVelocity = -5;
     public static final double acceleration = 2;
+    public static final double backwardsAcceleration = 0.5;
     public static final int angleMovement = 5;
     public static final int testMapHeight = 400;
     public static final int testMapWidth = 400;
@@ -33,7 +34,7 @@ class CarTest
     @BeforeEach
     public void setUp()
     {
-        car = new Car(0,0,0f,0, maxVelocity, backwardsMaxVelocity, acceleration, testMapHeight, testMapWidth);
+        car = new Car(0,0,0f,0, maxVelocity, backwardsMaxVelocity, acceleration, backwardsAcceleration, testMapHeight, testMapWidth);
     }
 
     /* 
@@ -96,14 +97,14 @@ class CarTest
         //Test moviment enrere (car.getVelocity <= 0)
         car.setVelocity(0);
         car.movement(Set.of(KeyEvent.VK_S));
-        assertEquals(-2, car.getVelocity());
+        assertEquals(-0.5, car.getVelocity());
         car.movement(Set.of(KeyEvent.VK_S));
-        assertEquals(-4, car.getVelocity());
+        assertEquals(-1, car.getVelocity());
         car.setVelocity(0);
         car.movement(Set.of(KeyEvent.VK_DOWN));
-        assertEquals(-2, car.getVelocity());
+        assertEquals(-0.5, car.getVelocity());
         car.movement(Set.of(KeyEvent.VK_DOWN));
-        assertEquals(-4, car.getVelocity());
+        assertEquals(-1, car.getVelocity());
 
         //Test moviment lateral amb tecles A/D o fleches laterals
         car.movement(Set.of(KeyEvent.VK_A));
@@ -458,7 +459,7 @@ class CarTest
 
         for (int key : keys) {
             for (double v : initialVelocities) {
-                Car car1 = new Car(50, 50, 0, v, 5, -2, 0.5, 100, 100);
+                Car car1 = new Car(50, 50, 0, v, 5, -2, 0.5, 0.5, 100, 100);
 
                 boolean moved = car.movement(Set.of(key));
                 car1.update();
@@ -484,7 +485,7 @@ class CarTest
             }
 
             for (double angle : initialAngles) {
-                Car car2 = new Car(50, 50, angle, 1, 5, -2, 0.5, 100, 100);
+                Car car2 = new Car(50, 50, angle, 1, 5, -2, 0.5, 0.5, 100, 100);
                 boolean moved = car2.movement(Set.of(key));
                 car2.update();
 

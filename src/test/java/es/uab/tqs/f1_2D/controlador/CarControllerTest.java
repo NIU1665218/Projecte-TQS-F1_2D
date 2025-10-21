@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.*;
 
@@ -30,7 +29,7 @@ public class CarControllerTest
 
     @BeforeEach
     public void setUp() {
-        car = new Car(100, 100, 0, 0, 10, -5, 1, 500, 500);
+        car = new Car(100, 100, 0, 0, 10, -5, 1, 0.5, 500, 500);
         controller = new CarController(car);
         mockController = new CarController(mockCar);
     }
