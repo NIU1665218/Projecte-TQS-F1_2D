@@ -93,6 +93,13 @@ public class CarDisplay extends JPanel {
                     car.getSprite().getWidth() / 2.0,
                     car.getSprite().getHeight() / 2.0);
             g2d.drawImage(car.getSprite(), transform, null);
+            /* hitbox for debugging
+            g2d.setColor(Color.RED);
+            g2d.setStroke(new BasicStroke(2)); 
+            Rectangle rect = new Rectangle(0, 0, car.getSprite().getWidth(), car.getSprite().getHeight());
+            Shape hitbox = transform.createTransformedShape(rect);
+            g2d.draw(hitbox);
+            */
         } else {
             g2d.setColor(Color.RED);
             g2d.fillRect((int) drawX, (int) drawY, 20, 10);

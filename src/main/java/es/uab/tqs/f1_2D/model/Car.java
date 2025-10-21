@@ -14,6 +14,7 @@ public class Car
     private double acceleration;
     private double backwardsAcceleration;
     private double friction;
+    private double offtrackFriction;
     private double backwardsMaxVelocity;
     private int mapHeight;
     private int mapWidth;
@@ -30,6 +31,7 @@ public class Car
         this.acceleration = acceleration;
         this.backwardsAcceleration = backwardsAcceleration;
         this.friction = 0.99;
+        this.offtrackFriction = 0.7;
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
     }
@@ -65,13 +67,34 @@ public class Car
     public boolean trackLimits(BufferedImage mapImage)
     {
         if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight) return true;
-        int color = mapImage.getRGB((int)x, (int)y);
-        return color == Color.GREEN.getRGB(); 
+        int color = mapImage.getRGB((int)x + 50, (int)y + 50);
+        Color c = new Color(color);
+        int r = c.getRed();
+        int g = c.getGreen();
+        int b = c.getBlue();
+
+        int targetR = 73;
+        int targetG = 127;
+        int targetB = 78;
+        int tolerance = 5; 
+
+        boolean similarToGreen =
+            Math.abs(r - targetR) <= tolerance &&
+            Math.abs(g - targetG) <= tolerance &&
+            Math.abs(b - targetB) <= tolerance;
+
+        return similarToGreen; 
     }
 
     public void update(BufferedImage mapImage)
     {   
-        velocity *= friction;
+        if(trackLimits(mapImage)) {
+            velocity *= offtrackFriction;
+        }
+        else
+        {
+            velocity *= friction;
+        }
 
         if(Math.abs(velocity) < 0.1)
             velocity = 0;
