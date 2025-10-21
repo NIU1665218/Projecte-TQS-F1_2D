@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.Set;
 import java.awt.Color;
+import java.awt.Graphics2D;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -21,6 +22,8 @@ class CarTest
 
     @Mock
     private BufferedImage mapImageMock;
+
+    BufferedImage grayMap;
 
     //Constants
     public static final double maxVelocity = 10;
@@ -35,6 +38,11 @@ class CarTest
     public void setUp()
     {
         car = new Car(0,0,0f,0, maxVelocity, backwardsMaxVelocity, acceleration, backwardsAcceleration, testMapHeight, testMapWidth);
+        grayMap = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = grayMap.createGraphics();
+        g2d.setColor(Color.GRAY);
+        g2d.fillRect(0, 0, 10, 10);
+        g2d.dispose();
     }
 
     /* 
@@ -155,7 +163,7 @@ class CarTest
     void testSingleKeyMovement() {
 
         boolean moved = car.movement(Set.of(KeyEvent.VK_W));
-        car.update();
+        car.update(grayMap);
 
         assertTrue(moved);
         assertTrue(car.getVelocity() > 0);
@@ -167,7 +175,7 @@ class CarTest
 
         car.movement(Set.of(KeyEvent.VK_W));
         car.movement(Set.of(KeyEvent.VK_D));
-        car.update();
+        car.update(grayMap);
 
         assertTrue(car.getVelocity() > 0);
         assertTrue(car.getAngle() > 0); 
@@ -180,7 +188,7 @@ class CarTest
       
         car.movement(Set.of(KeyEvent.VK_W));
         car.movement(Set.of(KeyEvent.VK_A));
-        car.update();
+        car.update(grayMap);
 
         assertTrue(car.getVelocity() > 0);
         assertTrue(car.getAngle() < 0);
@@ -192,7 +200,7 @@ class CarTest
 
         car.movement(Set.of(KeyEvent.VK_S));
         car.movement(Set.of(KeyEvent.VK_D));
-        car.update();
+        car.update(grayMap);
 
         assertTrue(car.getVelocity() < 0);
         assertTrue(car.getAngle() > 0);
@@ -201,7 +209,7 @@ class CarTest
     @Test
     void testFrictionMovement() {
         car.setVelocity(5);
-        car.update(); 
+        car.update(grayMap); 
         assertTrue(car.getVelocity() < 5);
     }
 
@@ -209,7 +217,7 @@ class CarTest
     void testBoundaryLimit() {
         car.setAngle(180);
         car.setVelocity(5);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() >= 0);
         assertTrue(car.getY() >= 0);
     }
@@ -381,7 +389,7 @@ class CarTest
         car.setY(50);
         car.setAngle(0);
         car.setVelocity(10);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() > 50);
         assertEquals(50, car.getY());
 
@@ -390,7 +398,7 @@ class CarTest
         car.setY(50);
         car.setAngle(0);
         car.setVelocity(-5);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() < 50);
         assertEquals(50, car.getY());
 
@@ -399,7 +407,7 @@ class CarTest
         car.setY(50);
         car.setAngle(0);
         car.setVelocity(0.001);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() == 50);
         assertEquals(50, car.getY());
 
@@ -408,7 +416,7 @@ class CarTest
         car.setY(testMapHeight);
         car.setAngle(0);
         car.setVelocity(-5);
-        car.update();
+        car.update(grayMap);
         assertEquals(0, car.getX());
         assertEquals(testMapHeight, car.getY());
     }
@@ -461,7 +469,7 @@ class CarTest
                 Car car1 = new Car(50, 50, 0, v, 5, -2, 0.5, 0.5, 100, 100);
 
                 boolean moved = car.movement(Set.of(key));
-                car1.update();
+                car1.update(grayMap);
 
                 switch (key) {
                     case KeyEvent.VK_W:
@@ -486,7 +494,7 @@ class CarTest
             for (double angle : initialAngles) {
                 Car car2 = new Car(50, 50, angle, 1, 5, -2, 0.5, 0.5, 100, 100);
                 boolean moved = car2.movement(Set.of(key));
-                car2.update();
+                car2.update(grayMap);
 
                 assertTrue(moved);
 
@@ -567,7 +575,7 @@ class CarTest
         car.setY(0);
         car.setAngle(225); 
         car.setVelocity(5);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() >= 0);
         assertTrue(car.getY() >= 0);
 
@@ -575,7 +583,7 @@ class CarTest
         car.setY(0.1);
         car.setAngle(225); 
         car.setVelocity(5);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() >= 0);
         assertTrue(car.getY() >= 0);
 
@@ -583,7 +591,7 @@ class CarTest
         car.setY(-0.1);
         car.setAngle(225); 
         car.setVelocity(5);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() >= 0);
         assertTrue(car.getY() >= 0);
         
@@ -591,7 +599,7 @@ class CarTest
         car.setY(testMapHeight);
         car.setAngle(45); 
         car.setVelocity(5);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() <= testMapWidth);
         assertTrue(car.getY() <= testMapHeight);
 
@@ -599,7 +607,7 @@ class CarTest
         car.setY(testMapHeight - 0.1);
         car.setAngle(45); 
         car.setVelocity(5);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() <= testMapWidth);
         assertTrue(car.getY() <= testMapHeight);
 
@@ -607,7 +615,7 @@ class CarTest
         car.setY(testMapHeight + 0.1);
         car.setAngle(45); 
         car.setVelocity(5);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() <= testMapWidth);
         assertTrue(car.getY() <= testMapHeight);
     }
@@ -617,14 +625,14 @@ class CarTest
     
         car.setX(Double.MAX_VALUE);
         car.setY(Double.MAX_VALUE);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() <= testMapWidth);
         assertTrue(car.getY() <= testMapHeight);
 
        
         car.setX(-Double.MAX_VALUE);
         car.setY(-Double.MAX_VALUE);
-        car.update();
+        car.update(grayMap);
         assertTrue(car.getX() >= 0);
         assertTrue(car.getY() >= 0);
        
@@ -634,11 +642,11 @@ class CarTest
     @Test
     public void testEdgeFriction() {
         car.setVelocity(0.0001);
-        car.update();
+        car.update(grayMap);
         assertEquals(0.0, car.getVelocity());
         
         car.setVelocity(-0.0001);
-        car.update();
+        car.update(grayMap);
         assertEquals(0.0, car.getVelocity());
     }    
 

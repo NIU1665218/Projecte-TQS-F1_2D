@@ -1,6 +1,7 @@
 package es.uab.tqs.f1_2D.controlador;
 import es.uab.tqs.f1_2D.model.Car;
 
+import java.awt.image.BufferedImage;
 import java.util.Set;
 
 public class CarController {
@@ -10,9 +11,9 @@ public class CarController {
         this.car = car;
     }
 
-    public void processInput(Set<Integer> keys) {
+    public void processInput(Set<Integer> keys, BufferedImage mapImage) {
         car.movement(keys);
-        car.update();
+        car.update(mapImage);
     }
 
     public Car getCar() {

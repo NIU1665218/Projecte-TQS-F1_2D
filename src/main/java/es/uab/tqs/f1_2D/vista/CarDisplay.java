@@ -55,7 +55,7 @@ public class CarDisplay extends JPanel {
             }
         });
 
-        new Timer(16, e -> { controller.processInput(keysPressed);; repaint();}).start();
+        new Timer(16, e -> { controller.processInput(keysPressed, largerMap);; repaint();}).start();
     }
 
     @Override

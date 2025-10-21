@@ -69,7 +69,7 @@ public class Car
         return color == Color.GREEN.getRGB(); 
     }
 
-    public void update()
+    public void update(BufferedImage mapImage)
     {   
         velocity *= friction;
 
