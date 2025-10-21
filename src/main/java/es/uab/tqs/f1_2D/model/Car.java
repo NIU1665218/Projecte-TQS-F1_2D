@@ -66,7 +66,7 @@ public class Car
     {
         if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight) return true;
         int color = mapImage.getRGB((int)x, (int)y);
-        return color != Color.GRAY.getRGB(); 
+        return color == Color.GREEN.getRGB(); 
     }
 
     public void update()

@@ -138,15 +138,14 @@ class CarTest
         car.setY(2);
         
         map.setRGB(2, 2, Color.RED.getRGB());
-        assertTrue(car.trackLimits(map));
+        assertFalse(car.trackLimits(map));
         
         map.setRGB(2, 2, Color.BLUE.getRGB());
-        assertTrue(car.trackLimits(map));
+        assertFalse(car.trackLimits(map));
         
         map.setRGB(2, 2, Color.BLACK.getRGB());
-        assertTrue(car.trackLimits(map));
+        assertFalse(car.trackLimits(map));
         
-        // Color gris (pista)
         map.setRGB(2, 2, Color.GRAY.getRGB());
         assertFalse(car.trackLimits(map));
         }
