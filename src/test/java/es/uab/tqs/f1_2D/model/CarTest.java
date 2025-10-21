@@ -386,6 +386,31 @@ class CarTest
         assertTrue(car.trackLimits(map));
     }
 
+    @Test 
+    public void inviWallPartitionTest()
+    {
+        BufferedImage map = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        //Test que comprova si el cotxe es troba amb una pared invisible que no permet el pas
+        map.setRGB(5, 5, Color.GREEN.getRGB());
+        car.setX(5);
+        car.setY(5);
+        assertFalse(car.invisibleWalls(map));
+
+        map.setRGB(4, 4, Color.BLUE.getRGB());
+        car.setX(4);
+        car.setY(4);
+        assertTrue(car.invisibleWalls(map));
+
+        map.setRGB(9, 9, Color.GRAY.getRGB());
+        car.setX(9);
+        car.setY(9);
+        assertFalse(car.invisibleWalls(map));
+
+        car.setX(999);
+        car.setY(999);
+        assertTrue(car.invisibleWalls(map));
+    }
+
     @Test
     public void updatePartitionTest()
     {
@@ -691,6 +716,39 @@ class CarTest
         car.setVelocity(-0.5);
         car.update(mapImageMock);
         assertTrue(car.trackLimits(mapImageMock));
+        assertTrue(5.0 == car.getX() && 5.0 == car.getY());
+    }
+
+    @Test
+    public void testInviWallFalse() {
+        when(mapImageMock.getRGB(0, 0)).thenReturn(Color.GRAY.getRGB());
+
+        car.setX(0);
+        car.setY(0);
+
+        assertFalse(car.invisibleWalls(mapImageMock));
+    }
+
+    @Test
+    public void testInviWallTrue() {
+        when(mapImageMock.getRGB(0, 0)).thenReturn(Color.BLUE.getRGB());
+
+        car.setX(0);
+        car.setY(0);
+
+        assertTrue(car.invisibleWalls(mapImageMock));
+    }
+
+    @Test
+    public void testInviWallNoMovement()
+    {
+        when(mapImageMock.getRGB(5, 5)).thenReturn(Color.BLUE.getRGB());
+
+        car.setX(5);
+        car.setY(5);
+        car.setVelocity(-0.5);
+        car.update(mapImageMock);
+        assertTrue(car.invisibleWalls(mapImageMock));
         assertTrue(5.0 == car.getX() && 5.0 == car.getY());
     }
 

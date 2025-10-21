@@ -19,10 +19,9 @@ public class CarDisplay extends JPanel {
     private CarController controller;
     private BufferedImage carImage;
     private BufferedImage largerMap; 
-    private BufferedImage collisionMap;
     private Set<Integer> keysPressed = new HashSet<>();
 
-    public CarDisplay(CarController controller, BufferedImage map) {
+    public CarDisplay(CarController controller, BufferedImage map, BufferedImage collisionMap) {
         this.controller = controller;
         this.largerMap = map;
         setFocusable(true);
@@ -56,7 +55,7 @@ public class CarDisplay extends JPanel {
             }
         });
 
-        new Timer(16, e -> { controller.processInput(keysPressed, largerMap);; repaint();}).start();
+        new Timer(16, e -> { controller.processInput(keysPressed, collisionMap); repaint();}).start();
     }
 
     @Override
@@ -94,7 +93,7 @@ public class CarDisplay extends JPanel {
                     car.getSprite().getWidth() / 2.0,
                     car.getSprite().getHeight() / 2.0);
             g2d.drawImage(car.getSprite(), transform, null);
-            /* hitbox for debugging
+            /* hitbox for debugging 
             g2d.setColor(Color.RED);
             g2d.setStroke(new BasicStroke(2)); 
             Rectangle rect = new Rectangle(0, 0, car.getSprite().getWidth(), car.getSprite().getHeight());
@@ -111,6 +110,8 @@ public class CarDisplay extends JPanel {
        
         BufferedImage backgroundImage = null;
         BufferedImage largeMap = null;
+        BufferedImage collisionImage = null;
+        BufferedImage collisionMap = null;
         double scaleFactor = 4.0;
 
         try {
@@ -126,6 +127,19 @@ public class CarDisplay extends JPanel {
             System.err.println("Error cargando el mapa: " + e.getMessage());
         }
 
+        try {
+            collisionImage = ImageIO.read(CarDisplay.class.getResource("/track/monacoCollision.jpg"));
+            int bigWidth = (int) (backgroundImage.getWidth() * scaleFactor);
+            int bigHeight = (int) (backgroundImage.getHeight() * scaleFactor);
+
+            collisionMap = new BufferedImage(bigWidth, bigHeight, BufferedImage.TYPE_INT_RGB);
+            Graphics2D gCollision = collisionMap.createGraphics();
+            gCollision.drawImage(collisionImage, 0, 0, bigWidth, bigHeight, null);
+            gCollision.dispose();
+        } catch (IOException e) {
+            System.err.println("Error cargando el mapa de collisiones: " + e.getMessage());
+        }
+
         
         int mapWidth = (largeMap != null) ? largeMap.getWidth() : 2000;
         int mapHeight = (largeMap != null) ? largeMap.getHeight() : 2000;
@@ -135,7 +149,7 @@ public class CarDisplay extends JPanel {
 
         
         JFrame frame = new JFrame("F1 2D");
-        CarDisplay display = new CarDisplay(controller, largeMap);
+        CarDisplay display = new CarDisplay(controller, largeMap, collisionMap);
         frame.add(display);
         frame.setSize(1024, 860);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

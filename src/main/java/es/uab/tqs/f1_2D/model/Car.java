@@ -67,7 +67,7 @@ public class Car
     public boolean trackLimits(BufferedImage mapImage)
     {
         if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight) return true;
-        int color = mapImage.getRGB((int)x + 50, (int)y + 50);
+        int color = mapImage.getRGB((int)x + 40, (int)y + 40);
         Color c = new Color(color);
         int r = c.getRed();
         int g = c.getGreen();
@@ -76,14 +76,23 @@ public class Car
         int targetR = 73;
         int targetG = 127;
         int targetB = 78;
-        int tolerance = 5; 
+        int tolerance = 20; 
 
         boolean similarToGreen =
             Math.abs(r - targetR) <= tolerance &&
             Math.abs(g - targetG) <= tolerance &&
             Math.abs(b - targetB) <= tolerance;
 
-        return similarToGreen; 
+        targetR = 0;
+        targetG = 0;
+        targetB = 255;
+
+        boolean similarToBlue =
+            Math.abs(r - targetR) <= tolerance &&
+            Math.abs(g - targetG) <= tolerance &&
+            Math.abs(b - targetB) <= tolerance;
+
+        return similarToGreen || similarToBlue;
     }
 
     public void update(BufferedImage mapImage)
