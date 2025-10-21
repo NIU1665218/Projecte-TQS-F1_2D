@@ -28,6 +28,7 @@ public class Car
         this.maxVelocity = maxVelocity;
         this.backwardsMaxVelocity = backwardsMaxVelocity;
         this.acceleration = acceleration;
+        this.backwardsAcceleration = backwardsAcceleration;
         this.friction = 0.99;
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;

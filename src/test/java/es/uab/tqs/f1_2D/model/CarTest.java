@@ -90,9 +90,9 @@ class CarTest
         //Test moviment parar/ fre amb tecles S o flecha inferior
         car.setVelocity(8);
         car.movement(Set.of(KeyEvent.VK_S));
-        assertEquals(6, car.getVelocity());
+        assertEquals(7.5, car.getVelocity());
         car.movement(Set.of(KeyEvent.VK_DOWN));
-        assertEquals(4, car.getVelocity());
+        assertEquals(7, car.getVelocity());
 
         //Test moviment enrere (car.getVelocity <= 0)
         car.setVelocity(0);
@@ -293,14 +293,14 @@ class CarTest
     {
         //Test for backswards movement using S or DOWN
         car.setVelocity(maxVelocity);
-        for(double i = maxVelocity - acceleration; i > backwardsMaxVelocity; i-= acceleration)
+        for(double i = maxVelocity - backwardsAcceleration; i > backwardsMaxVelocity; i-= backwardsAcceleration)
         {
             car.movement(Set.of(KeyEvent.VK_S));
             assertEquals(i, car.getVelocity());         
         }
 
         car.setVelocity(maxVelocity);
-        for(double i = maxVelocity - acceleration; i > backwardsMaxVelocity; i-= acceleration)
+        for(double i = maxVelocity - backwardsAcceleration; i > backwardsMaxVelocity; i-= backwardsAcceleration)
         {
             car.movement(Set.of(KeyEvent.VK_DOWN));
             assertEquals(i, car.getVelocity());
@@ -430,7 +430,7 @@ class CarTest
     @Test
     public void testVelocitySignChange() {
         
-        car.setVelocity(1.0);
+        car.setVelocity(0.4);
         car.movement(Set.of(KeyEvent.VK_S));
         assertTrue(car.getVelocity() < 0);
         

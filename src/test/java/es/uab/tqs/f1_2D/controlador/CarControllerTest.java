@@ -187,9 +187,9 @@ public class CarControllerTest
     public void testOppositeKeysWA_SD() {
         
         controller.processInput(Set.of(KeyEvent.VK_W, KeyEvent.VK_S));
+        assertEquals(0.495, car.getVelocity());
+
         controller.processInput(Set.of(KeyEvent.VK_A, KeyEvent.VK_D));
-        
-        assertEquals(0, car.getVelocity());
         assertEquals(0, car.getAngle());
     }
 
