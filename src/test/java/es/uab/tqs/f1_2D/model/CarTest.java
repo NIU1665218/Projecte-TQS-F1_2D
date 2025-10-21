@@ -371,6 +371,11 @@ class CarTest
         car.setY(5);
         assertTrue(car.trackLimits(map));
 
+        map.setRGB(4, 4, Color.BLUE.getRGB());
+        car.setX(4);
+        car.setY(4);
+        assertTrue(car.trackLimits(map));
+
         map.setRGB(9, 9, Color.GRAY.getRGB());
         car.setX(9);
         car.setY(9);
@@ -674,6 +679,19 @@ class CarTest
         car.setY(0);
 
         assertTrue(car.trackLimits(mapImageMock));
+    }
+
+    @Test
+    public void testTrackLimitsWall()
+    {
+        when(mapImageMock.getRGB(5, 5)).thenReturn(Color.BLUE.getRGB());
+
+        car.setX(5);
+        car.setY(5);
+        car.setVelocity(-0.5);
+        car.update(mapImageMock);
+        assertTrue(car.trackLimits(mapImageMock));
+        assertTrue(5.0 == car.getX() && 5.0 == car.getY());
     }
 
 

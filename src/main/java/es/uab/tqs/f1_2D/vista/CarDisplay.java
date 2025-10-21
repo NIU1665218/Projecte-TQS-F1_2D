@@ -18,7 +18,8 @@ import javax.imageio.ImageIO;
 public class CarDisplay extends JPanel {
     private CarController controller;
     private BufferedImage carImage;
-    private BufferedImage largerMap;  
+    private BufferedImage largerMap; 
+    private BufferedImage collisionMap;
     private Set<Integer> keysPressed = new HashSet<>();
 
     public CarDisplay(CarController controller, BufferedImage map) {
