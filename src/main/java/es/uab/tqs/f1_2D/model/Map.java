@@ -2,8 +2,6 @@ package es.uab.tqs.f1_2D.model;
 
 import java.awt.*;
 import java.util.List;
-import java.awt.image.BufferedImage;
-import java.sql.Time;
 import java.util.*;
 
 public class Map {
@@ -24,7 +22,7 @@ public class Map {
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.finishLine = finishLine;
-        this.checkpoints = checkpoints;
+        this.checkpoints = new ArrayList<>(checkpoints);
         this.passedCheckpoints = new HashSet<>();
         this.currentState = State.IDLE;
         this.bestLapTime = Long.MAX_VALUE;
@@ -37,10 +35,11 @@ public class Map {
             return;
         }
 
-        if(currentState == State.OFF_TRACK) { reset(); return;}
+        if(currentState == State.COMPLETED) currentState = State.IDLE;
 
-        if(finishLine.contains(x,y))
+        if(finishLine.contains(x + 40,y + 40))
         {
+            if(currentState == State.OFF_TRACK) currentState = State.IDLE;
             if(currentState == State.IDLE)
             {
                 startLap();
@@ -50,11 +49,12 @@ public class Map {
                 endLap();
             }
         }
+        if(currentState == State.OFF_TRACK) { reset(); return;}
         if(currentState == State.RUNNING)
         {
             for(int i=0; i<checkpoints.size(); i++)
             {
-                if(checkpoints.get(i).contains(x,y))
+                if(checkpoints.get(i).contains(x + 40,y + 40))
                 {
                     passedCheckpoints.add(i);
                 }

@@ -2,6 +2,7 @@ package es.uab.tqs.f1_2D.vista;
 
 import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.controlador.CarController;
+import es.uab.tqs.f1_2D.model.Map;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,8 +11,10 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -19,11 +22,41 @@ public class CarDisplay extends JPanel {
     private CarController controller;
     private BufferedImage carImage;
     private BufferedImage largerMap; 
+    private BufferedImage collisionMap;
     private Set<Integer> keysPressed = new HashSet<>();
+
+    private Map trackMap;
+    private LapUI lapUI;
+    private OffTrackOverlay offTrackOverlay;
+
+    Rectangle finish = new Rectangle(360, 1200, 200, 40);
+    List<Rectangle> checkpoints = new ArrayList<>();
+
 
     public CarDisplay(CarController controller, BufferedImage map, BufferedImage collisionMap) {
         this.controller = controller;
         this.largerMap = map;
+        this.collisionMap = collisionMap;
+
+        //Rectangle finish = new Rectangle(360, 1200, 200, 40);
+        //List<Rectangle> checkpoints = new ArrayList<>();
+        checkpoints.add(new Rectangle(1800, 700, 40, 200));
+        checkpoints.add(new Rectangle(6009, 552, 20, 200));
+        checkpoints.add(new Rectangle(3600, 1136, 40, 200));
+        checkpoints.add(new Rectangle(1496, 2600, 40, 200));
+        trackMap = new Map(map.getWidth(), map.getHeight(), finish, checkpoints);
+        trackMap.setTimeProvider(System::currentTimeMillis);
+
+        lapUI = new LapUI(trackMap);
+        offTrackOverlay = new OffTrackOverlay("/img/lapdeleted.png", "/sound/Popup.wav");
+        setLayout(null);
+        offTrackOverlay.setBounds(0, 0, 1024, 860);
+        lapUI.setBounds(20, 20, 300, 100);
+
+        add(lapUI);
+        add(offTrackOverlay);
+        setComponentZOrder(offTrackOverlay, 0);
+
         setFocusable(true);
 
         try {
@@ -55,7 +88,32 @@ public class CarDisplay extends JPanel {
             }
         });
 
-        new Timer(16, e -> { controller.processInput(keysPressed, collisionMap); repaint();}).start();
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                offTrackOverlay.setBounds(0, 0, getWidth(), getHeight());
+            }
+        });
+
+
+        new Timer(16, e -> { 
+            controller.processInput(keysPressed, collisionMap); 
+            updateRace();
+            repaint();
+        }).start();
+    }
+    
+    private void updateRace() {
+        Car car = controller.getCar();
+        boolean offTrack = car.trackLimits(collisionMap);
+        trackMap.updatePosition(car.getX(), car.getY(), offTrack);
+        if (trackMap.getState() == Map.State.OFF_TRACK) 
+        {
+            offTrackOverlay.showOverlay();
+        } else 
+        {
+            offTrackOverlay.hideOverlay();
+        }
     }
 
     @Override
@@ -104,6 +162,32 @@ public class CarDisplay extends JPanel {
             g2d.setColor(Color.RED);
             g2d.fillRect((int) drawX, (int) drawY, 20, 10);
         }
+
+        g2d.setColor(new Color(0, 255, 0, 100)); 
+        g2d.fillRect(
+            (int)(finish.x - cameraX),
+            (int)(finish.y - cameraY),
+            finish.width,
+            finish.height
+        );
+
+        /*
+        // Dibujar checkpoints
+        g2d.setColor(new Color(255, 0, 0, 100)); 
+        checkpoints.add(new Rectangle(1800, 700, 40, 200));
+        checkpoints.add(new Rectangle(6009, 552, 20, 200));
+        checkpoints.add(new Rectangle(3600, 1136, 40, 200));
+        checkpoints.add(new Rectangle(1496, 2600, 40, 200));
+        for (Rectangle cp : checkpoints) {
+            g2d.fillRect(
+                (int)(cp.x - cameraX),
+                (int)(cp.y - cameraY),
+                cp.width,
+                cp.height
+            );
+        }
+        */
+
     }
 
     public static void main(String[] args) {
