@@ -275,8 +275,6 @@ class CarTest
 
     }
 
-
-
     @Test 
     public void forwardMovementPartitionTest()
     {
