@@ -38,7 +38,7 @@ public class CarControllerTest
         controller = new CarController(car);
         mockController = new CarController(mockCar);
 
-        grayMap = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        grayMap = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = grayMap.createGraphics();
         g2d.setColor(Color.GRAY);
         g2d.fillRect(0, 0, 10, 10);

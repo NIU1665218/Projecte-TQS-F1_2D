@@ -67,7 +67,11 @@ public class Car
     public boolean trackLimits(BufferedImage mapImage)
     {
         if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight) return true;
-        int color = mapImage.getRGB((int)x + 40, (int)y + 40);
+        int xi = (int)x + 40;
+        int yi = (int)y + 40;
+        xi = Math.min(Math.max(xi, 0), mapImage.getWidth() - 1);
+        yi = Math.min(Math.max(yi, 0), mapImage.getHeight() -1);
+        int color = mapImage.getRGB(xi, yi);
         Color c = new Color(color);
         int r = c.getRed();
         int g = c.getGreen();
@@ -98,7 +102,11 @@ public class Car
     public boolean invisibleWalls(BufferedImage mapImage)
     {
         if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight) return true;
-        int color = mapImage.getRGB((int)x + 40, (int)y + 40);
+        int xi = (int)x + 40;
+        int yi = (int)y + 40;
+        xi = Math.min(Math.max(xi, 0), mapImage.getWidth() - 1);
+        yi = Math.min(Math.max(yi, 0), mapImage.getHeight() -1);
+        int color = mapImage.getRGB(xi, yi);
         Color c = new Color(color);
         int r = c.getRed();
         int g = c.getGreen();

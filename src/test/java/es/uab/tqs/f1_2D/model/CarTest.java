@@ -31,14 +31,14 @@ class CarTest
     public static final double acceleration = 2;
     public static final double backwardsAcceleration = 0.5;
     public static final int angleMovement = 5;
-    public static final int testMapHeight = 400;
-    public static final int testMapWidth = 400;
+    public static final int testMapHeight = 500;
+    public static final int testMapWidth = 500;
 
     @BeforeEach
     public void setUp()
     {
         car = new Car(0,0,0f,0, maxVelocity, backwardsMaxVelocity, acceleration, backwardsAcceleration, testMapHeight, testMapWidth);
-        grayMap = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        grayMap = new BufferedImage(testMapWidth, testMapHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = grayMap.createGraphics();
         g2d.setColor(Color.GRAY);
         g2d.fillRect(0, 0, 10, 10);
@@ -688,7 +688,7 @@ class CarTest
 
     @Test
     public void testTrackLimitsFalse() {
-        when(mapImageMock.getRGB(0, 0)).thenReturn(Color.GRAY.getRGB());
+        when(mapImageMock.getRGB(anyInt(), anyInt())).thenReturn(Color.GRAY.getRGB());
 
         car.setX(0);
         car.setY(0);
@@ -698,7 +698,7 @@ class CarTest
 
     @Test
     public void testTrackLimitsTrue() {
-        when(mapImageMock.getRGB(0, 0)).thenReturn(Color.GREEN.getRGB());
+        when(mapImageMock.getRGB(anyInt(), anyInt())).thenReturn(Color.GREEN.getRGB());
 
         car.setX(0);
         car.setY(0);
@@ -709,7 +709,7 @@ class CarTest
     @Test
     public void testTrackLimitsWall()
     {
-        when(mapImageMock.getRGB(5, 5)).thenReturn(Color.BLUE.getRGB());
+        when(mapImageMock.getRGB(anyInt(), anyInt())).thenReturn(Color.BLUE.getRGB());
 
         car.setX(5);
         car.setY(5);
@@ -721,7 +721,7 @@ class CarTest
 
     @Test
     public void testInviWallFalse() {
-        when(mapImageMock.getRGB(0, 0)).thenReturn(Color.GRAY.getRGB());
+        when(mapImageMock.getRGB(anyInt(), anyInt())).thenReturn(Color.GRAY.getRGB());
 
         car.setX(0);
         car.setY(0);
@@ -731,7 +731,7 @@ class CarTest
 
     @Test
     public void testInviWallTrue() {
-        when(mapImageMock.getRGB(0, 0)).thenReturn(Color.BLUE.getRGB());
+        when(mapImageMock.getRGB(anyInt(), anyInt())).thenReturn(Color.BLUE.getRGB());
 
         car.setX(0);
         car.setY(0);
@@ -742,7 +742,7 @@ class CarTest
     @Test
     public void testInviWallNoMovement()
     {
-        when(mapImageMock.getRGB(5, 5)).thenReturn(Color.BLUE.getRGB());
+        when(mapImageMock.getRGB(anyInt(), anyInt())).thenReturn(Color.BLUE.getRGB());
 
         car.setX(5);
         car.setY(5);
