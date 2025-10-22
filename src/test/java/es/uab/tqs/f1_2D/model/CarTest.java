@@ -33,6 +33,7 @@ class CarTest
     public static final int angleMovement = 5;
     public static final int testMapHeight = 500;
     public static final int testMapWidth = 500;
+    public static final int offsetSprite = 40;
 
     @BeforeEach
     public void setUp()
@@ -41,7 +42,7 @@ class CarTest
         grayMap = new BufferedImage(testMapWidth, testMapHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = grayMap.createGraphics();
         g2d.setColor(Color.GRAY);
-        g2d.fillRect(0, 0, 10, 10);
+        g2d.fillRect(0, 0, testMapWidth, testMapHeight);
         g2d.dispose();
     }
 
@@ -129,9 +130,9 @@ class CarTest
     @Test
     public void trackLimitsTest()
     {
-        BufferedImage map = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        BufferedImage map = new BufferedImage(testMapWidth, testMapHeight, BufferedImage.TYPE_INT_RGB);
         //Test que comprova si el cotxe es troba fora de pista
-        map.setRGB(5, 5, Color.GREEN.getRGB());
+        map.setRGB(5 + offsetSprite, 5 + offsetSprite, Color.GREEN.getRGB());
         car.setX(5);
         car.setY(5);
         assertTrue(car.trackLimits(map));
@@ -364,19 +365,19 @@ class CarTest
     @Test 
     public void trackLimitsPartitionTest()
     {
-        BufferedImage map = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        BufferedImage map = new BufferedImage(testMapWidth, testMapHeight, BufferedImage.TYPE_INT_RGB);
         //Test que comprova si el cotxe es troba fora de pista
-        map.setRGB(5, 5, Color.GREEN.getRGB());
+        map.setRGB(5 + offsetSprite, 5 + offsetSprite, Color.GREEN.getRGB());
         car.setX(5);
         car.setY(5);
         assertTrue(car.trackLimits(map));
 
-        map.setRGB(4, 4, Color.BLUE.getRGB());
+        map.setRGB(4 + offsetSprite, 4 + offsetSprite, Color.BLUE.getRGB());
         car.setX(4);
         car.setY(4);
         assertTrue(car.trackLimits(map));
 
-        map.setRGB(9, 9, Color.GRAY.getRGB());
+        map.setRGB(9 + offsetSprite, 9 + offsetSprite, Color.GRAY.getRGB());
         car.setX(9);
         car.setY(9);
         assertFalse(car.trackLimits(map));
@@ -389,14 +390,14 @@ class CarTest
     @Test 
     public void inviWallPartitionTest()
     {
-        BufferedImage map = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        BufferedImage map = new BufferedImage(testMapWidth, testMapHeight, BufferedImage.TYPE_INT_RGB);
         //Test que comprova si el cotxe es troba amb una pared invisible que no permet el pas
-        map.setRGB(5, 5, Color.GREEN.getRGB());
+        map.setRGB(5 + offsetSprite, 5 + offsetSprite, Color.GREEN.getRGB());
         car.setX(5);
         car.setY(5);
         assertFalse(car.invisibleWalls(map));
 
-        map.setRGB(4, 4, Color.BLUE.getRGB());
+        map.setRGB(4 + offsetSprite, 4 + offsetSprite, Color.BLUE.getRGB());
         car.setX(4);
         car.setY(4);
         assertTrue(car.invisibleWalls(map));

@@ -96,7 +96,7 @@ public class Car
             Math.abs(g - targetG) <= tolerance &&
             Math.abs(b - targetB) <= tolerance;
 
-        return similarToGreen || similarToBlue;
+        return similarToGreen || similarToBlue || color == Color.GREEN.getRGB();
     }
 
     public boolean invisibleWalls(BufferedImage mapImage)
@@ -127,6 +127,7 @@ public class Car
 
     public void update(BufferedImage mapImage)
     {   
+        correctOutOfMapBounds();
         if(trackLimits(mapImage)) {
             velocity *= offtrackFriction;
         }
@@ -144,18 +145,23 @@ public class Car
         x += Math.cos(rad) * velocity;
         y += Math.sin(rad) * velocity;
 
+        correctOutOfMapBounds();
         if(invisibleWalls(mapImage)) {
             x = oldx;
             y = oldy;
             velocity = 0;
             return;
         }
+        correctOutOfMapBounds();
+    }
+
+    private void correctOutOfMapBounds()
+    {
         if(x<0) x = 0;
         if(y<0) y = 0;
         if(x > mapWidth) x = mapWidth;
         if(y > mapHeight) y = mapHeight;
     }
-
     public double getX() {return x;}
     public double getY() {return y;}
     public void setX(double newX) {this.x = newX;}
