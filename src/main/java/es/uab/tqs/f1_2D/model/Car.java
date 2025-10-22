@@ -95,6 +95,28 @@ public class Car
         return similarToGreen || similarToBlue;
     }
 
+    public boolean invisibleWalls(BufferedImage mapImage)
+    {
+        if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight) return true;
+        int color = mapImage.getRGB((int)x + 40, (int)y + 40);
+        Color c = new Color(color);
+        int r = c.getRed();
+        int g = c.getGreen();
+        int b = c.getBlue();
+
+        int targetR = 0;
+        int targetG = 0;
+        int targetB = 255;
+        int tolerance = 20;
+
+        boolean similarToBlue =
+            Math.abs(r - targetR) <= tolerance &&
+            Math.abs(g - targetG) <= tolerance &&
+            Math.abs(b - targetB) <= tolerance;
+
+        return similarToBlue;
+    }
+
     public void update(BufferedImage mapImage)
     {   
         if(trackLimits(mapImage)) {
@@ -109,9 +131,17 @@ public class Car
             velocity = 0;
 
         double rad = Math.toRadians(angle);
+        double oldx = x;
+        double oldy = y;
         x += Math.cos(rad) * velocity;
         y += Math.sin(rad) * velocity;
 
+        if(invisibleWalls(mapImage)) {
+            x = oldx;
+            y = oldy;
+            velocity = 0;
+            return;
+        }
         if(x<0) x = 0;
         if(y<0) y = 0;
         if(x > mapWidth) x = mapWidth;
