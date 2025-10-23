@@ -44,7 +44,7 @@ public class LapUI extends JPanel
 
         g2d.setFont(customFont.deriveFont(28f));
 
-        if (map.getState() == Map.State.OFF_TRACK)
+        if (map.getState() == Map.State.OFF_TRACK || map.getState() == Map.State.INVALID_LAP)
             g2d.setColor(Color.RED);
         else if (map.getState() == Map.State.RESULT) 
             g2d.setColor(Color.YELLOW); 

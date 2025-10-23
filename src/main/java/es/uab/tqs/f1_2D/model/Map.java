@@ -6,19 +6,21 @@ import java.util.stream.LongStream;
 import java.util.*;
 
 public class Map {
-    public enum State {IDLE, RUNNING, OFF_TRACK, RESULT};
+    public enum State {IDLE, RUNNING, OFF_TRACK, RESULT, INVALID_LAP};
     private int mapHeight;
     private int mapWidth;
 
     private Rectangle finishLine;
     private List<Rectangle> checkpoints;
     private Set<Integer> passedCheckpoints;
+    private int nextCheckpointIndex = 0;
 
     private long lapStartTime;
     private long bestLapTime;
     private long lapTime;
     private long lastCompletedLapTime; 
     private Timer resultTimer;
+    private Timer offTrackTimer;
 
     private State currentState;
     private TimeProvider timeProvider;
@@ -47,6 +49,7 @@ public class Map {
         this.bestSectorTimes = new long[numSectors];
         this.sectorColors = new SectorColor[numSectors];
         this.sectorRecorded = new boolean[numSectors];
+        this.nextCheckpointIndex = 0;
 
         this.lastCompletedSectorTimes = new long[numSectors];
         this.lastCompletedSectorColors = new SectorColor[numSectors];
@@ -68,8 +71,8 @@ public class Map {
 
         if(finishLine.contains(x + 40,y + 40))
         {
-            if(currentState == State.OFF_TRACK) currentState = State.IDLE;
-            if(currentState == State.IDLE)
+            if(currentState == State.OFF_TRACK || currentState == State.INVALID_LAP) currentState = State.IDLE;
+            if(currentState == State.IDLE || currentState == State.INVALID_LAP)
             {
                 startLap();
             }
@@ -85,7 +88,7 @@ public class Map {
                     recordSector(lastSectorIndex, sectorTime);
                 }
 
-                if(passedExpectedSector())
+                if(passedAllCheckpoints())
                 {
                     endLap();
                 }
@@ -95,30 +98,39 @@ public class Map {
                 }
             }
         }
-        if(currentState == State.OFF_TRACK) { reset(); return;}
+        if(currentState == State.OFF_TRACK || currentState == State.INVALID_LAP) { reset(); return;}
         if(currentState == State.RUNNING)
         {
             for(int i=0; i<checkpoints.size(); i++)
             {
                 if(checkpoints.get(i).contains(x + 40,y + 40))
                 {
-                    if (!passedCheckpoints.contains(i))
+                    if(passedCheckpoints.contains(i)) break;
+                    if (i == nextCheckpointIndex)
                     {
-                       passedCheckpoints.add(i);   
-                    }
+                       passedCheckpoints.add(i);  
+                       nextCheckpointIndex++; 
+                    
 
-                     if (i >= 1 && i <= checkpoints.size() - 2) {
-                        int sectorIndex = i - 1;
-                        if (sectorIndex >= 0 && sectorIndex < numSectors - 1) {
-                            
-                            if (!sectorRecorded[sectorIndex]) {
-                                long now = timeProvider.now();
-                                long totalSinceStart = now - lapStartTime;
-                                long prevSum = sum(sectorTimes, sectorIndex);
-                                long sectorTime = totalSinceStart - prevSum;
-                                recordSector(sectorIndex, sectorTime);
+                        if (i >= 1 && i <= checkpoints.size() - 2) 
+                        {
+                            int sectorIndex = i - 1;
+                            if (sectorIndex >= 0 && sectorIndex < numSectors - 1) {
+                                
+                                if (!sectorRecorded[sectorIndex]) {
+                                    long now = timeProvider.now();
+                                    long totalSinceStart = now - lapStartTime;
+                                    long prevSum = sum(sectorTimes, sectorIndex);
+                                    long sectorTime = totalSinceStart - prevSum;
+                                    recordSector(sectorIndex, sectorTime);
+                                }
                             }
                         }
+                    }
+                    else
+                    {
+                        invalidateLap();
+                        break;
                     }
                 }
             }
@@ -133,6 +145,7 @@ public class Map {
         Arrays.fill(sectorRecorded, false);
         Arrays.fill(sectorColors, SectorColor.NONE);
         passedCheckpoints.clear();
+        nextCheckpointIndex = 0;
         currentState = State.RUNNING;
     }
 
@@ -161,12 +174,28 @@ public class Map {
         }, 3000);
     }
 
+    private void invalidateLap() {
+        currentState = State.INVALID_LAP;
+        
+        if (offTrackTimer != null) {
+            offTrackTimer.cancel();
+        }
+        offTrackTimer = new Timer();
+        offTrackTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                currentState = State.IDLE;
+            }
+        }, 5000);
+    }
+
     public void reset() {
         if(currentState == State.RUNNING) 
         {
             currentState = State.IDLE;
         }
         passedCheckpoints.clear();
+        nextCheckpointIndex = 0;
         lapTime = 0;
         Arrays.fill(sectorTimes, 0L);
         Arrays.fill(sectorRecorded, false);
@@ -216,13 +245,9 @@ public class Map {
         }
     }
 
-    private boolean passedExpectedSector() {
-        int expected = Math.max(0, checkpoints.size() - 2);
-        int passed = 0;
-        for (int i = 1; i <= checkpoints.size() - 2; i++) {
-            if (passedCheckpoints.contains(i)) passed++;
-        }
-        return passed >= expected;
+    private boolean passedAllCheckpoints() 
+    {
+        return passedCheckpoints.size() == checkpoints.size() && nextCheckpointIndex == checkpoints.size();
     }
 
     public State getState() { return currentState; }

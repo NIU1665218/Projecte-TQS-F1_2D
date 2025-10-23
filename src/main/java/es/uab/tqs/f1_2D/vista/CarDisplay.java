@@ -28,6 +28,7 @@ public class CarDisplay extends JPanel {
     private Map trackMap;
     private LapUI lapUI;
     private OffTrackOverlay offTrackOverlay;
+    private OffTrackOverlay invalidLapOverlay;
 
     Rectangle finish = new Rectangle(360, 1200, 200, 40);
     List<Rectangle> checkpoints = new ArrayList<>();
@@ -49,6 +50,9 @@ public class CarDisplay extends JPanel {
         offTrackOverlay = new OffTrackOverlay("/img/lapdeleted.png", "/sound/Popup.wav");
         setLayout(null);
         offTrackOverlay.setBounds(0, 0, 1024, 860);
+        invalidLapOverlay = new OffTrackOverlay("/img/invalidlap.png", "/sound/boxbox.wav");
+        invalidLapOverlay.setBounds(0, 0, 1024, 860);
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
         lapUI.setBounds((int)screenSize.getWidth() - 360, (int)screenSize.getHeight() - 200, 340, 150);
@@ -56,6 +60,8 @@ public class CarDisplay extends JPanel {
         add(lapUI);
         add(offTrackOverlay);
         setComponentZOrder(offTrackOverlay, 0);
+        add(invalidLapOverlay);
+        setComponentZOrder(invalidLapOverlay, 0);
 
         setFocusable(true);
 
@@ -92,6 +98,7 @@ public class CarDisplay extends JPanel {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 offTrackOverlay.setBounds(0, 0, getWidth(), getHeight());
+                invalidLapOverlay.setBounds(0, 0, getWidth(), getHeight());
             }
         });
 
@@ -105,7 +112,7 @@ public class CarDisplay extends JPanel {
     
     private void updateRace() {
         Car car = controller.getCar();
-        if (trackMap.getState() != Map.State.RESULT) 
+        if (trackMap.getState() != Map.State.RESULT && trackMap.getState() != Map.State.INVALID_LAP)
         {
             boolean offTrack = car.trackLimits(collisionMap);
             trackMap.updatePosition(car.getX(), car.getY(), offTrack);
@@ -114,9 +121,17 @@ public class CarDisplay extends JPanel {
         if (trackMap.getState() == Map.State.OFF_TRACK) 
         {
             offTrackOverlay.showOverlay();
-        } else 
+            invalidLapOverlay.hideOverlay();
+        } 
+        else if (trackMap.getState() == Map.State.INVALID_LAP)
+        {
+            invalidLapOverlay.showOverlay();
+            offTrackOverlay.hideOverlay();
+        }
+        else 
         {
             offTrackOverlay.hideOverlay();
+            invalidLapOverlay.hideOverlay();
         }
     }
 
@@ -196,7 +211,6 @@ public class CarDisplay extends JPanel {
     }
 
     public static void main(String[] args) {
-       
         BufferedImage backgroundImage = null;
         BufferedImage largeMap = null;
         BufferedImage collisionImage = null;
@@ -244,5 +258,4 @@ public class CarDisplay extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
-
 }

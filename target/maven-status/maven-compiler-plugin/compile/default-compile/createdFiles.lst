@@ -1,5 +1,14 @@
+es\uab\tqs\f1_2D\vista\LapUI$1.class
 es\uab\tqs\f1_2D\model\Car.class
+es\uab\tqs\f1_2D\vista\OffTrackOverlay.class
+es\uab\tqs\f1_2D\model\Map$2.class
+es\uab\tqs\f1_2D\model\TimeProvider.class
 es\uab\tqs\f1_2D\vista\CarDisplay.class
 es\uab\tqs\f1_2D\vista\CarDisplay$1.class
 es\uab\tqs\f1_2D\controlador\CarController.class
 es\uab\tqs\f1_2D\model\Map.class
+es\uab\tqs\f1_2D\model\Map$1.class
+es\uab\tqs\f1_2D\model\Map$State.class
+es\uab\tqs\f1_2D\vista\CarDisplay$2.class
+es\uab\tqs\f1_2D\vista\LapUI.class
+es\uab\tqs\f1_2D\model\Map$SectorColor.class

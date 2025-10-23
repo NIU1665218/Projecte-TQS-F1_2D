@@ -5,7 +5,6 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -103,6 +102,7 @@ class MapTest {
         Thread.sleep(10);
         track.updatePosition(210, 110, false);
         track.updatePosition(310, 160, false);
+        track.updatePosition(410, 210, false);
         track.updatePosition(110, 110, false);
         long firstLap = track.getLapTime();
 
@@ -111,6 +111,7 @@ class MapTest {
         Thread.sleep(5);
         track.updatePosition(210, 110, false);
         track.updatePosition(310, 160, false);
+        track.updatePosition(410, 210, false);
         track.updatePosition(110, 110, false);
 
         assertTrue(track.getLapTime() < firstLap);
@@ -128,6 +129,7 @@ class MapTest {
         assertEquals(Map.State.RESULT, track.getState());
 
         Thread.sleep(3500);
+        track.updatePosition(112, 112, false);
         assertEquals(Map.State.RUNNING, track.getState());
         assertTrue(track.getPassedCheckpoints().isEmpty());
     }
@@ -151,6 +153,7 @@ class MapTest {
         track.updatePosition(110, 110, false);
         track.updatePosition(210, 110, false);
         track.updatePosition(310, 160, false);
+        track.updatePosition(410, 210, false);
         track.updatePosition(110, 110, false);
         assertEquals(Map.State.RESULT, track.getState());
     }
@@ -391,6 +394,7 @@ class MapTest {
         track.updatePosition(110, 110, false); 
         track.updatePosition(210, 110, false); 
         track.updatePosition(310, 160, false); 
+        track.updatePosition(410, 210, false);
         track.updatePosition(110, 110, false); 
         assertEquals(Map.State.RESULT, track.getState());
     }
