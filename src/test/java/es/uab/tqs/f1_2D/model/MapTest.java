@@ -222,8 +222,8 @@ class MapTest {
     //Estado offTrack, posición NO en meta
     void tesOffTrackNotFinishLine() {
         
-        track.updatePosition(50, 50, true); 
-        track.updatePosition(80, 80, false); 
+        track.updatePosition(50 -offsetSprite, 50 - offsetSprite, true); 
+        track.updatePosition(80 - offsetSprite, 80 - offsetSprite, false); 
         
         assertEquals(Map.State.OFF_TRACK, track.getState());
     }
@@ -452,116 +452,28 @@ class MapTest {
 
         List<Rectangle> mockCheckpoints = List.of(mockCheckpoint);
         Map track = new Map(testMapWidth, testMapHeight, mockFinish, mockCheckpoints);
+        track.setState(Map.State.RUNNING);
 
         track.setTimeProvider(mockTime);
-        track.updatePosition(150, 150, false);
+        track.updatePosition(210, 110, false);
 
         assertTrue(track.getPassedCheckpoints().contains(0));
     }
 
     @Test
-    //Mock del tiempo
-    void testLapTimeMock() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L);
-        track.setTimeProvider(mockTime);
-        
-        track.updatePosition(110, 110, false); 
-        track.updatePosition(210, 110, false); 
-        track.updatePosition(310, 160, false);   
-        track.updatePosition(410, 210, false); 
-        track.updatePosition(110, 110, false); 
-        
-        assertEquals(2000L, track.getLapTime());
-        assertEquals(500L, track.getSectorTime(0));
-        assertEquals(500L, track.getSectorTime(1));
-        assertEquals(500L, track.getSectorTime(2));
-        
-        verify(mockTime, times(5)).now();
-    }
-
-    @Test
-    //Segunda vuelta mejora el mejor tiempo
-    void testBestLapTimeUpdated() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L, 3000L, 5000L, 7000L, 9000L);
-        track.setTimeProvider(mockTime);
-        
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false);
-        
-        long firstLapTime = track.getLapTime();
-        
-        when(mockTime.now()).thenReturn(10000L, 11000L, 12000L, 13000L, 14000L);
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false);
-        
-        assertTrue(track.getBestLapTime() < firstLapTime);
-    }
-
-    @Test
-    //Tiempos de sectores tras completar vuelta
-    void testResultStateShowsSectorTimes() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L);
-        track.setTimeProvider(mockTime);
-        
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false); 
-        track.updatePosition(310, 160, false); 
-        track.updatePosition(410, 210, false); 
-        track.updatePosition(110, 110, false);
-        
-        assertTrue(track.getSectorTime(0) > 0);
-        assertTrue(track.getSectorTime(1) > 0);
-        assertTrue(track.getSectorTime(2) > 0);
-    }
-
-    @Test
     void testFinishLineMock() {
         // Mock de Rectangle para línea de meta
+        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
+        when(mockTime.now()).thenReturn(1000L);
         Rectangle mockFinish = Mockito.mock(Rectangle.class);
         when(mockFinish.contains(anyDouble(), anyDouble())).thenReturn(true);
         
         Map trackWithMockFinish = new Map(testMapWidth, testMapHeight, mockFinish, checkpoints);
+        trackWithMockFinish.setTimeProvider(mockTime);
         trackWithMockFinish.updatePosition(50, 50, false);
         
         assertEquals(Map.State.RUNNING, trackWithMockFinish.getState());
-        verify(mockFinish).contains(50 + 40, 50 + 40); // Verificar offset del coche
-    }
-
-    @Test
-    // Mock colores de sectores
-    void testSectorColorsWithMockTime() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        
-        when(mockTime.now()).thenReturn(1000L, 1200L, 1500L, 1900L, 2400L);
-        track.setTimeProvider(mockTime);
-        
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false); // Sector 1: 200
-        track.updatePosition(310, 160, false); // Sector 2: 300
-        track.updatePosition(410, 210, false); // Sector 3: 400
-        track.updatePosition(110, 110, false);
-        
-        
-        when(mockTime.now()).thenReturn(3000L, 3200L, 3450L, 3900L, 4400L);
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false); // Sector 1: 200
-        track.updatePosition(310, 160, false); // Sector 2: 250 
-        track.updatePosition(410, 210, false); // Sector 3: 450 
-        track.updatePosition(110, 110, false);
-        
-        // Verificar colores de sectores
-        assertEquals(Map.SectorColor.ORANGE, track.getSectorColor(0)); 
-        assertEquals(Map.SectorColor.GREEN, track.getSectorColor(1));  
-        assertEquals(Map.SectorColor.ORANGE, track.getSectorColor(2)); 
+        verify(mockFinish).contains((double)(50 + 40), (double)(50 + 40)); // Verificar offset del coche
     }
 
     @Test

@@ -38,12 +38,10 @@ public class CarDisplay extends JPanel {
         this.largerMap = map;
         this.collisionMap = collisionMap;
 
-        //Rectangle finish = new Rectangle(360, 1200, 200, 40);
-        //List<Rectangle> checkpoints = new ArrayList<>();
         checkpoints.add(new Rectangle(1800, 700, 40, 200));
-        checkpoints.add(new Rectangle(6009, 552, 20, 200));
-        checkpoints.add(new Rectangle(3600, 1136, 40, 200));
-        checkpoints.add(new Rectangle(1496, 2600, 40, 200));
+        checkpoints.add(new Rectangle(5484, 152, 20, 200));
+        checkpoints.add(new Rectangle(1388, 1216, 200, 50));
+        checkpoints.add(new Rectangle(432, 2344, 250, 50));
         trackMap = new Map(map.getWidth(), map.getHeight(), finish, checkpoints);
         trackMap.setTimeProvider(System::currentTimeMillis);
 
@@ -51,7 +49,9 @@ public class CarDisplay extends JPanel {
         offTrackOverlay = new OffTrackOverlay("/img/lapdeleted.png", "/sound/Popup.wav");
         setLayout(null);
         offTrackOverlay.setBounds(0, 0, 1024, 860);
-        lapUI.setBounds(20, 20, 300, 100);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        lapUI.setBounds((int)screenSize.getWidth() - 360, (int)screenSize.getHeight() - 200, 340, 150);
 
         add(lapUI);
         add(offTrackOverlay);
@@ -105,8 +105,12 @@ public class CarDisplay extends JPanel {
     
     private void updateRace() {
         Car car = controller.getCar();
-        boolean offTrack = car.trackLimits(collisionMap);
-        trackMap.updatePosition(car.getX(), car.getY(), offTrack);
+        if (trackMap.getState() != Map.State.RESULT) 
+        {
+            boolean offTrack = car.trackLimits(collisionMap);
+            trackMap.updatePosition(car.getX(), car.getY(), offTrack);
+        }
+
         if (trackMap.getState() == Map.State.OFF_TRACK) 
         {
             offTrackOverlay.showOverlay();
@@ -163,6 +167,8 @@ public class CarDisplay extends JPanel {
             g2d.fillRect((int) drawX, (int) drawY, 20, 10);
         }
 
+        
+        // Dibujar checkpoints
         g2d.setColor(new Color(0, 255, 0, 100)); 
         g2d.fillRect(
             (int)(finish.x - cameraX),
@@ -171,13 +177,12 @@ public class CarDisplay extends JPanel {
             finish.height
         );
 
-        /*
-        // Dibujar checkpoints
+        
         g2d.setColor(new Color(255, 0, 0, 100)); 
         checkpoints.add(new Rectangle(1800, 700, 40, 200));
-        checkpoints.add(new Rectangle(6009, 552, 20, 200));
-        checkpoints.add(new Rectangle(3600, 1136, 40, 200));
-        checkpoints.add(new Rectangle(1496, 2600, 40, 200));
+        checkpoints.add(new Rectangle(5484, 152, 20, 200));
+        checkpoints.add(new Rectangle(1388, 1216, 250, 50));
+        checkpoints.add(new Rectangle(432, 2344, 250, 50));
         for (Rectangle cp : checkpoints) {
             g2d.fillRect(
                 (int)(cp.x - cameraX),
@@ -186,7 +191,7 @@ public class CarDisplay extends JPanel {
                 cp.height
             );
         }
-        */
+        
 
     }
 
@@ -235,7 +240,7 @@ public class CarDisplay extends JPanel {
         JFrame frame = new JFrame("F1 2D");
         CarDisplay display = new CarDisplay(controller, largeMap, collisionMap);
         frame.add(display);
-        frame.setSize(1024, 860);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
