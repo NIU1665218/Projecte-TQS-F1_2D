@@ -1,9 +1,16 @@
 package es.uab.tqs.f1_2D.model;
 
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
 import java.awt.*;
-import java.util.*;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
+
 
 class MapTest {
 
@@ -15,12 +22,14 @@ class MapTest {
 
     @BeforeEach
     void setup() {
+
         finish = new Rectangle(100, 100, 50, 50);
-        checkpoints = List.of(
-                new Rectangle(200, 100, 50, 50),
-                new Rectangle(300, 150, 50, 50)
-        );
-        track = new Track(testMapWidth, testMapHeight, finish, checkpoints);
+        checkpoints = new ArrayList<>();
+        checkpoints.add(new Rectangle(200, 100, 50, 50));
+        checkpoints.add(new Rectangle(300, 150, 50, 50));
+        checkpoints.add(new Rectangle(400, 200, 50, 50));
+        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
+        track.setTimeProvider(System::currentTimeMillis);
     }
 
     /* 
@@ -51,7 +60,7 @@ class MapTest {
         track.updatePosition(210, 110, false);
         track.updatePosition(310, 160, false);
         track.updatePosition(110, 110, false);
-        assertEquals(Map.State.COMPLETED, track.getState());
+        assertEquals(Map.State.RESULT, track.getState());
     }
 
     @Test
@@ -59,7 +68,7 @@ class MapTest {
     void testLapNotCompleted() {
         track.updatePosition(110, 110, false);
         track.updatePosition(110, 110, false);
-        assertNotEquals(Map.State.COMPLETED, track.getState());
+        assertNotEquals(Map.State.RESULT, track.getState());
     }
 
     @Test
@@ -123,7 +132,7 @@ class MapTest {
         track.updatePosition(210, 110, false);
         track.updatePosition(310, 160, false);
         track.updatePosition(110, 110, false);
-        assertEquals(Map.State.COMPLETED, track.getState());
+        assertEquals(Map.State.RESULT, track.getState());
     }
 
     @Test
@@ -197,7 +206,7 @@ class MapTest {
         track.updatePosition(210, 110, false); 
         track.updatePosition(310, 160, false); 
         track.updatePosition(110, 110, false); 
-        assertEquals(Map.State.COMPLETED, track.getState());
+        assertEquals(Map.State.RESULT, track.getState());
     }
 
     @Test
@@ -238,6 +247,7 @@ class MapTest {
         Rectangle mockFinish = Mockito.mock(Rectangle.class);
         when(mockFinish.contains(Mockito.anyDouble(), Mockito.anyDouble())).thenReturn(true);
         Map mockMap = new Map(testMapWidth, testMapHeight, mockFinish, checkpoints);
+        mockMap.setTimeProvider(System::currentTimeMillis);
         mockMap.updatePosition(50, 50, false);
         assertEquals(Map.State.RUNNING, mockMap.getState());
     }
@@ -264,7 +274,7 @@ class MapTest {
         TimeProvider mockTime = Mockito.mock(TimeProvider.class);
         when(mockTime.now()).thenReturn(1000L, 2000L); 
 
-        Map track = new Map(testMapWidth, testMapHeight, finishLine, checkpoints);
+        Map track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
         track.setTimeProvider(mockTime);
 
         track.updatePosition(110, 110, false);
@@ -272,7 +282,7 @@ class MapTest {
         track.updatePosition(310, 160, false);
         track.updatePosition(110, 110, false);
 
-        assertEquals(Map.State.COMPLETED, track.getState());
+        assertEquals(Map.State.RESULT, track.getState());
         assertEquals(1000, track.getLapTime());
     }
 
@@ -283,7 +293,7 @@ class MapTest {
         when(mockCar.getX()).thenReturn(110.0);
         when(mockCar.getY()).thenReturn(110.0);
 
-        Map track = new Map(testMapWidth, testMapHeight, finishLine, checkpoints);
+        Map track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
         track.updatePosition(mockCar.getX(), mockCar.getY(), false);
 
         assertEquals(Map.State.RUNNING, track.getState());
