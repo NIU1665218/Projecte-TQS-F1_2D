@@ -46,8 +46,17 @@ public class LapUI extends JPanel
 
         if (map.getState() == Map.State.OFF_TRACK || map.getState() == Map.State.INVALID_LAP)
             g2d.setColor(Color.RED);
-        else if (map.getState() == Map.State.RESULT) 
-            g2d.setColor(Color.YELLOW); 
+        else if (map.getState() == Map.State.RESULT)
+        {
+            if(map.getBestLapTime() < map.getLapTime())
+            {
+                g2d.setColor(Color.YELLOW); 
+            }
+            else
+            {
+                g2d.setColor(Color.GREEN);
+            }   
+        }    
         else 
             g2d.setColor(Color.WHITE);
     

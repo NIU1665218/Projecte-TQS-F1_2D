@@ -1,6 +1,7 @@
 package es.uab.tqs.f1_2D.model;
 
 import java.awt.*;
+import javax.swing.Timer;
 import java.util.List;
 import java.util.stream.LongStream;
 import java.util.*;
@@ -140,6 +141,7 @@ public class Map {
     }
 
     private void startLap() {
+        stopAllTimers();
         lapStartTime = timeProvider.now();
         Arrays.fill(sectorTimes, 0L);
         Arrays.fill(sectorRecorded, false);
@@ -161,35 +163,29 @@ public class Map {
             bestLapTime = lastCompletedLapTime;
         }
     
-        if (resultTimer != null) {
-            resultTimer.cancel();
-        }
-        resultTimer = new Timer();
-        resultTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                currentState = State.IDLE;
-                startLap();
-            }
-        }, 3000);
+        stopAllTimers();
+        resultTimer = new Timer(3000, e -> {
+            currentState = State.IDLE;
+            startLap();
+            resultTimer.stop();
+        });
+        resultTimer.setRepeats(false);
+        resultTimer.start();
     }
 
     private void invalidateLap() {
         currentState = State.INVALID_LAP;
-        
-        if (offTrackTimer != null) {
-            offTrackTimer.cancel();
-        }
-        offTrackTimer = new Timer();
-        offTrackTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                currentState = State.IDLE;
-            }
-        }, 5000);
+        stopAllTimers();
+        offTrackTimer = new Timer(3500, e -> {
+            currentState = State.IDLE;
+            offTrackTimer.stop();
+        });
+        offTrackTimer.setRepeats(false);
+        offTrackTimer.start();
     }
 
     public void reset() {
+        stopAllTimers();
         if(currentState == State.RUNNING) 
         {
             currentState = State.IDLE;
@@ -200,6 +196,15 @@ public class Map {
         Arrays.fill(sectorTimes, 0L);
         Arrays.fill(sectorRecorded, false);
         Arrays.fill(sectorColors, SectorColor.NONE);
+    }
+
+    private void stopAllTimers() {
+        if (resultTimer != null && resultTimer.isRunning()) {
+            resultTimer.stop();
+        }
+        if (offTrackTimer != null && offTrackTimer.isRunning()) {
+            offTrackTimer.stop();
+        }
     }
 
     
