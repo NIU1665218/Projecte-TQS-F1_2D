@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -21,6 +23,9 @@ class MapTest
     private Rectangle finishLine;
     private List<Rectangle> checkpoints;
 
+    @Mock
+    private TimeProvider timeProvider;
+
     @BeforeEach
     void setUp() 
     {
@@ -31,6 +36,7 @@ class MapTest
         checkpoints.add(new Rectangle(400, 400, 30, 30));
         
         map = new Map(1000, 1000, finishLine, checkpoints);
+        map.setTimeProvider(timeProvider);
     }
 
     /* 
@@ -48,6 +54,41 @@ class MapTest
         assertEquals(0, map.getNextCheckpointIndex());
         assertEquals(0, map.getLapTime());
         assertEquals(0, map.getBestLapTime());
+    }
+
+    @Test
+    //Verificar estado inicial del modo carrera
+    void testRaceInitialState() 
+    {
+        assertFalse(map.isRaceMode());
+        assertEquals(3, map.getTotalLaps());
+        assertEquals(0, map.getCurrentLap());
+        assertFalse(map.isRaceComplete());
+        assertFalse(map.isCountdownActive());
+        assertEquals(0, map.getRemainingCountdown());
+    }
+
+    @Test
+    //Test setters del modo carrera
+    void testRaceSetters() 
+    {
+        map.setRaceMode(true);
+        assertTrue(map.isRaceMode());
+
+        map.setTotalLaps(5);
+        assertEquals(5, map.getTotalLaps());
+
+        map.setCurrentLap(2);
+        assertEquals(2, map.getCurrentLap());
+
+        map.setRaceStartTime(1000L);
+        assertEquals(1000L, map.getRaceStartTime());
+
+        map.setCountdownEndTime(2000L);
+        assertEquals(2000L, map.getCountdownEndTime());
+
+        map.setCountdownSeconds(10);
+        assertEquals(10, map.getCountdownSeconds());
     }
 
     @Test
@@ -99,9 +140,9 @@ class MapTest
         assertEquals(300L, map.sum(array, 10)); 
     }
 
-        @Test
-    //Verificación con mock el comportamiento correcto de los sectores
-    void testSectorOperations() 
+    @Test
+    //Verificación comportamiento correcto de los sectores
+    void testSector() 
     {
         
         Rectangle finishLine = new Rectangle(100, 100, 50, 50);
@@ -235,7 +276,7 @@ class MapTest
     }
 
     @Test
-    // Verificar que podemos cambiar entre todos los estados
+    //Verificar que podemos cambiar entre todos los estados
     void testStateTransitions() 
     {
         Map.State[] states = Map.State.values();
@@ -244,5 +285,162 @@ class MapTest
             map.setCurrentState(state);
             assertEquals(state, map.getState());
         }
+    }
+
+    @Test
+    //Verificar la funcionalidad para finalizar la carrera
+    void testIsRaceComplete() 
+    {
+        map.setRaceMode(false);
+        map.setCurrentLap(5);
+        assertFalse(map.isRaceComplete());
+
+        map.setRaceMode(true);
+        map.setCurrentLap(2);
+        map.setTotalLaps(3);
+        assertFalse(map.isRaceComplete());
+
+        map.setCurrentLap(3);
+        assertTrue(map.isRaceComplete());
+
+        map.setCurrentLap(4);
+        assertTrue(map.isRaceComplete());
+    }
+
+    @Test
+    //Verificar estado countdown
+    void testIsCountdownActive() 
+    {
+        assertFalse(map.isCountdownActive());
+
+        map.setCurrentState(Map.State.COUNTDOWN);
+        assertTrue(map.isCountdownActive());
+
+        map.setCurrentState(Map.State.RUNNING);
+        assertFalse(map.isCountdownActive());
+    }
+
+    @Test
+    // Test que los sectores funcionan correctamente durante una carrera
+    void testSectorRace() 
+    {
+        map.setRaceMode(true);
+        map.setCurrentLap(1);
+        
+        map.setSectorTime(0, 1500L);
+        map.setSectorTime(1, 1200L);
+        map.setSectorTime(2, 1800L);
+        
+        map.setSectorColor(0, Map.SectorColor.GREEN);
+        map.setSectorColor(1, Map.SectorColor.PURPLE);
+        map.setSectorColor(2, Map.SectorColor.ORANGE);
+        
+        map.setSectorRecorded(0, true);
+        map.setSectorRecorded(1, true);
+        map.setSectorRecorded(2, false);
+        
+        assertEquals(1500L, map.getSectorTime(0));
+        assertEquals(1200L, map.getSectorTime(1));
+        assertEquals(1800L, map.getSectorTime(2));
+        
+        assertEquals(Map.SectorColor.GREEN, map.getSectorColor(0));
+        assertEquals(Map.SectorColor.PURPLE, map.getSectorColor(1));
+        assertEquals(Map.SectorColor.ORANGE, map.getSectorColor(2));
+        
+        assertTrue(map.getSectorRecorded()[0]);
+        assertTrue(map.getSectorRecorded()[1]);
+        assertFalse(map.getSectorRecorded()[2]);
+    }
+
+    @Test
+    //Verificación que termina carrera al hacer 3 vueltas
+    void testFinishRace() 
+    {
+        map.setRaceMode(true);
+        map.setCurrentLap(3);
+        map.setTotalLaps(3);
+    
+        map.incrementLap();
+
+        assertEquals(4, map.getCurrentLap()); 
+        assertTrue(map.isRaceComplete());
+        assertEquals(Map.State.RACE_FINISHED, map.getState());
+    }
+
+    /* 
+      =============================================================================
+        MOCK OBJECT
+      =============================================================================
+    */
+
+    @Test
+    //Verificación funcionalidad countdown
+    void testStartCountdown() 
+    {
+        when(timeProvider.now()).thenReturn(1000L);
+
+        map.startCountdown();
+
+        assertEquals(Map.State.COUNTDOWN, map.getState());
+        assertEquals(1000L + 5000, map.getCountdownEndTime()); 
+        assertEquals(0, map.getCurrentLap());
+        assertTrue(map.isCountdownActive());
+    }
+
+    @Test
+    //Verificación inicialización carrera
+    void testStartRace() 
+    {
+        when(timeProvider.now()).thenReturn(1500L);
+
+        map.startRace();
+
+        assertEquals(Map.State.RUNNING, map.getState());
+        assertEquals(1500L, map.getRaceStartTime());
+        assertEquals(1500L, map.getLapStartTime());
+        assertEquals(1, map.getCurrentLap());
+        
+        assertTrue(map.getPassedCheckpoints().isEmpty());
+        assertEquals(0, map.getNextCheckpointIndex());
+        
+        for (int i = 0; i < map.getNumSectors(); i++) {
+            assertEquals(0L, map.getSectorTime(i));
+            assertFalse(map.getSectorRecorded()[i]);
+        }
+    }
+
+    @Test
+    //Verificación se incrementa vuelta y se reinician sectores
+    void testIncrementLap() 
+    {
+        map.setRaceMode(true);
+        map.setCurrentLap(1);
+        map.setTotalLaps(3);
+        when(timeProvider.now()).thenReturn(2000L);
+
+        map.getPassedCheckpoints().add(0);
+        map.getPassedCheckpoints().add(1);
+        map.setNextCheckpointIndex(2);
+
+        map.setSectorTime(0, 1000L);
+        map.setSectorTime(1, 1500L);
+        map.setSectorRecorded(0, true);
+        map.setSectorRecorded(1, true);
+
+        map.incrementLap();
+
+        assertEquals(2, map.getCurrentLap());
+        assertEquals(2000L, map.getLapStartTime());
+
+        assertTrue(map.getPassedCheckpoints().isEmpty());
+        assertEquals(0, map.getNextCheckpointIndex());
+
+        for (int i = 0; i < map.getNumSectors(); i++) {
+            assertEquals(0L, map.getSectorTime(i));
+            assertFalse(map.getSectorRecorded()[i]);
+        }
+
+        assertFalse(map.isRaceComplete());
+        assertNotEquals(Map.State.RACE_FINISHED, map.getState());
     }
 }
