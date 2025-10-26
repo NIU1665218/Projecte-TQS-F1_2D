@@ -206,8 +206,8 @@ public class MapController {
         // Mejora global real (y existía un global previo)
 <span class="fc bfc" id="L207" title="All 4 branches covered.">        if (previousGlobalBest != Long.MAX_VALUE &amp;&amp; newGlobalBest &lt; previousGlobalBest) </span>
         {
-<span class="fc" id="L209">            model.setBestSectorTime(sectorIndex, newGlobalBest);</span>
-<span class="fc" id="L210">            model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);</span>
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">            if (model.getBestSectorTime(sectorIndex) == newGlobalBest) </span>
+<span class="fc" id="L210">                model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);</span>
         }
 <span class="fc" id="L212">    }</span>
     

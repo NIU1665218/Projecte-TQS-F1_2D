@@ -32,6 +32,13 @@ class OffTrackOverlayTest {
     //Ruta relativa al archivo de sonido para test válido
     private String soundPath = "/sound/Popup.wav";
 
+
+    /* 
+      ================================================================================
+        TEST SOBRE VISTA, NO ES DEMANA PERO EM SERVEIX PER VERIFICAR FUNCIONAMENT
+      ================================================================================
+    */
+    
     @BeforeEach
     void setUp() {
         overlay = new OffTrackOverlay("", "");

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="es.uab.tqs.f1_2D.model.MapTest" time="0.165" tests="22" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="es.uab.tqs.f1_2D.model.MapTest" time="0.128" tests="22" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="25"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="ES"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-25.0.0.36-hotspot\bin"/>
-    <property name="sun.java.command" value="C:\Users\Adrian\AppData\Local\Temp\surefire14699984892155314350\surefirebooter-20251026140456985_3.jar C:\Users\Adrian\AppData\Local\Temp\surefire14699984892155314350 2025-10-26T14-04-56_799-jvmRun1 surefire-20251026140456985_1tmp surefire_0-20251026140456985_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\Adrian\AppData\Local\Temp\surefire3817458857806985683\surefirebooter-20251026142753832_3.jar C:\Users\Adrian\AppData\Local\Temp\surefire3817458857806985683 2025-10-26T14-27-53_685-jvmRun1 surefire-20251026142753832_1tmp surefire_0-20251026142753832_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\Adrian\Documents\GitHub\Projecte-TQS-F1_2D\Projecte-TQS-F1_2D\target\test-classes;C:\Users\Adrian\Documents\GitHub\Projecte-TQS-F1_2D\Projecte-TQS-F1_2D\target\classes;C:\Users\Adrian\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.2\junit-jupiter-5.10.2.jar;C:\Users\Adrian\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\Adrian\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\Adrian\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\Adrian\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Adrian\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.2\junit-jupiter-params-5.10.2.jar;C:\Users\Adrian\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\Adrian\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;C:\Users\Adrian\.m2\repository\org\mockito\mockito-core\3.12.4\mockito-core-3.12.4.jar;C:\Users\Adrian\.m2\repository\net\bytebuddy\byte-buddy\1.11.13\byte-buddy-1.11.13.jar;C:\Users\Adrian\.m2\repository\net\bytebuddy\byte-buddy-agent\1.11.13\byte-buddy-agent-1.11.13.jar;C:\Users\Adrian\.m2\repository\org\objenesis\objenesis\3.2\objenesis-3.2.jar;C:\Users\Adrian\.m2\repository\org\mockito\mockito-junit-jupiter\3.12.4\mockito-junit-jupiter-3.12.4.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -31,7 +31,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\Adrian\AppData\Local\Temp\surefire14699984892155314350\surefirebooter-20251026140456985_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\Adrian\AppData\Local\Temp\surefire3817458857806985683\surefirebooter-20251026142753832_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="25+36-LTS"/>
@@ -61,22 +61,22 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="69.0"/>
   </properties>
-  <testcase name="testGetSectorTimeValid(int)[1]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.038"/>
+  <testcase name="testGetSectorTimeValid(int)[1]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.036"/>
   <testcase name="testGetSectorTimeValid(int)[2]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
   <testcase name="testGetSectorTimeValid(int)[3]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
   <testcase name="testPassedAllCheckpoints" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
   <testcase name="testSum_IndexOutOfBounds" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
-  <testcase name="testGetBestSectorTimeInvalid(int)[1]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
-  <testcase name="testGetBestSectorTimeInvalid(int)[2]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.005"/>
+  <testcase name="testGetBestSectorTimeInvalid(int)[1]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.002"/>
+  <testcase name="testGetBestSectorTimeInvalid(int)[2]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
   <testcase name="testGetBestSectorTimeInvalid(int)[3]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
-  <testcase name="testCheckpointProgression" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
-  <testcase name="testSum_EmptyArray" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.002"/>
+  <testcase name="testCheckpointProgression" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.002"/>
+  <testcase name="testSum_EmptyArray" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.006"/>
   <testcase name="testGetBestLapTimeFinish" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
-  <testcase name="testGetBestLapTime" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
-  <testcase name="testSectorOperations" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.006"/>
-  <testcase name="testInitialState" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.002"/>
+  <testcase name="testGetBestLapTime" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.002"/>
+  <testcase name="testSectorOperations" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
+  <testcase name="testInitialState" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
   <testcase name="testGetSectorTimeInvalid(int)[1]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
-  <testcase name="testGetSectorTimeInvalid(int)[2]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.004"/>
+  <testcase name="testGetSectorTimeInvalid(int)[2]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
   <testcase name="testGetSectorTimeInvalid(int)[3]" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
   <testcase name="resetSectors" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>
   <testcase name="testIniPassedAllCheckpoints" classname="es.uab.tqs.f1_2D.model.MapTest" time="0.001"/>

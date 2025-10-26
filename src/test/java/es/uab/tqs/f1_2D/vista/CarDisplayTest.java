@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.*;
 
 import java.awt.Graphics2D;
@@ -39,6 +41,12 @@ class CarDisplayTest {
     private Map mockMap2;
     @Mock
     private LapUI lapUI;
+
+    /* 
+      ================================================================================
+        TEST SOBRE VISTA, NO ES DEMANA PERO EM SERVEIX PER VERIFICAR FUNCIONAMENT
+      ================================================================================
+    */
 
     @BeforeEach
     void setUp()

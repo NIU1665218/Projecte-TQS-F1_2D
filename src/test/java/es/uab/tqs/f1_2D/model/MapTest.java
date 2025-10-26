@@ -35,7 +35,7 @@ class MapTest
 
     /* 
       =============================================================================
-        TEST DRIVEN DEVELOPMENT 
+        TEST DRIVEN DEVELOPMENT (SON GETTERS Y SETTERS PRÁCTICAMENTE)
       =============================================================================
     */
 
@@ -153,12 +153,6 @@ class MapTest
         map.setNextCheckpointIndex(3);
         assertTrue(map.passedAllCheckpoints());
     }
-
-    /* 
-      =============================================================================
-        CAJA NEGRA
-      =============================================================================
-    */
 
     @Test
     //Test getter

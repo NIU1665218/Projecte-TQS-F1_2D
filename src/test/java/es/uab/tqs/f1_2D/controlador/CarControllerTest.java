@@ -111,8 +111,39 @@ public class CarControllerTest
 
     /* 
       =============================================================================
-        EQUIVALENT PARTITIONS
+        PAIRWISE TESTING + EDGE CASES + EQUIVALENT PARTITIONING 
       =============================================================================
+    */
+
+    /*
+        VALORES A MIRAR EN PARTICIONES Y FRONTERA: (mismos que modelo pero con las funciones de esta clase y las de car)
+            TECLAS DE ENTRADA: W | UP + S | DOWN + A | LEFT + D | RIGHT + NO VALID 
+            ESTADO DE LA VELOCIDAD (0-10, -5-0, 0)
+            POSICIÓN EN EL MAPA ( X=[0, 500] y Y=[0, 500] || x/y < 0 + x/y > 500)
+            SUPERFICIE EN PISTA ( EN PISTA, FUERA DE PISTA, COLISIÓN CON PARED INVISIBLE)
+
+        - COVERAGE ACTUAL 100% DE LOS VALORES - 
+
+        PAIRWISE TABLE:
+        
+        A	F	I	D	Combinación de Teclas	
+        0	0	0	0	Ninguna tecla	
+        0	0	0	1	D o RIGHT	
+        0	0	1	0	A o LEFT	
+        0	0	1	1	A + D o LEFT + RIGHT	
+        0	1	0	0	S o DOWN	
+        0	1	0	1	S + D o DOWN + RIGHT	
+        0	1	1	0	S + A o DOWN + LEFT	
+        0	1	1	1	S + A + D o DOWN + LEFT + RIGHT	
+        1	0	0	0	W o UP	
+        1	0	0	1	W + D o UP + RIGHT	
+        1	0	1	0	W + A o UP + LEFT	
+        1	0	1	1	W + A + D o UP + LEFT + RIGHT	
+        1	1	0	0	W + S o UP + DOWN	
+        1	1	0	1	W + S + D
+        1	1	1	0	W + S + A	
+        1	1	1	1	W + S + A + D
+
     */
 
     // W | UP
@@ -228,12 +259,6 @@ public class CarControllerTest
         assertTrue(car.getVelocity() >= -5 && car.getVelocity() <= -4.9);
     }
 
-     /* 
-      =============================================================================
-        Pairwise Testing
-      =============================================================================
-    */
-
     @Test
     public void testPairwiseWA() {
         controller.processInput(Set.of(KeyEvent.VK_W, KeyEvent.VK_A), grayMap);
@@ -261,12 +286,6 @@ public class CarControllerTest
         assertTrue(car.getVelocity() < 0);
         assertTrue(car.getAngle() > 0);
     }
-
-    /* 
-    =============================================================================
-    EDGE CASES 
-    =============================================================================
-    */
 
     @Test
     public void testEdgeMaxVelocity() {

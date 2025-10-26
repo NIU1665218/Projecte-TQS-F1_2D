@@ -206,8 +206,8 @@ public class MapController {
         // Mejora global real (y existía un global previo)
         if (previousGlobalBest != Long.MAX_VALUE && newGlobalBest < previousGlobalBest) 
         {
-            model.setBestSectorTime(sectorIndex, newGlobalBest);
-            model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);
+            if (model.getBestSectorTime(sectorIndex) == newGlobalBest) 
+                model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);
         }
     }
     

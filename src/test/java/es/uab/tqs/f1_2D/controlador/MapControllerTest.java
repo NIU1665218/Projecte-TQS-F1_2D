@@ -324,6 +324,16 @@ class MapControllerTest
       =============================================================================
     */
 
+    /*
+        VALORES A MIRAR EN PARTICIONES Y FRONTERA:
+            ESTADOS DEL MAPA: IDLE, RUNNING, OFF_TRACK, INVALID_MAP, RESULT
+            LÍMITES EN LÍNEA DE META Y CHECKPOINTS
+            TIMERS
+            SECTORS 1,2,3 - COLORS NONE, ORANGE, GREEN, PURPLE
+
+        - COVERAGE ACTUAL 90% DE LOS VALORES - (FALTA SECTORS - FALTA IMPLEMENTAR ALTRES COTXES)
+    */
+
     @Test
     //Estado IDLE → RUNNING al cruzar línea de meta sin estar fuera de pista
     void testIdleToRunningTransition() 
@@ -635,6 +645,26 @@ class MapControllerTest
         trackController.updatePosition(110, 110, false);
         assertEquals(Map.State.RUNNING, track.getState());
     }
+
+    /*
+    @Test
+    void testSectorPartitions() 
+    {
+        // Configurar mejores tiempos existentes
+        track.setBestSectorTime(0, 1000L);
+        track.setBestSectorTime(1, 2000L);
+        
+        trackController.recordSector(0, 800L);
+        
+        assertEquals(Map.SectorColor.PURPLE, track.getSectorColor(0));
+        
+        trackController.recordSector(0, 1800L);
+        assertEquals(Map.SectorColor.ORANGE, track.getSectorColor(0));
+
+        trackController.recordSector(0, 1700L);
+        assertEquals(Map.SectorColor.GREEN, track.getSectorColor(0));
+    }
+    */
 
     /* 
       =============================================================================

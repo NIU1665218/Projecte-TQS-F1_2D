@@ -31,6 +31,12 @@ class LapUITest {
     //Graphics2D para pruebas de pintado
     private Graphics2D g2d;
 
+    /* 
+      ================================================================================
+        TEST SOBRE VISTA, NO ES DEMANA PERO EM SERVEIX PER VERIFICAR FUNCIONAMENT
+      ================================================================================
+    */
+
     @BeforeEach
     void setUp() 
     {

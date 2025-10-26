@@ -1,6 +1,7 @@
 package es.uab.tqs.f1_2D.model;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -225,9 +226,38 @@ class CarTest
 
     /* 
       =============================================================================
-        EQUIVALENT PARTITIONS
+        PAIRWISE TESTING + EDGE CASES + EQUIVALENT PARTITIONING 
       =============================================================================
     */
+
+    /*
+        VALORES A MIRAR EN PARTICIONES Y FRONTERA: (mismos que controller pero con las funciones de esta clase)
+            TECLAS DE ENTRADA: W | UP + S | DOWN + A | LEFT + D | RIGHT + NO VALID 
+            ESTADO DE LA VELOCIDAD (0-10, -5-0, 0)
+            POSICIÓN EN EL MAPA ( X=[0, 500] y Y=[0, 500] || x/y < 0 + x/y > 500)
+            SUPERFICIE EN PISTA ( EN PISTA, FUERA DE PISTA, COLISIÓN CON PARED INVISIBLE)
+
+        - COVERAGE ACTUAL 100% DE LOS VALORES - 
+
+        PAIRWISE TABLE:
+        
+        
+        A	F	I	D	Combinación	   Estado Velocidad	    Ángulo	
+        0	0	0	0	Ninguna	       Cero	                Cualquiera	
+        0	0	0	1	Solo D	       Cero/Positiva	    Aumenta	
+        0	0	1	0	Solo A	       Cero/Positiva	    Disminuye	
+        0	0	1	1	A + D	       Cero/Positiva	    Neutral	
+        0	1	0	0	Solo S	       Positiva/Negativa	Cualquiera	
+        0	1	0	1	S + D	       Negativa	            Aumenta	
+        0	1	1	0	S + A	       Negativa	            Disminuye	
+        0	1	1	1	S + A + D	   Negativa	            Neutral	
+        1	0	0	0	Solo W	       Cero/Positiva	    Cualquiera	
+        1	0	0	1	W + D	       Positiva	            Aumenta	
+        1	0	1	0	W + A	       Positiva	            Disminuye	
+        1	0	1	1	W + A + D	   Positiva	            Neutral	
+        1	1	0	0	W + S	       Positiva/Negativa	Cualquiera	
+    */
+
     @Test
     public void settersGettersPartitionTest()
     {
@@ -551,13 +581,6 @@ class CarTest
         assertTrue(car.getVelocity() > 0);
     }
 
-
-    /* 
-      =============================================================================
-        Pairwise Testing
-      =============================================================================
-    */
-
     public void testPairwiseMovement()
     {
         int[] keys = {
@@ -636,12 +659,6 @@ class CarTest
             }
         }
     }
-
-    /* 
-    =============================================================================
-    EDGE CASES 
-    =============================================================================
-    */
 
     @Test
     public void testEdgeVelocityBoundary() {
