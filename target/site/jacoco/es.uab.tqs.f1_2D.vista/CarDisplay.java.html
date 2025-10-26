@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CarDisplay.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.vista</a> &gt; <span class="el_source">CarDisplay.java</span></div><h1>CarDisplay.java</h1><pre class="source lang-java linenums">package es.uab.tqs.f1_2D.vista;
+
+import es.uab.tqs.f1_2D.model.Car;
+import es.uab.tqs.f1_2D.controlador.CarController;
+import es.uab.tqs.f1_2D.controlador.MapController;
+import es.uab.tqs.f1_2D.model.Map;
+
+import javax.swing.*;
+
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
+public class CarDisplay extends JPanel 
+{
+    private CarController controller;
+    private BufferedImage largerMap; 
+    private BufferedImage collisionMap;
+<span class="fc" id="L28">    private Set&lt;Integer&gt; keysPressed = new HashSet&lt;&gt;();</span>
+
+    private Map trackMap;
+    private MapController trackMapController;
+    private LapUI lapUI;
+    private OffTrackOverlay offTrackOverlay;
+    private OffTrackOverlay invalidLapOverlay;
+
+<span class="fc" id="L36">    Rectangle finish = new Rectangle(360, 1200, 200, 40);</span>
+<span class="fc" id="L37">    List&lt;Rectangle&gt; checkpoints = new ArrayList&lt;&gt;();</span>
+
+    // Constructor
+<span class="fc" id="L40">    public CarDisplay(CarController controller, BufferedImage map, BufferedImage collisionMap1) {</span>
+<span class="fc" id="L41">        this.controller = controller;</span>
+
+        // Si no hay mapas, usar valores mínimos seguros
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (map == null) {</span>
+<span class="fc" id="L45">            map = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);</span>
+        }
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (collisionMap1 == null) </span>
+        {
+<span class="fc" id="L49">            collisionMap1 = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);</span>
+        }
+<span class="fc" id="L51">        this.largerMap = map;</span>
+<span class="fc" id="L52">        this.collisionMap = collisionMap1;</span>
+
+        // Configurar el mapa de la pista
+<span class="fc" id="L55">        checkpoints.add(new Rectangle(1800, 700, 40, 200));</span>
+<span class="fc" id="L56">        checkpoints.add(new Rectangle(5484, 152, 20, 200));</span>
+<span class="fc" id="L57">        checkpoints.add(new Rectangle(1388, 1216, 200, 50));</span>
+<span class="fc" id="L58">        checkpoints.add(new Rectangle(432, 2344, 250, 50));</span>
+<span class="fc" id="L59">        trackMap = new Map(map.getWidth(), map.getHeight(), finish, checkpoints);</span>
+<span class="fc" id="L60">        trackMapController = new MapController(trackMap);</span>
+<span class="fc" id="L61">        trackMapController.setTimeProvider(System::currentTimeMillis);</span>
+
+        // Configurar interfaces de usuario
+<span class="fc" id="L64">        lapUI = new LapUI(trackMap);</span>
+<span class="fc" id="L65">        offTrackOverlay = new OffTrackOverlay(&quot;/img/lapdeleted.png&quot;, &quot;/sound/Popup.wav&quot;);</span>
+<span class="fc" id="L66">        setLayout(null);</span>
+<span class="fc" id="L67">        offTrackOverlay.setBounds(0, 0, 1024, 860);</span>
+<span class="fc" id="L68">        invalidLapOverlay = new OffTrackOverlay(&quot;/img/invalidlap.png&quot;, &quot;/sound/boxbox.wav&quot;);</span>
+<span class="fc" id="L69">        invalidLapOverlay.setBounds(0, 0, 1024, 860);</span>
+
+<span class="fc" id="L71">        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();</span>
+<span class="fc" id="L72">        lapUI.setBounds((int)screenSize.getWidth() - 360, (int)screenSize.getHeight() - 200, 340, 150);</span>
+<span class="fc" id="L73">        add(lapUI);</span>
+<span class="fc" id="L74">        add(offTrackOverlay);</span>
+<span class="fc" id="L75">        setComponentZOrder(offTrackOverlay, 0);</span>
+<span class="fc" id="L76">        add(invalidLapOverlay);</span>
+<span class="fc" id="L77">        setComponentZOrder(invalidLapOverlay, 0);</span>
+
+<span class="fc" id="L79">        setFocusable(true);</span>
+
+        // Cargar el sprite del coche
+<span class="fc" id="L82">        loadCarSprite(controller, &quot;/img/car.png&quot;);</span>
+
+        // Configurar listeners de teclado
+<span class="fc" id="L85">        addKeyListener(new KeyAdapter() {</span>
+            @Override
+            public void keyPressed(KeyEvent e) {
+<span class="fc" id="L88">                keysPressed.add(e.getKeyCode());</span>
+<span class="fc" id="L89">            }</span>
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+<span class="fc" id="L93">                keysPressed.remove(e.getKeyCode());</span>
+<span class="fc" id="L94">            }</span>
+        });
+
+        // Ajustar overlays al redimensionar
+<span class="fc" id="L98">        addComponentListener(new java.awt.event.ComponentAdapter() {</span>
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+<span class="fc" id="L101">                offTrackOverlay.setBounds(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L102">                invalidLapOverlay.setBounds(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L103">            }</span>
+        });
+
+        // Timer para actualizar el juego y repintar
+<span class="fc" id="L107">        new Timer(16, e -&gt; { </span>
+<span class="fc" id="L108">            controller.processInput(keysPressed, collisionMap); </span>
+<span class="fc" id="L109">            updateRace();</span>
+<span class="fc" id="L110">            repaint();</span>
+<span class="fc" id="L111">        }).start();</span>
+<span class="fc" id="L112">    }</span>
+    
+    // Actualiza el estado de la carrera y los overlays
+    public void updateRace() 
+    {
+<span class="fc" id="L117">        Car car = controller.getCar();</span>
+<span class="fc bfc" id="L118" title="All 4 branches covered.">        if (trackMap.getState() != Map.State.RESULT &amp;&amp; trackMap.getState() != Map.State.INVALID_LAP)</span>
+        {
+            // Actualizar posición del coche en el mapa
+<span class="fc" id="L121">            boolean offTrack = car.trackLimits(collisionMap);</span>
+<span class="fc" id="L122">            trackMapController.updatePosition(car.getX(), car.getY(), offTrack);</span>
+        }
+
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if (trackMap.getState() == Map.State.OFF_TRACK) </span>
+        {
+            // Mostrar overlay de fuera de pista
+<span class="fc" id="L128">            offTrackOverlay.showOverlay();</span>
+<span class="fc" id="L129">            invalidLapOverlay.hideOverlay();</span>
+        } 
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        else if (trackMap.getState() == Map.State.INVALID_LAP)</span>
+        {
+            // Mostrar overlay de vuelta inválida
+<span class="fc" id="L134">            invalidLapOverlay.showOverlay();</span>
+<span class="fc" id="L135">            offTrackOverlay.hideOverlay();</span>
+        }
+        else 
+        {
+            // Ocultar ambos overlays
+<span class="fc" id="L140">            offTrackOverlay.hideOverlay();</span>
+<span class="fc" id="L141">            invalidLapOverlay.hideOverlay();</span>
+        }
+<span class="fc" id="L143">    }</span>
+
+    // PaintComponent para dibujar el mapa y el coche
+    @Override
+    protected void paintComponent(Graphics g) 
+    {
+<span class="fc" id="L149">        super.paintComponent(g);</span>
+
+<span class="fc" id="L151">        Car car = controller.getCar();</span>
+<span class="fc" id="L152">        Graphics2D g2d = (Graphics2D) g;</span>
+
+        // Calcular la posición de la cámara centrada en el coche
+<span class="fc" id="L155">        int panelWidth = getWidth();</span>
+<span class="fc" id="L156">        int panelHeight = getHeight();</span>
+<span class="fc" id="L157">        double cameraX = car.getX() - panelWidth / 2.0;</span>
+<span class="fc" id="L158">        double cameraY = car.getY() - panelHeight / 2.0;</span>
+
+<span class="fc" id="L160">        cameraX = Math.max(0, Math.min(cameraX, largerMap.getWidth() - panelWidth));</span>
+<span class="fc" id="L161">        cameraY = Math.max(0, Math.min(cameraY, largerMap.getHeight() - panelHeight));</span>
+
+       // Dibujar la porción visible del mapa
+<span class="fc" id="L164">        g2d.drawImage(largerMap,</span>
+                0, 0, panelWidth, panelHeight,
+                (int) cameraX, (int) cameraY,
+                (int) cameraX + panelWidth, (int) cameraY + panelHeight,
+                null);
+
+        
+<span class="fc" id="L171">        double drawX = car.getX() - cameraX;</span>
+<span class="fc" id="L172">        double drawY = car.getY() - cameraY;</span>
+
+        // Dibujar el coche con rotación
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        if (car.getSprite() != null) {</span>
+<span class="fc" id="L176">            AffineTransform transform = new AffineTransform();</span>
+<span class="fc" id="L177">            transform.translate(drawX, drawY);</span>
+<span class="fc" id="L178">            transform.rotate(Math.toRadians(car.getAngle()),</span>
+<span class="fc" id="L179">                    car.getSprite().getWidth() / 2.0,</span>
+<span class="fc" id="L180">                    car.getSprite().getHeight() / 2.0);</span>
+<span class="fc" id="L181">            g2d.drawImage(car.getSprite(), transform, null);</span>
+
+            /* DEBUGGING PURPOSES
+            // Dibujar hitbox del coche
+            g2d.setColor(Color.RED);
+            g2d.setStroke(new BasicStroke(2)); 
+            Rectangle rect = new Rectangle(0, 0, car.getSprite().getWidth(), car.getSprite().getHeight());
+            Shape hitbox = transform.createTransformedShape(rect);
+            g2d.draw(hitbox);
+            */
+
+<span class="fc" id="L192">        } else {</span>
+            // Dibujar un rectángulo rojo si no hay sprite
+<span class="fc" id="L194">            g2d.setColor(Color.RED);</span>
+<span class="fc" id="L195">            g2d.fillRect((int) drawX, (int) drawY, 20, 10);</span>
+        }
+
+        /* DEBUGGING PURPOSES
+        // Dibujar checkpoints
+        g2d.setColor(new Color(0, 255, 0, 100)); 
+        g2d.fillRect(
+            (int)(finish.x - cameraX),
+            (int)(finish.y - cameraY),
+            finish.width,
+            finish.height
+        );
+
+        g2d.setColor(new Color(255, 0, 0, 100)); 
+        checkpoints.add(new Rectangle(1800, 700, 40, 200));
+        checkpoints.add(new Rectangle(5484, 152, 20, 200));
+        checkpoints.add(new Rectangle(1388, 1216, 250, 50));
+        checkpoints.add(new Rectangle(432, 2344, 250, 50));
+        for (Rectangle cp : checkpoints) {
+            g2d.fillRect(
+                (int)(cp.x - cameraX),
+                (int)(cp.y - cameraY),
+                cp.width,
+                cp.height
+            );
+        }
+        */
+
+<span class="fc" id="L223">    }</span>
+
+    // Carga y asigna el sprite del coche al controlador
+    public void loadCarSprite(CarController controller, String path) 
+    {
+        BufferedImage carImage;
+
+        try {
+<span class="fc bfc" id="L231" title="All 2 branches covered.">            if (path == null) {</span>
+<span class="fc" id="L232">                throw new IllegalArgumentException(&quot;Ruta del sprite no puede ser null&quot;);</span>
+            }
+
+<span class="fc" id="L235">            carImage = ImageIO.read(getClass().getResource(path));</span>
+
+            // Redimensionar la imagen del coche
+<span class="fc" id="L238">            int newWidth = 80;</span>
+<span class="fc" id="L239">            int newHeight = 80;</span>
+<span class="fc" id="L240">            Image scaledImage = carImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);</span>
+
+<span class="fc" id="L242">            BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);</span>
+<span class="fc" id="L243">            Graphics2D g2d = resized.createGraphics();</span>
+<span class="fc" id="L244">            g2d.drawImage(scaledImage, 0, 0, null);</span>
+<span class="fc" id="L245">            g2d.dispose();</span>
+
+            // Asignar el sprite redimensionado al coche
+<span class="fc" id="L248">            controller.getCar().setSprite(resized);</span>
+
+<span class="fc" id="L250">        } catch (IOException | IllegalArgumentException e) {</span>
+            // Imagen por defecto si hay error al cargar
+<span class="fc" id="L252">            BufferedImage defaultImage = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);</span>
+<span class="fc" id="L253">            controller.getCar().setSprite(defaultImage);</span>
+<span class="fc" id="L254">        }</span>
+<span class="fc" id="L255">    }</span>
+
+    // Carga una imagen para el track y se escala para cubrir toda el área
+    public static BufferedImage loadImage(String path, double scaleFactor) 
+    {
+        BufferedImage original;
+        try
+        {
+<span class="fc bfc" id="L263" title="All 2 branches covered.">            if (path == null) throw new IllegalArgumentException(&quot;Path no puede ser null&quot;);</span>
+<span class="fc" id="L264">            original = ImageIO.read(CarDisplay.class.getResource(path));</span>
+        }
+<span class="fc" id="L266">        catch (IOException | IllegalArgumentException e)</span>
+        {
+<span class="fc" id="L268">            original = new BufferedImage(2000, 2000, BufferedImage.TYPE_INT_RGB);</span>
+<span class="fc" id="L269">        }</span>
+
+        // Escalar la imagen
+<span class="fc" id="L272">        int bigWidth = (int)(original.getWidth() * scaleFactor);</span>
+<span class="fc" id="L273">        int bigHeight = (int)(original.getHeight() * scaleFactor);</span>
+
+<span class="fc" id="L275">        BufferedImage scaled = new BufferedImage(bigWidth, bigHeight, BufferedImage.TYPE_INT_RGB);</span>
+<span class="fc" id="L276">        Graphics2D g = scaled.createGraphics();</span>
+<span class="fc" id="L277">        g.drawImage(original, 0, 0, bigWidth, bigHeight, null);</span>
+<span class="fc" id="L278">        g.dispose();</span>
+<span class="fc" id="L279">        return scaled;</span>
+    }
+
+    // Crea la ventana del juego con el CarDisplay
+    public static JFrame createGame(CarController controller, BufferedImage largeMap, BufferedImage collisionMap) 
+    {
+<span class="fc" id="L285">        JFrame frame = new JFrame(&quot;F1 2D&quot;);</span>
+<span class="fc" id="L286">        CarDisplay display = new CarDisplay(controller, largeMap, collisionMap);</span>
+<span class="fc" id="L287">        frame.add(display);</span>
+<span class="fc" id="L288">        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);</span>
+<span class="fc" id="L289">        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="fc" id="L290">        return frame;</span>
+    }
+
+    // Getter para test
+<span class="fc" id="L294">    public Set&lt;Integer&gt; getKeysPressed() { return keysPressed; }</span>
+<span class="fc" id="L295">    public Map getTrackMap() { return trackMap; }</span>
+<span class="fc" id="L296">    public OffTrackOverlay getOffTrackOverlay() { return offTrackOverlay; }</span>
+<span class="fc" id="L297">    public OffTrackOverlay getInvalidLapOverlay() { return invalidLapOverlay; }</span>
+
+
+    // Main para ejecutar el juego
+    public static void main(String[] args) 
+    {
+<span class="fc" id="L303">    double scaleFactor = 4.0;</span>
+<span class="fc" id="L304">    BufferedImage largeMap = null;</span>
+<span class="fc" id="L305">    BufferedImage collisionMap = null;</span>
+
+<span class="fc" id="L307">    largeMap = loadImage(&quot;/track/monaco.jpg&quot;, scaleFactor);</span>
+<span class="fc" id="L308">    collisionMap = loadImage(&quot;/track/monacoCollision.jpg&quot;, scaleFactor);</span>
+
+    // Crear el coche y el controlador
+<span class="fc" id="L311">    Car car = new Car(880, 1780, 267, 0, 15, -5, 2, 0.5, largeMap.getHeight() - 150, largeMap.getWidth() - 200);</span>
+<span class="fc" id="L312">    CarController controller = new CarController(car);</span>
+
+    // Crear y mostrar la ventana del juego
+<span class="fc" id="L315">    JFrame frame = createGame(controller, largeMap, collisionMap);</span>
+<span class="fc" id="L316">    frame.setVisible(true);</span>
+<span class="fc" id="L317">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

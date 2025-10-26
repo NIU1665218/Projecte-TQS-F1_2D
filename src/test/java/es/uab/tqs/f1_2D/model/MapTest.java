@@ -1,37 +1,36 @@
 package es.uab.tqs.f1_2D.model;
 
-import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+@ExtendWith(MockitoExtension.class)
+class MapTest 
+{
 
-class MapTest {
-
-    private Map track;
-    private static final int testMapHeight = 500;
-    private static final int testMapWidth = 500;
-    private Rectangle finish;
+    private Map map;
+    private Rectangle finishLine;
     private List<Rectangle> checkpoints;
-    private static final int offsetSprite = 40;
 
     @BeforeEach
-    void setup() {
-
-        finish = new Rectangle(100, 100, 80, 80);
+    void setUp() 
+    {
+        finishLine = new Rectangle(100, 100, 50, 50);
         checkpoints = new ArrayList<>();
-        checkpoints.add(new Rectangle(200, 100, 80, 80));
-        checkpoints.add(new Rectangle(300, 150, 80, 80));
-        checkpoints.add(new Rectangle(400, 200, 80, 80));
-        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(System::currentTimeMillis);
+        checkpoints.add(new Rectangle(200, 200, 30, 30));
+        checkpoints.add(new Rectangle(300, 300, 30, 30));
+        checkpoints.add(new Rectangle(400, 400, 30, 30));
+        
+        map = new Map(1000, 1000, finishLine, checkpoints);
     }
 
     /* 
@@ -41,460 +40,215 @@ class MapTest {
     */
 
     @Test
-    //Al cruzar la línea de meta por primera vez se inicia la vuelta
-    void testStartLap() {
-        track.updatePosition(110, 110, false);
-        assertEquals(Map.State.RUNNING, track.getState());
-    }
-
-    @Test
-    //Al cruzar la línea de meta por primera vez se inicia la vuelta
-    void testCheckpoint() {
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false); 
-        assertTrue(track.getPassedCheckpoints().contains(0));
-    }
-
-    @Test
-    //Al cruzar la línea de meta tras pasar todos los checkpoints se completa la vuelta
-    void testLapCompletion() {
-        track.updatePosition(110, 110, false); 
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false);
-        assertEquals(Map.State.RESULT, track.getState());
-    }
-
-    @Test
-    //No se completa la vuelta si no se han pasado todos los checkpoints
-    void testLapNotCompleted() {
-        track.updatePosition(110, 110, false);
-        track.updatePosition(110, 110, false);
-        assertNotEquals(Map.State.RESULT, track.getState());
-    }
-
-    @Test
-    //Salir de la pista detiene la vuelta
-    void testOffTrackStopsLap() {
-        track.updatePosition(110, 110, false);
-        track.updatePosition(120, 120, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-        assertEquals(0, track.getLapTime());
-        assertTrue(track.getPassedCheckpoints().isEmpty());
-    }
-
-    @Test
-    //Resetear el mapa vuelve al estado inicial
-    void testResetFunctionality() {
-        track.updatePosition(110, 110, false);
-        track.updatePosition(120, 120, false);
-        track.reset();
-        assertEquals(Map.State.IDLE, track.getState());
-        assertEquals(0, track.getLapTime());
-        assertTrue(track.getPassedCheckpoints().isEmpty());
-    }
-
-    @Test
-    //Al completar una vuelta se guarda el mejor tiempo
-    void testBestLapTime() throws InterruptedException {
-        track.updatePosition(110, 110, false);
-        Thread.sleep(10);
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false);
-        long firstLap = track.getLapTime();
-
-        track.reset();
-        track.updatePosition(110, 110, false);
-        Thread.sleep(5);
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false);
-
-        assertTrue(track.getLapTime() < firstLap);
-    }
-
-    @Test
-    //Al completar vuelta transiciona de RESULT a RUNNING
-    void testResultToRunningTransition() throws InterruptedException 
+    //Verificaciones estado inicial
+    void testInitialState() 
     {
-        track.updatePosition(110, 110, false); 
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false);
-        assertEquals(Map.State.RESULT, track.getState());
-
-        Thread.sleep(3500);
-        track.updatePosition(112, 112, false);
-        assertEquals(Map.State.RUNNING, track.getState());
-        assertTrue(track.getPassedCheckpoints().isEmpty());
-    }
-
-    /* 
-      =============================================================================
-        PAIRWISE TESTING + EDGE CASES + EQUIVALENT PARTITIONING 
-      =============================================================================
-    */
-
-    @Test
-    //Estado IDLE → RUNNING al cruzar línea de meta sin estar fuera de pista
-    void testIdleToRunningTransition() {
-        track.updatePosition(110, 110, false);
-        assertEquals(Map.State.RUNNING, track.getState());
+        assertEquals(Map.State.IDLE, map.getState());
+        assertTrue(map.getPassedCheckpoints().isEmpty());
+        assertEquals(0, map.getNextCheckpointIndex());
+        assertEquals(0, map.getLapTime());
+        assertEquals(0, map.getBestLapTime());
     }
 
     @Test
-    //Estado RUNNING → COMPLETED solo si todos los checkpoints están pasados
-    void testRunningToCompletedTransition() {
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false);
-        assertEquals(Map.State.RESULT, track.getState());
+    //Verificaciones estado inicial flag
+    void testIniPassedAllCheckpoints() 
+    {
+        assertFalse(map.passedAllCheckpoints());
     }
 
     @Test
-    //Estado RUNNING → OFF_TRACK si offTrack es true
-    void testRunningToOffTrackTransition() {
-        track.updatePosition(110, 110, false);
-        track.updatePosition(120, 120, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-    }
-
-    @Test
-    //Estado offTrack = true, cualquier posición 
-    void testOffTrackAnyPosition() {
-        
-        track.updatePosition(50, 50, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-     
-        track.updatePosition(110, 110, false); 
-        track.updatePosition(120, 120, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-        
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false); 
-        track.updatePosition(130, 130, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-    }
-
-    @Test
-    //Estado offTrack = false, todos checkpoints pasados
-    void testNoOffTrackFinishLineAllCheckpoints() {
-    
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false);
-        track.updatePosition(310, 160, false);
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false);
-        
-        assertEquals(Map.State.RESULT, track.getState());
-    }
-
-    @Test
-    //Estado offTrack = false, posición checkpoints
-    void testNoOffTrackCheckpointPosition() {
-        
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, false);
-        
-        assertTrue(track.getPassedCheckpoints().contains(0));
-        assertEquals(Map.State.RUNNING, track.getState());
-    }
-
-    @Test
-    //Estado offTrack = false, posición regular
-    void testRegularPosition() {
-            
-        track.updatePosition(110, 110, false);
-        track.updatePosition(150, 150, false);
-        
-        assertEquals(Map.State.RUNNING, track.getState());
-        assertTrue(track.getPassedCheckpoints().isEmpty());
-    }
-
-    @Test
-    //Estado offTrack, posición NO en meta
-    void tesOffTrackNotFinishLine() {
-        
-        track.updatePosition(50 -offsetSprite, 50 - offsetSprite, true); 
-        track.updatePosition(80 - offsetSprite, 80 - offsetSprite, false); 
-        
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-    }
-   
-    @Test
-    // Frontera interna de la línea de meta
-    void testFinishLineBoundaryInside() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L);
-
-        // Esquina superior izquierda
-        track.updatePosition(100 - offsetSprite, 100 - offsetSprite, false);
-        assertEquals(Map.State.RUNNING, track.getState());
-        
-        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(mockTime);
-        // Esquina superior derecha
-        track.updatePosition(179 - offsetSprite, 100 - offsetSprite, false);
-        assertEquals(Map.State.RUNNING, track.getState());
-        
-        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(mockTime);
-        // Esquina inferior izquierda
-        track.updatePosition(100 - offsetSprite, 179 - offsetSprite, false);
-        assertEquals(Map.State.RUNNING, track.getState());
-        
-        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(mockTime);
-        // Esquina inferior derecha
-        track.updatePosition(179 - offsetSprite, 179 - offsetSprite, false);
-        assertEquals(Map.State.RUNNING, track.getState());
-        
-        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(mockTime);
-        // Centro
-        track.updatePosition(125 - offsetSprite, 125 - offsetSprite, false);
-        assertEquals(Map.State.RUNNING, track.getState());
-    }
-
-    @Test
-    //Frontera externa de la línea de meta
-    void testFinishLineBoundaryOutside() {
+    //Verificación estado flag despues de checkpoints
+    void testPassedAllCheckpoints() 
+    {
        
-        // Esquina superior izquierda
-        track.updatePosition(99 - offsetSprite, 99 - offsetSprite, false);
-        assertEquals(Map.State.IDLE, track.getState());
-        
-        // Justo fuera - superior derecha
-        track.updatePosition(180 - offsetSprite, 99 - offsetSprite, false);
-        assertEquals(Map.State.IDLE, track.getState());
-        
-        // Justo fuera - inferior izquierda
-        track.updatePosition(99 - offsetSprite, 180 - offsetSprite, false);
-        assertEquals(Map.State.IDLE, track.getState());
-        
-        // Justo fuera - inferior derecha
-        track.updatePosition(180 - offsetSprite, 180 - offsetSprite, false);
-        assertEquals(Map.State.IDLE, track.getState());
+        for (int i = 0; i < checkpoints.size(); i++) 
+        {
+            map.getPassedCheckpoints().add(i);
+        }
+        map.setNextCheckpointIndex(checkpoints.size());
+
+        assertTrue(map.passedAllCheckpoints());
     }
 
     @Test
-    void testCheckpointBoundaryInside() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L);
-        track.updatePosition(110, 110, false); 
-    
-        // Esquina superior izquierda
-        track.updatePosition(200 - offsetSprite, 100 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(300 - offsetSprite, 150 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(1));
-        track.updatePosition(400 - offsetSprite, 200 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(2));
-
-        
-        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(mockTime);
-        track.updatePosition(110, 110, false);
-        // Esquina superior derecha
-        track.updatePosition(279 - offsetSprite, 100 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(379 - offsetSprite, 150 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(1));
-        track.updatePosition(479 - offsetSprite, 200 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(2));
-        
-        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(mockTime);
-        track.updatePosition(110, 110, false);
-        // Esquina inferior izquierda
-        track.updatePosition(200 - offsetSprite, 179 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(300 - offsetSprite, 229 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(1));
-        track.updatePosition(400 - offsetSprite, 279 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(2));
-        
-        track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(mockTime);
-        track.updatePosition(110, 110, false);
-        // Esquina inferior derecha
-        track.updatePosition(279 - offsetSprite, 179 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(379 - offsetSprite, 229 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(1));
-        track.updatePosition(479 - offsetSprite, 279 - offsetSprite, false);
-        assertTrue(track.getPassedCheckpoints().contains(2));
-
+    //Test función suma sin valores
+    void testSum_EmptyArray() 
+    {
+        long[] emptyArray = new long[0];
+        assertEquals(0L, map.sum(emptyArray, 0));
     }
 
     @Test
-    void testCheckpointBoundaryOutside() {
-        track.updatePosition(110, 110, false); // Inicia vuelta
+    //Verificación suma de distintos tiempos de sectores
+    void testSum_PartialElements() 
+    {
+        long[] array = {100L, 200L, 300L};
+        assertEquals(100L, map.sum(array, 1)); 
+        assertEquals(300L, map.sum(array, 2)); 
+        assertEquals(600L, map.sum(array, 3)); 
+    }
+
+    @Test
+    //Verificación coverage de fuera de indice
+    void testSum_IndexOutOfBounds() 
+    {
+        long[] array = {100L, 200L};
+        assertEquals(0L, map.sum(array, 0));
+        assertEquals(100L, map.sum(array, 1));
+        assertEquals(300L, map.sum(array, 10)); 
+    }
+
+        @Test
+    //Verificación con mock el comportamiento correcto de los sectores
+    void testSectorOperations() 
+    {
         
-        //Esquina superior izquierda
-        track.updatePosition(199 - offsetSprite, 99 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(299 - offsetSprite, 149 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(399 - offsetSprite, 199  - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
+        Rectangle finishLine = new Rectangle(100, 100, 50, 50);
+        List<Rectangle> checkpoints = new ArrayList<>();
+        Map map = new Map(1000, 1000, finishLine, checkpoints);
         
-        //Esquina superior derecha
-        track.updatePosition(280 - offsetSprite, 99 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(380 - offsetSprite, 149 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(480 - offsetSprite, 199 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
         
-        //Esquina inferior izquierda
-        track.updatePosition(199 - offsetSprite, 180 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(299 - offsetSprite, 230 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(399 - offsetSprite, 280 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
+        map.setSectorTime(0, 1500L);
+        map.setSectorTime(1, 2000L);
+        map.setSectorTime(2, 1800L);
         
-        //Esquina inferior derecha
-        track.updatePosition(280 - offsetSprite, 150 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(380 - offsetSprite, 230 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
-        track.updatePosition(480 - offsetSprite, 280 - offsetSprite, false);
-        assertFalse(track.getPassedCheckpoints().contains(0));
+        assertEquals(1500L, map.getSectorTime(0));
+        assertEquals(2000L, map.getSectorTime(1));
+        assertEquals(1800L, map.getSectorTime(2));
+        
+        
+        map.setBestSectorTime(0, 1400L);
+        map.setBestSectorTime(1, 1900L);
+        map.setBestSectorTime(2, 1700L);
+        
+        assertEquals(1400L, map.getBestSectorTime(0));
+        assertEquals(1900L, map.getBestSectorTime(1));
+        assertEquals(1700L, map.getBestSectorTime(2));
     }
 
     @Test
-    //En meta + offTrack 
-    void testFinishLineOffTrackPairwise() {
-        track.updatePosition(110, 110, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-    }
-
-    @Test
-    // IDLE + En meta + sin offTrack = Empieza vuelta
-    void testIdleStartsLap() {
-        track.updatePosition(110, 110, false);
-        assertEquals(Map.State.RUNNING, track.getState());
-    }
-
-    @Test
-    // RUNNING + En meta + todos checkpoints = Termina vuelta
-    void testRunningAtFinishLineCompletesLap() {
-        track.updatePosition(110, 110, false); 
-        track.updatePosition(210, 110, false); 
-        track.updatePosition(310, 160, false); 
-        track.updatePosition(410, 210, false);
-        track.updatePosition(110, 110, false); 
-        assertEquals(Map.State.RESULT, track.getState());
-    }
-
-    @Test
-    // IDLE + fuera de meta + offTrack = OFF_TRACK 
-    void testIdleOffTrackPairwise() {
-        track.updatePosition(400, 400, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-    }
-
-    @Test
-    //Checkpoint + offTrack = OFF_TRACK sin marcar checkpoint
-    void testCheckpointOffTrackPairwise() {
-        track.updatePosition(110, 110, false);
-        track.updatePosition(210, 110, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-        assertTrue(track.getPassedCheckpoints().isEmpty());
-    }
-
-    @Test
-    //OFF_TRACK + FinishLine = Empieza vuelta
-    void testOffTrackStartsPairwise() {
-        track.updatePosition(110, 110, false);
-        track.updatePosition(120, 120, true);
-        assertEquals(Map.State.OFF_TRACK, track.getState());
-        track.updatePosition(110, 110, false);
-        assertEquals(Map.State.RUNNING, track.getState());
+    //Verificación con mock el comportamiento de la progressión en una vuelta
+    void testCheckpointProgression() 
+    {
+       
+        Rectangle finishLine = new Rectangle(100, 100, 50, 50);
+        List<Rectangle> checkpoints = new ArrayList<>();
+        checkpoints.add(new Rectangle(200, 200, 30, 30));
+        checkpoints.add(new Rectangle(300, 300, 30, 30));
+        checkpoints.add(new Rectangle(400, 400, 30, 30));
+        
+        Map map = new Map(1000, 1000, finishLine, checkpoints);
+        
+        
+        map.getPassedCheckpoints().add(0);
+        map.setNextCheckpointIndex(1);
+        assertFalse(map.passedAllCheckpoints());
+        
+        map.getPassedCheckpoints().add(1);
+        map.setNextCheckpointIndex(2);
+        assertFalse(map.passedAllCheckpoints());
+        
+        map.getPassedCheckpoints().add(2);
+        map.setNextCheckpointIndex(3);
+        assertTrue(map.passedAllCheckpoints());
     }
 
     /* 
       =============================================================================
-        Mock Object
+        CAJA NEGRA
       =============================================================================
     */
 
     @Test
-    //Verificar detección de línea de meta
-    void testUpdatePositionMock() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L);
-        Rectangle mockFinish = Mockito.mock(Rectangle.class);
-        when(mockFinish.contains(Mockito.anyDouble(), Mockito.anyDouble())).thenReturn(true);
-        Map mockMap = new Map(testMapWidth, testMapHeight, mockFinish, checkpoints);
-        mockMap.setTimeProvider(mockTime);
-        mockMap.updatePosition(50, 50, false);
-        assertEquals(Map.State.RUNNING, mockMap.getState());
+    //Test getter
+    void testGetBestLapTime() 
+    {
+        assertEquals(0L, map.getBestLapTime());
+
+        map.setBestLapTime(1500L);
+        assertEquals(1500L, map.getBestLapTime());
     }
 
     @Test
-    //Mock de checkpoint detectado
-    void testCheckpointMock() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L);
-        Rectangle mockFinish = Mockito.mock(Rectangle.class);
-        Rectangle mockCheckpoint = Mockito.mock(Rectangle.class);
-        when(mockFinish.contains(Mockito.anyDouble(), Mockito.anyDouble())).thenReturn(false);
-        when(mockCheckpoint.contains(Mockito.anyDouble(), Mockito.anyDouble())).thenReturn(true);
+    //Test getter
+    void testGetBestLapTimeFinish() 
+    {
+        assertEquals(Long.MAX_VALUE, map.getBestLapTimeFinish());
+    }
 
-        List<Rectangle> mockCheckpoints = List.of(mockCheckpoint);
-        Map track = new Map(testMapWidth, testMapHeight, mockFinish, mockCheckpoints);
-        track.setState(Map.State.RUNNING);
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 3, 10})
+    //Test getter invalido
+    void testGetSectorTimeInvalid(int invalidIndex) 
+    {
+        assertEquals(0L, map.getSectorTime(invalidIndex));
+    }
 
-        track.setTimeProvider(mockTime);
-        track.updatePosition(210, 110, false);
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2})
+    //Test getter
+    void testGetSectorTimeValid(int validIndex) 
+    {
+        map.setSectorTime(validIndex, 1000L + validIndex * 100);
+        assertEquals(1000L + validIndex * 100, map.getSectorTime(validIndex));
+    }
 
-        assertTrue(track.getPassedCheckpoints().contains(0));
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 3, 100})
+    //Test getter invalido
+    void testGetBestSectorTimeInvalid(int invalidIndex) 
+    {
+        assertEquals(0L, map.getBestSectorTime(invalidIndex));
     }
 
     @Test
-    void testFinishLineMock() {
-        // Mock de Rectangle para línea de meta
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L);
-        Rectangle mockFinish = Mockito.mock(Rectangle.class);
-        when(mockFinish.contains(anyDouble(), anyDouble())).thenReturn(true);
+    //Verificación función reset, resetea correctamente
+    void resetSectors() 
+    {
+      
+        for (int i = 0; i < 3; i++) 
+        {
+            map.setSectorTime(i, 1000L);
+            map.setSectorColor(i, Map.SectorColor.GREEN);
+            map.setSectorRecorded(i, true);
+        }
+
+        map.resetSectors();
+
+        for (int i = 0; i < 3; i++) 
+        {
+            assertEquals(0L, map.getSectorTime(i));
+            assertEquals(Map.SectorColor.NONE, map.getSectorColor(i));
+            assertFalse(map.getSectorRecorded()[i]);
+        }
+    }
+
+    @Test
+    //Verificación función para el resultado de las vueltas se copia correctamente
+    void copyCurrentToLastSectors() 
+    {
+        map.setSectorTime(0, 1000L);
+        map.setSectorTime(1, 2000L);
+        map.setSectorTime(2, 3000L);
+        map.setSectorColor(0, Map.SectorColor.GREEN);
+        map.setSectorColor(1, Map.SectorColor.ORANGE);
+        map.setSectorColor(2, Map.SectorColor.PURPLE);
+
+        map.copyCurrentToLastSectors();
+
+        assertDoesNotThrow(() -> map.copyCurrentToLastSectors());
+    }
+
+    @Test
+    // Verificar que podemos cambiar entre todos los estados
+    void testStateTransitions() 
+    {
+        Map.State[] states = Map.State.values();
         
-        Map trackWithMockFinish = new Map(testMapWidth, testMapHeight, mockFinish, checkpoints);
-        trackWithMockFinish.setTimeProvider(mockTime);
-        trackWithMockFinish.updatePosition(50, 50, false);
-        
-        assertEquals(Map.State.RUNNING, trackWithMockFinish.getState());
-        verify(mockFinish).contains((double)(50 + 40), (double)(50 + 40)); // Verificar offset del coche
+        for (Map.State state : states) {
+            map.setCurrentState(state);
+            assertEquals(state, map.getState());
+        }
     }
-
-    @Test
-    //Mock de la conexión con el coche
-    void testCarMock() {
-        TimeProvider mockTime = Mockito.mock(TimeProvider.class);
-        when(mockTime.now()).thenReturn(1000L);
-        Car mockCar = Mockito.mock(Car.class);
-        when(mockCar.getX()).thenReturn(110.0);
-        when(mockCar.getY()).thenReturn(110.0);
-
-        Map track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
-        track.setTimeProvider(mockTime);
-        track.updatePosition(mockCar.getX(), mockCar.getY(), false);
-
-        assertEquals(Map.State.RUNNING, track.getState());
-    }
-
-
 }

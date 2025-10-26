@@ -380,7 +380,62 @@ class CarTest
         car.setY(9);
         assertFalse(car.trackLimits(map));
 
+       map.setRGB(10 + offsetSprite, 10 + offsetSprite, new Color(73, 0, 0).getRGB());
+       car.setX(10);
+       car.setY(10);
+       assertFalse(car.trackLimits(map));
+
+       map.setRGB(10 + offsetSprite, 10 + offsetSprite, new Color(0, 127, 0).getRGB());
+       car.setX(10);
+       car.setY(10);
+       assertFalse(car.trackLimits(map));
+       
+       map.setRGB(10 + offsetSprite, 10 + offsetSprite, new Color(0, 0, 78).getRGB());
+       car.setX(10);
+       car.setY(10);
+       assertFalse(car.trackLimits(map));
+       
+       map.setRGB(10 + offsetSprite, 10 + offsetSprite, new Color(73, 127, 0).getRGB());
+       car.setX(10);
+       car.setY(10);
+       assertFalse(car.trackLimits(map));
+       
+       map.setRGB(10 + offsetSprite, 10 + offsetSprite, new Color(73, 0, 78).getRGB());
+       car.setX(10);
+       car.setY(10);
+       assertFalse(car.trackLimits(map));
+       
+       map.setRGB(10 + offsetSprite, 10 + offsetSprite, new Color(0, 127, 78).getRGB());
+       car.setX(10);
+       car.setY(10);
+       assertFalse(car.trackLimits(map));
+
+       map.setRGB(10 + offsetSprite, 10 + offsetSprite, new Color(80, 130, 90).getRGB());
+       car.setX(10);
+       car.setY(10);
+       assertTrue(car.trackLimits(map));
+       
         car.setX(999);
+        car.setY(999);
+        assertTrue(car.trackLimits(map));
+
+        car.setX(-1);
+        car.setY(-1);
+        assertTrue(car.trackLimits(map));
+        
+        car.setX(-1);
+        car.setY(5);
+        assertTrue(car.trackLimits(map));
+
+        car.setX(5);
+        car.setY(-1);
+        assertTrue(car.trackLimits(map));
+
+        car.setX(999);
+        car.setY(5);
+        assertTrue(car.trackLimits(map));
+
+        car.setX(5);
         car.setY(999);
         assertTrue(car.trackLimits(map));
     }
@@ -406,6 +461,26 @@ class CarTest
         assertFalse(car.invisibleWalls(map));
 
         car.setX(999);
+        car.setY(999);
+        assertTrue(car.invisibleWalls(map));
+
+        car.setX(-1);
+        car.setY(-1);
+        assertTrue(car.invisibleWalls(map));
+        
+        car.setX(-1);
+        car.setY(5);
+        assertTrue(car.invisibleWalls(map));
+
+        car.setX(5);
+        car.setY(-1);
+        assertTrue(car.invisibleWalls(map));
+
+        car.setX(999);
+        car.setY(5);
+        assertTrue(car.invisibleWalls(map));
+
+        car.setX(5);
         car.setY(999);
         assertTrue(car.invisibleWalls(map));
     }
@@ -750,6 +825,14 @@ class CarTest
         assertTrue(car.invisibleWalls(mapImageMock));
         assertTrue(5.0 == car.getX() && 5.0 == car.getY());
     }
+
+    /* 
+      =============================================================================
+        Decision/Condition Coverage
+      =============================================================================
+    */
+
+    
 
 
 }

@@ -1,0 +1,12 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+f1_2D,es.uab.tqs.f1_2D.model,Map.SectorColor,0,27,0,0,0,1,0,1,0,1
+f1_2D,es.uab.tqs.f1_2D.model,Car,0,545,0,74,0,109,0,53,0,16
+f1_2D,es.uab.tqs.f1_2D.model,Map.State,0,33,0,0,0,1,0,1,0,1
+f1_2D,es.uab.tqs.f1_2D.model,Map,0,280,0,20,0,62,0,43,0,33
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay,0,630,0,18,0,125,0,21,0,12
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new KeyAdapter() {...},0,24,0,0,0,5,0,3,0,3
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new ComponentAdapter() {...},0,31,0,0,0,4,0,2,0,2
+f1_2D,es.uab.tqs.f1_2D.vista,OffTrackOverlay,0,161,0,14,0,52,0,20,0,13
+f1_2D,es.uab.tqs.f1_2D.vista,LapUI,0,333,0,20,0,66,0,20,0,9
+f1_2D,es.uab.tqs.f1_2D.controlador,MapController,0,482,0,56,0,111,0,44,0,16
+f1_2D,es.uab.tqs.f1_2D.controlador,CarController,0,19,0,0,0,7,0,3,0,3

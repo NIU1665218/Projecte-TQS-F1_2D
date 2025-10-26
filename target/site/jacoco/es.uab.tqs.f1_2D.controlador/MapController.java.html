@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.controlador</a> &gt; <span class="el_source">MapController.java</span></div><h1>MapController.java</h1><pre class="source lang-java linenums">package es.uab.tqs.f1_2D.controlador;
+
+import es.uab.tqs.f1_2D.model.Map;
+import es.uab.tqs.f1_2D.model.TimeProvider;
+import javax.swing.Timer;
+import java.util.stream.LongStream;
+
+public class MapController {
+    private Map model;
+    private TimeProvider timeProvider;
+    private Timer resultTimer;
+    private Timer offTrackTimer;
+    
+    public MapController(Map model) 
+<span class="fc" id="L15">    {</span>
+<span class="fc" id="L16">        this.model = model;</span>
+<span class="fc" id="L17">    }</span>
+    
+    public void updatePosition(double x, double y, boolean offTrack) 
+    {
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (offTrack) </span>
+        {
+<span class="fc" id="L23">            model.setCurrentState(Map.State.OFF_TRACK);</span>
+<span class="fc" id="L24">            return;</span>
+        }
+        
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (model.getState() == Map.State.RESULT) return;</span>
+        
+        // Verificar línea de meta
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (model.getFinishLine().contains(x + 40, y + 40)) </span>
+        {
+<span class="fc" id="L32">            handleFinishLineCrossing();</span>
+        }
+        
+<span class="fc bfc" id="L35" title="All 4 branches covered.">        if (model.getState() == Map.State.OFF_TRACK || model.getState() == Map.State.INVALID_LAP) </span>
+        {
+<span class="fc" id="L37">            reset();</span>
+<span class="fc" id="L38">            return;</span>
+        }
+        
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (model.getState() == Map.State.RUNNING) </span>
+        {
+<span class="fc" id="L43">            handleCheckpoints(x, y);</span>
+<span class="fc" id="L44">            model.setLapTime(timeProvider.now() - model.getLapStartTime());</span>
+        }
+<span class="fc" id="L46">    }</span>
+    
+    private void handleFinishLineCrossing() 
+    {
+<span class="fc" id="L50">        Map.State currentState = model.getState();</span>
+        
+<span class="fc bfc" id="L52" title="All 4 branches covered.">        if (currentState == Map.State.OFF_TRACK || currentState == Map.State.INVALID_LAP) </span>
+        {
+<span class="fc" id="L54">            model.setCurrentState(Map.State.IDLE);</span>
+        }
+        
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (currentState == Map.State.IDLE) </span>
+        {
+<span class="fc" id="L59">            startLap();</span>
+        } else {
+            // Grabar último sector si no se ha grabado
+<span class="fc" id="L62">            int lastSectorIndex = model.getNumSectors() - 1;</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (!model.getSectorRecorded()[lastSectorIndex]) </span>
+            {
+<span class="fc" id="L65">                long now = timeProvider.now();</span>
+<span class="fc" id="L66">                long totalSinceStart = now - model.getLapStartTime();</span>
+<span class="fc" id="L67">                long prevSum = model.sum(model.getSectorTimes(), lastSectorIndex);</span>
+<span class="fc" id="L68">                long sectorTime = totalSinceStart - prevSum;</span>
+<span class="fc" id="L69">                recordSector(lastSectorIndex, sectorTime);</span>
+            }
+            
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            if (model.passedAllCheckpoints()) </span>
+            {
+<span class="fc" id="L74">                endLap();</span>
+            } else 
+            {
+<span class="fc" id="L77">                startLap();</span>
+            }
+        }
+<span class="fc" id="L80">    }</span>
+    
+    private void handleCheckpoints(double x, double y) 
+    {
+<span class="fc" id="L84">        var checkpoints = model.getCheckpoints();</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        for (int i = 0; i &lt; checkpoints.size(); i++) </span>
+        {
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            if (checkpoints.get(i).contains(x + 40, y + 40)) </span>
+            {
+<span class="fc bfc" id="L89" title="All 2 branches covered.">                if (model.getPassedCheckpoints().contains(i)) break;</span>
+                
+<span class="fc bfc" id="L91" title="All 2 branches covered.">                if (i == model.getNextCheckpointIndex()) </span>
+                {
+<span class="fc" id="L93">                    model.getPassedCheckpoints().add(i);</span>
+<span class="fc" id="L94">                    model.setNextCheckpointIndex(model.getNextCheckpointIndex() + 1);</span>
+                    
+                    // Grabar sector (excepto para el primer y último checkpoint)
+<span class="fc bfc" id="L97" title="All 4 branches covered.">                    if (i &gt;= 1 &amp;&amp; i &lt;= checkpoints.size() - 2) </span>
+                    {
+<span class="fc" id="L99">                        int sectorIndex = i - 1;</span>
+<span class="fc" id="L100">                        long now = timeProvider.now();</span>
+<span class="fc" id="L101">                        long totalSinceStart = now - model.getLapStartTime();</span>
+<span class="fc" id="L102">                        long prevSum = model.sum(model.getSectorTimes(), sectorIndex);</span>
+<span class="fc" id="L103">                        long sectorTime = totalSinceStart - prevSum;</span>
+<span class="fc" id="L104">                        recordSector(sectorIndex, sectorTime);</span>
+<span class="fc" id="L105">                    }</span>
+                } 
+                else 
+                {
+<span class="fc" id="L109">                    invalidateLap();</span>
+<span class="fc" id="L110">                    break;</span>
+                }
+            }
+        }
+<span class="fc" id="L114">    }</span>
+    
+    public void startLap() 
+    {
+<span class="fc" id="L118">        stopAllTimers();</span>
+<span class="fc" id="L119">        model.setLapStartTime(timeProvider.now());</span>
+<span class="fc" id="L120">        model.resetSectors();</span>
+<span class="fc" id="L121">        model.getPassedCheckpoints().clear();</span>
+<span class="fc" id="L122">        model.setNextCheckpointIndex(0);</span>
+<span class="fc" id="L123">        model.setCurrentState(Map.State.RUNNING);</span>
+<span class="fc" id="L124">    }</span>
+    
+    private void endLap() 
+    {
+<span class="fc" id="L128">        model.setLastCompletedLapTime(timeProvider.now() - model.getLapStartTime());</span>
+<span class="fc" id="L129">        model.copyCurrentToLastSectors();</span>
+<span class="fc" id="L130">        model.setCurrentState(Map.State.RESULT);</span>
+        
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (model.getLastCompletedLapTime() &lt; model.getBestLapTimeFinish()) </span>
+        {
+<span class="fc" id="L134">            model.setBestLapTime(model.getLastCompletedLapTime());</span>
+        }
+        
+<span class="fc" id="L137">        stopAllTimers();</span>
+<span class="fc" id="L138">        resultTimer = new Timer(3000, e -&gt; {</span>
+<span class="fc" id="L139">            model.setCurrentState(Map.State.IDLE);</span>
+<span class="fc" id="L140">            startLap();</span>
+<span class="fc" id="L141">            resultTimer.stop();</span>
+<span class="fc" id="L142">        });</span>
+<span class="fc" id="L143">        resultTimer.setRepeats(false);</span>
+<span class="fc" id="L144">        resultTimer.start();</span>
+<span class="fc" id="L145">    }</span>
+    
+    public void invalidateLap() 
+    {
+<span class="fc" id="L149">        model.setCurrentState(Map.State.INVALID_LAP);</span>
+<span class="fc" id="L150">        stopAllTimers();</span>
+<span class="fc" id="L151">        offTrackTimer = new Timer(3500, e -&gt; {</span>
+<span class="fc" id="L152">            model.setCurrentState(Map.State.IDLE);</span>
+<span class="fc" id="L153">            offTrackTimer.stop();</span>
+<span class="fc" id="L154">        });</span>
+<span class="fc" id="L155">        offTrackTimer.setRepeats(false);</span>
+<span class="fc" id="L156">        offTrackTimer.start();</span>
+<span class="fc" id="L157">    }</span>
+    
+    public void reset() 
+    {
+<span class="fc" id="L161">        stopAllTimers();</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (model.getState() == Map.State.RUNNING) </span>
+        {
+<span class="fc" id="L164">            model.setCurrentState(Map.State.IDLE);</span>
+        }
+<span class="fc" id="L166">        model.getPassedCheckpoints().clear();</span>
+<span class="fc" id="L167">        model.setNextCheckpointIndex(0);</span>
+<span class="fc" id="L168">        model.setLapTime(0);</span>
+<span class="fc" id="L169">        model.resetSectors();</span>
+<span class="fc" id="L170">    }</span>
+    
+    private void stopAllTimers() 
+    {
+<span class="fc bfc" id="L174" title="All 4 branches covered.">        if (resultTimer != null &amp;&amp; resultTimer.isRunning()) </span>
+        {
+<span class="fc" id="L176">            resultTimer.stop();</span>
+        }
+<span class="fc bfc" id="L178" title="All 4 branches covered.">        if (offTrackTimer != null &amp;&amp; offTrackTimer.isRunning()) </span>
+        {
+<span class="fc" id="L180">            offTrackTimer.stop();</span>
+        }
+<span class="fc" id="L182">    }</span>
+    
+    public void recordSector(int sectorIndex, long sectorTime) 
+    {
+<span class="fc bfc" id="L186" title="All 4 branches covered.">        if (sectorIndex &lt; 0 || sectorIndex &gt;= model.getNumSectors()) return;</span>
+        
+<span class="fc" id="L188">        model.setSectorTime(sectorIndex, sectorTime);</span>
+<span class="fc" id="L189">        model.setSectorRecorded(sectorIndex, true);</span>
+        
+<span class="fc" id="L191">        long previousLocalBest = model.getBestSectorTime(sectorIndex);</span>
+<span class="fc" id="L192">        long previousGlobalBest = LongStream.of(model.getBestSectorTimes()).min().orElse(Long.MAX_VALUE);</span>
+        
+        // Mejora local
+<span class="fc bfc" id="L195" title="All 2 branches covered.">        if (sectorTime &lt; previousLocalBest) </span>
+        {
+<span class="fc" id="L197">            model.setBestSectorTime(sectorIndex, sectorTime);</span>
+<span class="fc" id="L198">            model.setSectorColor(sectorIndex, Map.SectorColor.GREEN);</span>
+        } else 
+        {
+<span class="fc" id="L201">            model.setSectorColor(sectorIndex, Map.SectorColor.ORANGE);</span>
+        }
+        
+<span class="fc" id="L204">        long newGlobalBest = LongStream.of(model.getBestSectorTimes()).min().orElse(Long.MAX_VALUE);</span>
+        
+        // Mejora global real (y existía un global previo)
+<span class="fc bfc" id="L207" title="All 4 branches covered.">        if (previousGlobalBest != Long.MAX_VALUE &amp;&amp; newGlobalBest &lt; previousGlobalBest) </span>
+        {
+<span class="fc" id="L209">            model.setBestSectorTime(sectorIndex, newGlobalBest);</span>
+<span class="fc" id="L210">            model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);</span>
+        }
+<span class="fc" id="L212">    }</span>
+    
+<span class="fc" id="L214">    public void setTimeProvider(TimeProvider timeProvider) {this.timeProvider = timeProvider;}</span>
+<span class="fc" id="L215">    public void setMap(Map map) {this.model = map;}</span>
+<span class="fc" id="L216">    public Map getModel() { return model;} </span>
+<span class="fc" id="L217">    public Timer getOffTrackTimer() { return offTrackTimer; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
