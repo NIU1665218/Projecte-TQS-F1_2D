@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,6 +34,9 @@ class MapControllerTest
     private Rectangle finish;
     private List<Rectangle> checkpoints;
     private static final int offsetSprite = 40;
+
+    @Mock
+    TimeProvider mockTime;
 
     @BeforeEach
     void setup() 
@@ -49,6 +53,7 @@ class MapControllerTest
         track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
         trackController = new MapController(track);
         trackController.setTimeProvider(System::currentTimeMillis);
+        mockTime = Mockito.mock(TimeProvider.class);
     }
 
     /* 
@@ -317,7 +322,19 @@ class MapControllerTest
         assertEquals(Map.State.IDLE, track.getState()); 
         assertFalse(offTrackTimer.isRunning());
     }
- 
+
+    @Test
+    // Verificar que startQualyMode configura correctamente el modo qualy
+    void testStartQualyMode() 
+    {
+        trackController.startQualyMode();
+
+        assertFalse(track.isRaceMode());
+        assertEquals(Map.State.IDLE, track.getState());
+        assertTrue(track.getPassedCheckpoints().isEmpty());
+        assertEquals(0, track.getNextCheckpointIndex());
+    }
+    
     /* 
       =============================================================================
         PAIRWISE TESTING + EDGE CASES + EQUIVALENT PARTITIONING 
@@ -817,5 +834,22 @@ class MapControllerTest
         assertEquals(track.getBestSectorTime(-1), 0);
         assertEquals(track.getBestSectorTime(1), Long.MAX_VALUE);
         assertEquals(track.getBestSectorTime(0), 1500L);
+    }
+
+    @Test
+    // Verificar que startRaceMode configura correctamente el modo carrera
+    void testStartRaceMode() 
+    {
+        when(mockTime.now()).thenReturn(1000L);
+        trackController.setTimeProvider(mockTime);
+
+        trackController.startRaceMode();
+
+        assertTrue(track.isRaceMode());
+        assertEquals(Map.State.COUNTDOWN, track.getState());
+        assertTrue(track.isCountdownActive());
+       
+        assertNotNull(trackController.getCountdownTimer());
+        assertTrue(trackController.getCountdownTimer().isRunning());
     }
 }
