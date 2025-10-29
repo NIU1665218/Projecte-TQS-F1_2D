@@ -365,7 +365,7 @@ class MapTest
         assertEquals(4, map.getCurrentLap()); 
         assertTrue(map.isRaceComplete());
         assertEquals(Map.State.RACE_FINISHED, map.getState());
-        
+
     }
 
     /* 
@@ -466,11 +466,6 @@ class MapTest
 
         assertTrue(map.getPassedCheckpoints().isEmpty());
         assertEquals(0, map.getNextCheckpointIndex());
-
-        for (int i = 0; i < map.getNumSectors(); i++) {
-            assertEquals(0L, map.getSectorTime(i));
-            assertFalse(map.getSectorRecorded()[i]);
-        }
 
         assertFalse(map.isRaceComplete());
         assertNotEquals(Map.State.RACE_FINISHED, map.getState());

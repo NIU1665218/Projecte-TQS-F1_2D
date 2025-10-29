@@ -181,10 +181,12 @@ public class Map{
     // Incrementar vuelta
     public void incrementLap() {
         currentLap++;
+        
         lapStartTime = timeProvider.now(); 
-        resetSectors();                    
+        //resetSectors();                    
         passedCheckpoints.clear();         
         nextCheckpointIndex = 0;
+        
         if (isRaceComplete()) {
             currentState = State.RACE_FINISHED;
         } 

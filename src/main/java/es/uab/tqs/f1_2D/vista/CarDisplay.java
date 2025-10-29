@@ -97,12 +97,16 @@ public class CarDisplay extends JPanel
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (inMainMenu) {
-                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                if (inMainMenu) 
+                {
+            
+                } else 
+                {
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) 
+                    {
                         showMainMenu();
                     }
-                } else {
-                    if(!trackMap.isCountdownActive())
+                    else if(!trackMap.isCountdownActive())
                     {
                         keysPressed.add(e.getKeyCode());
                     }
@@ -239,7 +243,7 @@ public class CarDisplay extends JPanel
     
         JOptionPane.showMessageDialog(this, 
             "¡Carrera completada!\n" +
-            "Vueltas: " + trackMap.getCurrentLap() + "/" + trackMap.getTotalLaps() + "\n" +
+            "Vueltas: " + (trackMap.getCurrentLap() - 1) + "/" + trackMap.getTotalLaps() + "\n" +
             "Mejor vuelta: " + formatTime(trackMap.getBestLapTime()),
             "Resultados de Carrera", 
             JOptionPane.INFORMATION_MESSAGE);
