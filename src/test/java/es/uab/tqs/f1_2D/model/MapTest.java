@@ -365,6 +365,7 @@ class MapTest
         assertEquals(4, map.getCurrentLap()); 
         assertTrue(map.isRaceComplete());
         assertEquals(Map.State.RACE_FINISHED, map.getState());
+        
     }
 
     /* 
@@ -385,6 +386,37 @@ class MapTest
         assertEquals(1000L + 5000, map.getCountdownEndTime()); 
         assertEquals(0, map.getCurrentLap());
         assertTrue(map.isCountdownActive());
+    }
+
+    @Test
+    void testGetRemainingCountdownWhenActive() {
+        long baseTime = 1000L;
+        when(timeProvider.now()).thenReturn(baseTime);
+        
+        map.startCountdown();
+        
+        assertTrue(map.isCountdownActive());
+        assertEquals(Map.State.COUNTDOWN, map.getState());
+
+        when(timeProvider.now()).thenReturn(baseTime);
+        int remaining = map.getRemainingCountdown();
+        assertEquals(6, remaining);
+        
+        when(timeProvider.now()).thenReturn(baseTime + 2000L);
+        remaining = map.getRemainingCountdown();
+        assertEquals(4, remaining);
+        
+        when(timeProvider.now()).thenReturn(baseTime + 4000L);
+        remaining = map.getRemainingCountdown();
+        assertEquals(2, remaining);
+        
+        when(timeProvider.now()).thenReturn(baseTime + 4500L);
+        remaining = map.getRemainingCountdown();
+        assertEquals(1, remaining);
+        
+        when(timeProvider.now()).thenReturn(baseTime + 4999L);
+        remaining = map.getRemainingCountdown();
+        assertEquals(1, remaining);
     }
 
     @Test

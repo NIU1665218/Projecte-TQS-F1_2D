@@ -264,7 +264,7 @@ public class MapController {
     }
     
     //Función para parar todos los timers y evitar descontrol de variables sobreescritas
-    private void stopAllTimers() 
+    public void stopAllTimers() 
     {
         if (resultTimer != null && resultTimer.isRunning()) 
         {
@@ -324,5 +324,4 @@ public class MapController {
     public Timer getOffTrackTimer() { return offTrackTimer; }
     public Timer getCountdownTimer() { return countdownTimer; }
     public void setSkip(boolean isSkip) { this.isSkipEnabled = isSkip;}
-    public boolean getSkip() {return isSkipEnabled;}
 }

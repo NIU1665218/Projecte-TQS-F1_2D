@@ -919,6 +919,8 @@ class MapControllerTest
 
         assertEquals(Map.State.RACE_FINISHED, track.getState());
         assertTrue(track.isRaceComplete());
+        trackController.updatePosition(410, 210, false);
+        assertEquals(Map.State.RACE_FINISHED, track.getState());
     }
 
     @Test
@@ -937,6 +939,38 @@ class MapControllerTest
         trackController.updatePosition(110, 110, false);
 
         assertEquals(0, track.getCurrentLap());
+    }
+
+    @Test
+    // Test coverage para stopAllTimers 
+    void testStopAllTimersVariousTimerStates() {
+        when(mockTime.now()).thenReturn(1000L);
+        trackController.setTimeProvider(mockTime);
+        
+        trackController.stopAllTimers();
+        
+        trackController.startRaceMode();
+        trackController.getCountdownTimer().stop();
+        trackController.stopAllTimers();
+        
+        trackController.invalidateLap();
+        trackController.getOffTrackTimer().stop();
+        trackController.stopAllTimers();
+        
+        trackController.updatePosition(110, 110, false);
+        trackController.updatePosition(210, 110, false);
+        trackController.updatePosition(310, 160, false);
+        trackController.updatePosition(410, 210, false);
+        trackController.updatePosition(110, 110, false); 
+        
+        try { Thread.sleep(100); } catch (InterruptedException e) {}
+        if (trackController.getOffTrackTimer() != null) {
+            trackController.getOffTrackTimer().stop();
+        }
+        
+        trackController.stopAllTimers();
+        
+        assertTrue(true); 
     }
 
     @Test

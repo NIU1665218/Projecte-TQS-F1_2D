@@ -109,10 +109,10 @@ public class Map{
 <span class="fc bfc" id="L109" title="All 2 branches covered.">    public boolean isCountdownActive() { return currentState == State.COUNTDOWN; }</span>
     public int getRemainingCountdown() 
     {
-<span class="pc bpc" id="L112" title="1 of 2 branches missed.">        if (!isCountdownActive()) return 0;</span>
-<span class="nc" id="L113">        long now = timeProvider.now();</span>
-<span class="nc" id="L114">        long remaining = countdownEndTime - now;</span>
-<span class="nc" id="L115">        return (int) Math.max(0, (remaining / 1000) + 1);</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        if (!isCountdownActive()) return 0;</span>
+<span class="fc" id="L113">        long now = timeProvider.now();</span>
+<span class="fc" id="L114">        long remaining = countdownEndTime - now;</span>
+<span class="fc" id="L115">        return (int) Math.max(0, (remaining / 1000) + 1);</span>
     }
         
     // Setters
