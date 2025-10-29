@@ -852,4 +852,145 @@ class MapControllerTest
         assertNotNull(trackController.getCountdownTimer());
         assertTrue(trackController.getCountdownTimer().isRunning());
     }
+
+    @Test
+    // Verificar que durante la cuenta atrás no se procesa la posición
+    void testUpdatePositionDuringCountdown() 
+    {
+        when(mockTime.now()).thenReturn(1000L);
+        trackController.setTimeProvider(mockTime);
+
+        trackController.startRaceMode();
+
+        trackController.updatePosition(110, 110, false);
+
+        assertEquals(Map.State.COUNTDOWN, track.getState());
+    }
+
+    @Test
+    // Verificar que la cuenta atrás termina e inicia la carrera correctamente
+    void testCountdownEndsAndRaceStarts() 
+    {
+        when(mockTime.now()).thenReturn(1000L, 6000L); 
+        trackController.setTimeProvider(mockTime);
+
+        trackController.startRaceMode();
+
+        
+        trackController.updatePosition(0, 0, false); 
+
+        assertEquals(Map.State.RUNNING, track.getState());
+        assertEquals(1, track.getCurrentLap());
+    }
+
+    @Test
+    // Verificar que se incrementa la vuelta en modo carrera
+    void testIncrementLapInRaceMode() 
+    {
+        when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L, 3500L);
+        trackController.setTimeProvider(mockTime);
+
+        trackController.startRaceMode();
+        trackController.updatePosition(0, 0, false); 
+       
+        trackController.updatePosition(110, 110, false); 
+        trackController.updatePosition(210, 110, false);
+        trackController.updatePosition(310, 160, false); 
+        trackController.updatePosition(410, 210, false); 
+        trackController.updatePosition(110, 110, false); 
+
+        assertEquals(2, track.getCurrentLap());
+    }
+
+    @Test
+    // Verificar que la carrera se completa correctamente después de todas las vueltas
+    void testRaceCompletion() 
+    {
+        when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L, 3500L, 4000L, 4500L, 5000L, 5500L);
+        trackController.setTimeProvider(mockTime);
+
+        trackController.startRaceMode();
+        trackController.updatePosition(0, 0, false); 
+   
+        for (int lap = 0; lap < 3; lap++) {
+            trackController.updatePosition(110, 110, false);
+            trackController.updatePosition(210, 110, false);
+            trackController.updatePosition(310, 160, false);
+            trackController.updatePosition(410, 210, false);
+            trackController.updatePosition(110, 110, false);
+        }
+
+        assertEquals(Map.State.RACE_FINISHED, track.getState());
+        assertTrue(track.isRaceComplete());
+    }
+
+    @Test
+    // Verificar que en modo qualy no se incrementa el contador de vueltas
+    void testQualyModeDoesNotIncrementLap() 
+    {
+        when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L);
+        trackController.setTimeProvider(mockTime);
+
+        trackController.startQualyMode();
+        
+        trackController.updatePosition(110, 110, false);
+        trackController.updatePosition(210, 110, false);
+        trackController.updatePosition(310, 160, false);
+        trackController.updatePosition(410, 210, false);
+        trackController.updatePosition(110, 110, false);
+
+        assertEquals(0, track.getCurrentLap());
+    }
+
+    @Test
+    // Verificar que el modo carrera maneja correctamente vueltas inválidas
+    void testInvalidLapRaceMode() 
+    {
+        when(mockTime.now()).thenReturn(1000L, 1500L);
+        trackController.setTimeProvider(mockTime);
+
+        trackController.startRaceMode();
+        trackController.updatePosition(0, 0, false); 
+
+        trackController.updatePosition(110, 110, false); 
+        trackController.updatePosition(310, 160, false); 
+
+        assertEquals(Map.State.INVALID_LAP, track.getState());
+    }
+
+    @Test
+    // Verificar que después de vuelta inválida en modo carrera se vuelve a RUNNING
+    void testAfterInvalidLapReturnsToRunningInRaceMode() throws InterruptedException 
+    {
+        when(mockTime.now()).thenReturn(1000L, 1500L);
+        trackController.setTimeProvider(mockTime);
+
+        trackController.startRaceMode();
+        Thread.sleep(1000);
+        trackController.updatePosition(0, 0, false);
+
+      
+        trackController.updatePosition(110, 110, false);
+        trackController.updatePosition(310, 160, false); 
+
+        assertEquals(Map.State.INVALID_LAP, track.getState());
+
+        Thread.sleep(3600);
+        
+        assertEquals(Map.State.RUNNING, track.getState());
+    }
+
+    @Test
+    // Verificar getter para countdownTimer
+    void testGetCountdownTimer() {
+        assertNull(trackController.getCountdownTimer()); 
+        
+        when(mockTime.now()).thenReturn(1000L);
+        trackController.setTimeProvider(mockTime);
+        
+        trackController.startRaceMode();
+        
+        assertNotNull(trackController.getCountdownTimer());
+        assertTrue(trackController.getCountdownTimer().isRunning());
+    }
 }
