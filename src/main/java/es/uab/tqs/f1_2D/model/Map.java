@@ -38,7 +38,7 @@ public class Map{
 
     //Carrera
     private boolean raceMode = false;
-    private int totalLaps = 3;
+    private int totalLaps = 3; 
     private int currentLap = 0;
     private long raceStartTime;
     private long countdownEndTime;
@@ -105,7 +105,7 @@ public class Map{
     public long getRaceStartTime() { return raceStartTime; }    
     public long getCountdownEndTime() { return countdownEndTime; }    
     public int getCountdownSeconds() { return countdownSeconds; }
-    public boolean isRaceComplete() { return raceMode && currentLap >= totalLaps;}  
+    public boolean isRaceComplete() { return raceMode && currentLap > totalLaps;}  
     public boolean isCountdownActive() { return currentState == State.COUNTDOWN; }
     public int getRemainingCountdown() 
     {
@@ -168,7 +168,6 @@ public class Map{
     public void startCountdown() {
         currentState = State.COUNTDOWN;
         countdownEndTime = timeProvider.now() + (countdownSeconds * 1000);
-        currentLap = 0;
     }
     
     // Finalizar cuenta atrás e iniciar carrera
@@ -176,12 +175,16 @@ public class Map{
         currentState = State.RUNNING;
         raceStartTime = timeProvider.now();
         lapStartTime = raceStartTime;
-        currentLap = 0; 
+        currentLap = 1; 
     }
     
     // Incrementar vuelta
     public void incrementLap() {
         currentLap++;
+        lapStartTime = timeProvider.now(); 
+        resetSectors();                    
+        passedCheckpoints.clear();         
+        nextCheckpointIndex = 0;
         if (isRaceComplete()) {
             currentState = State.RACE_FINISHED;
         } 

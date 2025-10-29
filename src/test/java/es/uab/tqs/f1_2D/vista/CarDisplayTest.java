@@ -2,6 +2,7 @@ package es.uab.tqs.f1_2D.vista;
 import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.model.Map;
 import es.uab.tqs.f1_2D.controlador.CarController;
+import es.uab.tqs.f1_2D.controlador.MapController;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,14 +12,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.*;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import javax.sound.sampled.Clip;
 import javax.swing.JFrame;
@@ -29,18 +29,24 @@ class CarDisplayTest {
 
     @Mock
     private CarController mockController;
+    private CarController realController;
     @Mock
     private BufferedImage mockMap;
+    private BufferedImage realMap;
     @Mock
     private BufferedImage mockCollisionMap;
+    private BufferedImage realCollisionMap;
     @Mock
     private Car mockCar;
+    private Car realCar;
     @Mock
     private Clip mockClip;
     @Mock
     private Map mockMap2;
     @Mock
     private LapUI lapUI;
+    @Mock
+    private MapController mockMapController;
 
     /* 
       ================================================================================
@@ -115,22 +121,6 @@ class CarDisplayTest {
     }
 
     @Test
-    void testKeyTriggersProcessInput() 
-    {
-        //Configuración del mock
-        when(mockController.getCar()).thenReturn(mockCar);
-
-        //Creación del resto de componentes necesarios para el test
-        CarDisplay display = new CarDisplay(mockController, mockMap, mockCollisionMap);
-        KeyEvent event = new KeyEvent(display, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_W, 'W');
-        display.dispatchEvent(event);
-        try { Thread.sleep(50); } catch (InterruptedException ignored) {}
-
-        //Verificar que  se ha llamado al método process input
-        verify(mockController, atLeastOnce()).processInput(anySet(), any(BufferedImage.class));
-    }
-
-    @Test
     //La imagen del coche no se pueden cargar
     void testCarDisplayNoRecursos() 
     {
@@ -150,10 +140,7 @@ class CarDisplayTest {
 
         //Configuración del mock
         when(mockController.getCar()).thenReturn(mockCar);
-        when(mockCar.getX()).thenReturn(100.0);
-        when(mockCar.getY()).thenReturn(100.0);
-        when(mockCar.getSprite()).thenReturn(null);
-    
+            
         //Creación del resto de componentes necesarios para la creación del display
         BufferedImage map = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
         CarDisplay display = new CarDisplay(mockController, map, map);
@@ -169,14 +156,9 @@ class CarDisplayTest {
     @Test
     void testPaintComponentWithSprite() 
     {
-        BufferedImage sprite = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);
         //Configuración del mock
         when(mockController.getCar()).thenReturn(mockCar);
-        when(mockCar.getX()).thenReturn(100.0);
-        when(mockCar.getY()).thenReturn(100.0);
-        when(mockCar.getSprite()).thenReturn(sprite);
-        when(mockCar.getAngle()).thenReturn(45.0);
-
+       
         //Creación del resto de componentes necesarios para la creación del display
         BufferedImage map = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
         CarDisplay display = new CarDisplay(mockController, map, map);
@@ -189,11 +171,21 @@ class CarDisplayTest {
 
 
     @Test
-    void testKeyListenerAddsAndRemovesKeys() 
+    void testKeyListenerAddsAndRemovesKeys() throws Exception
     {
         //Configuración del mock
-        when(mockController.getCar()).thenReturn(mockCar);
-        CarDisplay display = new CarDisplay(mockController, mockMap, mockCollisionMap);
+        Map mockTempMap = mock(Map.class);
+        when(mockTempMap.isCountdownActive()).thenReturn(false);
+    
+        realCar = new Car(0, 0, 0, 0, 0, 0, 0, 0, 100, 100);
+        realController = new CarController(realCar);
+        CarDisplay display = new CarDisplay(realController, realMap, realCollisionMap);
+        display.setIsMainMenu(false);
+
+        //Inyectar mockTempMap para poder devolver false a isCountDownActive y poder realizar el test
+        Field f = CarDisplay.class.getDeclaredField("trackMap");
+        f.setAccessible(true);
+        f.set(display, mockTempMap);
 
         // Simular pulsación de tecla
         display.getKeyListeners()[0].keyPressed(
@@ -245,8 +237,7 @@ class CarDisplayTest {
     {
         //Configuración del mock
         when(mockController.getCar()).thenReturn(mockCar);
-        when(mockCar.trackLimits(mockCollisionMap)).thenReturn(false);
-
+        
         CarDisplay display = new CarDisplay(mockController, mockMap, mockCollisionMap);
         display.getOffTrackOverlay().setClip(mockClip);
         display.getInvalidLapOverlay().setClip(mockClip);

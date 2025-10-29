@@ -301,7 +301,7 @@ class MapTest
         assertFalse(map.isRaceComplete());
 
         map.setCurrentLap(3);
-        assertTrue(map.isRaceComplete());
+        assertFalse(map.isRaceComplete());
 
         map.setCurrentLap(4);
         assertTrue(map.isRaceComplete());

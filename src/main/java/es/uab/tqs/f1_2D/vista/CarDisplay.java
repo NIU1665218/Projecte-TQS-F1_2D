@@ -41,7 +41,8 @@ public class CarDisplay extends JPanel
     Rectangle finish = new Rectangle(360, 1200, 200, 40);
     List<Rectangle> checkpoints = new ArrayList<>();
 
-    public enum GameMode {
+    public enum GameMode 
+    {
         QUALY,
         RACE
     }
@@ -476,6 +477,7 @@ public class CarDisplay extends JPanel
     public OffTrackOverlay getInvalidLapOverlay() { return invalidLapOverlay; }
     public boolean isInMainMenu() { return inMainMenu; }
     public GameMode getCurrentGameMode() { return currentGameMode; }
+    public void setIsMainMenu(boolean active) {this.inMainMenu = active;} 
 
     // Clase interna para el menú principal
     private class MainMenu extends JPanel {

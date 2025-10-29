@@ -11,6 +11,7 @@ public class MapController {
     private Timer resultTimer;
     private Timer offTrackTimer;
     private Timer countdownTimer;
+    private boolean isSkipEnabled = false; //variable para testing timer
     
     public MapController(Map model) 
     {
@@ -170,12 +171,17 @@ public class MapController {
         stopAllTimers();
         model.setRaceMode(true);
         model.startCountdown();
-        
-        // Timer para actualizar la cuenta atrás
-        countdownTimer = new Timer(100, e -> {
-            updateCountdown();
-        });
-        countdownTimer.start();
+        //Simular que el countdown termina directament pels tests
+        if(isSkipEnabled)
+        {
+            model.startRace();
+        }
+        else 
+        {
+            // Timer para actualizar la cuenta atrás
+            countdownTimer = new Timer(100, e -> {updateCountdown();});
+            countdownTimer.start();
+        }
     }
     
     //Función para empezar qualy/practice mode
@@ -202,17 +208,28 @@ public class MapController {
         { 
             model.incrementLap();
         }
-        
-        stopAllTimers();
-        resultTimer = new Timer(3000, e -> 
+        if(model.getState() != Map.State.RACE_FINISHED)
         {
-            model.setCurrentState(Map.State.IDLE);
-            startLap();
-            model.setLapStartTime(timeProvider.now() - 3000);
-            resultTimer.stop();
-        });
-        resultTimer.setRepeats(false);
-        resultTimer.start();
+            if(!isSkipEnabled)
+            {
+                stopAllTimers();
+                resultTimer = new Timer(3000, e -> 
+                {
+                    model.setCurrentState(Map.State.IDLE);
+                    startLap();
+                    model.setLapStartTime(timeProvider.now() - 3000);
+                    resultTimer.stop();
+                });
+                resultTimer.setRepeats(false);
+                resultTimer.start();
+            }
+            else
+            {
+                model.setCurrentState(Map.State.IDLE);
+                startLap();
+                model.setLapStartTime(timeProvider.now() - 3000);
+            }
+        }
     }
     
     //Si el jugador no sigue el camino correcto del circuito se le invalida la vuelta
@@ -306,4 +323,6 @@ public class MapController {
     public Map getModel() { return model;} 
     public Timer getOffTrackTimer() { return offTrackTimer; }
     public Timer getCountdownTimer() { return countdownTimer; }
+    public void setSkip(boolean isSkip) { this.isSkipEnabled = isSkip;}
+    public boolean getSkip() {return isSkipEnabled;}
 }

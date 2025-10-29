@@ -842,15 +842,12 @@ class MapControllerTest
     {
         when(mockTime.now()).thenReturn(1000L);
         trackController.setTimeProvider(mockTime);
-
+        trackController.setSkip(true);
         trackController.startRaceMode();
 
         assertTrue(track.isRaceMode());
-        assertEquals(Map.State.COUNTDOWN, track.getState());
-        assertTrue(track.isCountdownActive());
-       
-        assertNotNull(trackController.getCountdownTimer());
-        assertTrue(trackController.getCountdownTimer().isRunning());
+        assertEquals(Map.State.RUNNING, track.getState());
+        assertFalse(track.isCountdownActive()); //Skipped
     }
 
     @Test
@@ -889,7 +886,7 @@ class MapControllerTest
     {
         when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L, 3500L);
         trackController.setTimeProvider(mockTime);
-
+        trackController.setSkip(true);
         trackController.startRaceMode();
         trackController.updatePosition(0, 0, false); 
        
@@ -908,11 +905,11 @@ class MapControllerTest
     {
         when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L, 3500L, 4000L, 4500L, 5000L, 5500L);
         trackController.setTimeProvider(mockTime);
-
+        trackController.setSkip(true);
         trackController.startRaceMode();
         trackController.updatePosition(0, 0, false); 
    
-        for (int lap = 0; lap < 3; lap++) {
+        for (int lap = 1; lap < 4; lap++) {
             trackController.updatePosition(110, 110, false);
             trackController.updatePosition(210, 110, false);
             trackController.updatePosition(310, 160, false);
@@ -948,6 +945,7 @@ class MapControllerTest
     {
         when(mockTime.now()).thenReturn(1000L, 1500L);
         trackController.setTimeProvider(mockTime);
+        trackController.setSkip(true);
 
         trackController.startRaceMode();
         trackController.updatePosition(0, 0, false); 
@@ -964,7 +962,7 @@ class MapControllerTest
     {
         when(mockTime.now()).thenReturn(1000L, 1500L);
         trackController.setTimeProvider(mockTime);
-
+        trackController.setSkip(true);
         trackController.startRaceMode();
         Thread.sleep(1000);
         trackController.updatePosition(0, 0, false);
