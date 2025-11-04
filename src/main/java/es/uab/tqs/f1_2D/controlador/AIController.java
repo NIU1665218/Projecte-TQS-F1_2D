@@ -79,9 +79,9 @@ public class AIController
             new Point(5970, 598),    
             new Point(6028, 585), //T6
             new Point(6070, 547),  
-            new Point(6085, 472),  
-            new Point(6090, 407), //T7 
-            new Point(6113, 355),  
+            new Point(6095, 472),  
+            new Point(6110, 407), //T7 
+            new Point(6120, 355),  
             new Point(6180, 345),
             new Point(6227, 335),        
             new Point(6296, 330), 

@@ -738,7 +738,7 @@ public class CarDisplay extends JPanel
                 }
             }
 
-            /*
+            
             //DEBUGGING PURPOSES
             //RACING LINE DRAWING
             List<Point> racingLine = aiController.getRacingLine();
@@ -773,7 +773,7 @@ public class CarDisplay extends JPanel
                 int y = (int) (point.y - cameraY);
                 g2d.fillOval(x - 5, y - 5, 10, 10); 
             }
-            */  
+            
         }
 
     }
