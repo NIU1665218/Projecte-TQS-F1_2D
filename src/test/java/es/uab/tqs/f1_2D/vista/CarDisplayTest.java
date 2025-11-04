@@ -90,17 +90,17 @@ class CarDisplayTest {
         CarDisplay display = new CarDisplay(controller, null, null);
 
         //Prueba carga de sprite válida 
-        display.loadCarSprite(controller, "/img/car.png");
+        display.loadCarSprite(car, "/img/car.png");
         assertNotNull(car.getSprite());
         assertEquals(80, car.getSprite().getWidth());
         assertEquals(80, car.getSprite().getHeight());
 
         //Prueba carga de sprite inválida
-        assertDoesNotThrow(() -> display.loadCarSprite(controller, null));
+        assertDoesNotThrow(() -> display.loadCarSprite(car, null));
         assertNotNull(car.getSprite());
 
         //Prueba carga con ruta invalida
-        assertDoesNotThrow(() -> display.loadCarSprite(controller, "/img/invalid.png"));
+        assertDoesNotThrow(() -> display.loadCarSprite(car, "/img/invalid.png"));
         assertNotNull(car.getSprite());
     }
 

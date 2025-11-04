@@ -954,7 +954,9 @@ class MapControllerTest
         trackController.stopAllTimers();
         
         trackController.invalidateLap();
-        trackController.getOffTrackTimer().stop();
+        if (trackController.getOffTrackTimer() != null) {
+            trackController.getOffTrackTimer().stop();
+        }
         trackController.stopAllTimers();
         
         trackController.updatePosition(110, 110, false);
@@ -987,11 +989,11 @@ class MapControllerTest
         trackController.updatePosition(110, 110, false); 
         trackController.updatePosition(310, 160, false); 
 
-        assertEquals(Map.State.INVALID_LAP, track.getState());
+        assertEquals(Map.State.RUNNING, track.getState());
     }
 
     @Test
-    // Verificar que después de vuelta inválida en modo carrera se vuelve a RUNNING
+    // Verificar que después de un tiempo de forma inválida en modo carrera se vuelve a RUNNING
     void testAfterInvalidLapReturnsToRunningInRaceMode() throws InterruptedException 
     {
         when(mockTime.now()).thenReturn(1000L, 1500L);
@@ -1005,7 +1007,7 @@ class MapControllerTest
         trackController.updatePosition(110, 110, false);
         trackController.updatePosition(310, 160, false); 
 
-        assertEquals(Map.State.INVALID_LAP, track.getState());
+        assertEquals(Map.State.RUNNING, track.getState());
 
         Thread.sleep(3600);
         

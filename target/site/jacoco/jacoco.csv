@@ -1,0 +1,17 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+f1_2D,es.uab.tqs.f1_2D.model,AICar,40,504,13,35,5,98,14,27,1,16
+f1_2D,es.uab.tqs.f1_2D.model,Map.SectorColor,0,27,0,0,0,1,0,1,0,1
+f1_2D,es.uab.tqs.f1_2D.model,Car,6,562,3,75,1,115,2,55,0,18
+f1_2D,es.uab.tqs.f1_2D.model,Map.State,0,45,0,0,0,1,0,1,0,1
+f1_2D,es.uab.tqs.f1_2D.model,Map,3,477,0,30,1,113,1,72,1,57
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.GameMode,0,15,0,0,0,3,0,1,0,1
+f1_2D,es.uab.tqs.f1_2D.vista,OffTrackOverlay,0,161,0,14,0,52,0,20,0,13
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.MainMenu,121,146,1,1,18,32,5,2,4,2
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay,714,766,37,25,135,147,30,27,8,18
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new KeyAdapter() {...},5,46,5,5,1,10,5,3,0,3
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.BufferedMenuButton,38,0,2,0,10,0,3,0,2,0
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new ComponentAdapter() {...},0,47,1,1,0,6,1,2,0,2
+f1_2D,es.uab.tqs.f1_2D.vista,LapUI,8,337,3,21,1,67,2,20,0,9
+f1_2D,es.uab.tqs.f1_2D.controlador,CarController,0,19,0,0,0,7,0,3,0,3
+f1_2D,es.uab.tqs.f1_2D.controlador,MapController,89,678,14,82,22,166,12,62,2,24
+f1_2D,es.uab.tqs.f1_2D.controlador,AIController,30,958,4,16,8,58,5,13,2,6

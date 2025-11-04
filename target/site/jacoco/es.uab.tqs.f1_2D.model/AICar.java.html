@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AICar.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.model</a> &gt; <span class="el_source">AICar.java</span></div><h1>AICar.java</h1><pre class="source lang-java linenums">package es.uab.tqs.f1_2D.model;
+
+import java.awt.image.BufferedImage;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AICar extends Car {
+    private String team;
+    private double skillLevel; // 0.0 a 1.0
+    private List&lt;Point&gt; racingLine;
+    private int currentTargetIndex;
+    private double targetSpeed;
+    private Car playerCar;
+    private double slipstreamBoost;
+    
+    // Parámetros de comportamiento según dificultad
+    private double brakingDistance;
+    
+    public AICar(double x, double y, double angle, double velocity, double maxVelocity, 
+                 double backwardsMaxVelocity, double acceleration, double backwardsAcceleration, 
+                 int mapHeight, int mapWidth, String team, double skillLevel) 
+    {
+<span class="fc" id="L24">        super(x, y, angle, velocity, maxVelocity, backwardsMaxVelocity, acceleration, </span>
+              backwardsAcceleration, mapHeight, mapWidth);
+<span class="fc" id="L26">        this.team = team;</span>
+<span class="fc" id="L27">        this.skillLevel = Math.max(0.1, Math.min(1.0, skillLevel));</span>
+<span class="fc" id="L28">        this.racingLine = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L29">        this.currentTargetIndex = 0;</span>
+<span class="fc" id="L30">        this.slipstreamBoost = 0;</span>
+        
+<span class="fc" id="L32">        setupAIParameters();</span>
+<span class="fc" id="L33">    }</span>
+    
+    private void setupAIParameters() 
+    {
+<span class="fc" id="L37">        this.brakingDistance = 150 + (100 * (1 - skillLevel)); </span>
+<span class="fc" id="L38">        this.targetSpeed = maxVelocity * (0.8 + (0.2 * skillLevel));</span>
+<span class="fc" id="L39">    }</span>
+    
+    public void setRacingLine(List&lt;Point&gt; racingLine) 
+    {
+<span class="fc" id="L43">        this.racingLine = new ArrayList&lt;&gt;(racingLine);</span>
+<span class="fc" id="L44">        this.currentTargetIndex = 0;</span>
+<span class="fc" id="L45">    }</span>
+    
+    public void setPlayerCar(Car playerCar) 
+    {
+<span class="fc" id="L49">        this.playerCar = playerCar;</span>
+<span class="fc" id="L50">    }</span>
+    
+    public void updateAI(BufferedImage collisionMap, List&lt;AICar&gt; otherAICars, int currentLap)
+    {       
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        if (racingLine.isEmpty()) return;</span>
+          
+<span class="fc" id="L56">        applySlipstream(otherAICars, currentLap);</span>
+<span class="fc" id="L57">        followRacingLine();</span>
+<span class="fc" id="L58">        update(collisionMap);</span>
+<span class="fc" id="L59">    }</span>
+    
+    public void applySlipstream(List&lt;AICar&gt; otherAICars, int currentLap) 
+    {
+<span class="fc" id="L63">        slipstreamBoost = 0;</span>
+        
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (currentLap &gt;= 2) </span>
+        {
+            // Buscar coches cercanos por delante
+<span class="fc bfc" id="L68" title="All 2 branches covered.">            for (AICar otherCar : otherAICars) </span>
+            {
+<span class="pc bpc" id="L70" title="2 of 4 branches missed.">                if (otherCar != this &amp;&amp; isBehind(otherCar)) </span>
+                {
+<span class="fc" id="L72">                    double distance = calculateDistance(otherCar);</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                    if (distance &lt; 100) </span>
+                    { 
+<span class="fc" id="L75">                        slipstreamBoost = 5.0 * skillLevel; </span>
+<span class="fc" id="L76">                        break;</span>
+                    }
+                }
+<span class="fc" id="L79">            }</span>
+            
+           
+<span class="pc bpc" id="L82" title="1 of 4 branches missed.">            if (playerCar != null &amp;&amp; isBehindPlayer()) </span>
+            {
+<span class="fc" id="L84">                double distance = calculateDistanceToPlayer();</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">                if (distance &lt; 100) </span>
+                {
+<span class="fc" id="L87">                    slipstreamBoost = Math.max(slipstreamBoost, 5.0 * skillLevel);</span>
+                }
+            }
+        }
+<span class="fc" id="L91">    }</span>
+    
+    public void followRacingLine() 
+    {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (currentTargetIndex &gt;= racingLine.size()) </span>
+        {
+<span class="nc" id="L97">            currentTargetIndex = 0;</span>
+        }
+        
+<span class="fc" id="L100">        Point target = racingLine.get(currentTargetIndex);</span>
+<span class="fc" id="L101">        double targetX = target.x;</span>
+<span class="fc" id="L102">        double targetY = target.y;</span>
+        
+<span class="fc" id="L104">        double dx = targetX - x;</span>
+<span class="fc" id="L105">        double dy = targetY - y;</span>
+<span class="fc" id="L106">        double distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
+
+        // Si estamos muy cerca del waypoint, pasar al siguiente
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (distanceToTarget &lt; 80)  // Aumentar distancia de detección</span>
+        {
+<span class="fc" id="L111">            currentTargetIndex++;</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">            if(currentTargetIndex == racingLine.size()) currentTargetIndex = 0;</span>
+            // NO return aquí - necesitamos seguir procesando el movimiento
+<span class="fc" id="L114">            target = racingLine.get(currentTargetIndex);</span>
+<span class="fc" id="L115">            targetX = target.x;</span>
+<span class="fc" id="L116">            targetY = target.y;</span>
+            
+<span class="fc" id="L118">            dx = targetX - x;</span>
+<span class="fc" id="L119">            dy = targetY - y;</span>
+<span class="fc" id="L120">            distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
+        
+        }
+        
+        // Calcular ángulo hacia el objetivo
+<span class="fc" id="L125">        double targetAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
+        
+        // Suavizar el giro - más agresivo para coches AI
+<span class="fc" id="L128">        double angleDiff = normalizeAngle(targetAngle - angle);</span>
+<span class="fc" id="L129">        double turnAmount = Math.min(5.0 * skillLevel, Math.abs(angleDiff)); // Más giro</span>
+        
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (angleDiff &gt; 0) </span>
+        {
+<span class="fc" id="L133">            angle += turnAmount;</span>
+        } 
+        else 
+        {
+<span class="fc" id="L137">            angle -= turnAmount;</span>
+        }
+        
+        // Control de velocidad mejorado
+<span class="fc" id="L141">        double speedMultiplier = 1.0;</span>
+        
+        // Reducir velocidad en curvas pronunciadas
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        if (Math.abs(angleDiff) &gt; 90) {</span>
+<span class="fc" id="L145">            speedMultiplier = 0.4;</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        } else if (Math.abs(angleDiff) &gt; 45) {</span>
+<span class="fc" id="L147">            speedMultiplier = 0.6;</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        } else if (Math.abs(angleDiff) &gt; 20) {</span>
+<span class="fc" id="L149">            speedMultiplier = 0.8;</span>
+        }
+        
+        // Reducir velocidad al acercarse al waypoint
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (distanceToTarget &lt; brakingDistance)</span>
+        {
+<span class="fc" id="L155">            double brakeMultiplier = Math.max(0.3, distanceToTarget / brakingDistance);</span>
+<span class="fc" id="L156">            speedMultiplier *= brakeMultiplier;</span>
+        }
+        
+<span class="fc" id="L159">        double currentTargetSpeed = (targetSpeed + slipstreamBoost) * speedMultiplier;</span>
+        
+        // Control de aceleración más agresivo y directo
+<span class="fc" id="L162">        double speedDifference = currentTargetSpeed - velocity;</span>
+        
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">        if (speedDifference &gt; 0) </span>
+        {
+            // Acelerar
+<span class="fc" id="L167">            velocity += acceleration * skillLevel * Math.min(1.0, speedDifference / 5.0);</span>
+        } 
+        else 
+        {
+            // Frenar
+<span class="nc" id="L172">            velocity += backwardsAcceleration * skillLevel * Math.max(-1.0, speedDifference / 5.0);</span>
+        }
+        
+        // Limitar velocidad máxima y mínima
+<span class="fc" id="L176">        velocity = Math.max(backwardsMaxVelocity, Math.min(getEffectiveMaxVelocity(), velocity));</span>
+<span class="fc" id="L177">    }</span>
+    
+    /*
+    public void avoidCollisions(List&lt;AICar&gt; otherAICars) 
+    {
+        for (AICar otherCar : otherAICars) 
+        {
+            if (otherCar != this) 
+            {
+                double distance = calculateDistance(otherCar);
+                if (distance &lt; 80)
+                 {  
+                    velocity *= 0.8;
+                    
+                    if (Math.random() &gt; 0.5) 
+                    {
+                        angle += 10 * skillLevel;
+                    } 
+                    else 
+                    {
+                        angle -= 10 * skillLevel;
+                    }
+                 }
+            }
+        }
+    }
+    */
+    
+    public double calculateDistance(AICar otherCar) 
+    {
+<span class="fc" id="L207">        double dx = otherCar.getX() - x;</span>
+<span class="fc" id="L208">        double dy = otherCar.getY() - y;</span>
+<span class="fc" id="L209">        return Math.sqrt(dx * dx + dy * dy);</span>
+    }
+    
+    private double calculateDistanceToPlayer() 
+    {
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">        if (playerCar == null) return Double.MAX_VALUE;</span>
+<span class="fc" id="L215">        double dx = playerCar.getX() - x;</span>
+<span class="fc" id="L216">        double dy = playerCar.getY() - y;</span>
+<span class="fc" id="L217">        return Math.sqrt(dx * dx + dy * dy);</span>
+    }
+    
+    private boolean isBehind(AICar otherCar) 
+    {
+<span class="fc" id="L222">        double dx = otherCar.getX() - x;</span>
+<span class="fc" id="L223">        double dy = otherCar.getY() - y;</span>
+<span class="fc" id="L224">        double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
+<span class="fc" id="L225">        double angleDiff = normalizeAngle(relativeAngle - angle);</span>
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">        return Math.abs(angleDiff) &lt; 90; </span>
+    }
+    
+    private boolean isBehindPlayer() 
+    {
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">        if (playerCar == null) return false;</span>
+<span class="fc" id="L232">        double dx = playerCar.getX() - x;</span>
+<span class="fc" id="L233">        double dy = playerCar.getY() - y;</span>
+<span class="fc" id="L234">        double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
+<span class="fc" id="L235">        double angleDiff = normalizeAngle(relativeAngle - angle);</span>
+<span class="pc bpc" id="L236" title="1 of 2 branches missed.">        return Math.abs(angleDiff) &lt; 90;</span>
+    }
+    
+    private double normalizeAngle(double angle) 
+    {
+<span class="pc bpc" id="L241" title="1 of 2 branches missed.">        while (angle &gt; 180) angle -= 360;</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">        while (angle &lt; -180) angle += 360;</span>
+<span class="fc" id="L243">        return angle;</span>
+    }
+    
+    // Getters y Setters
+<span class="fc" id="L247">    public String getTeam() { return this.team; }</span>
+<span class="fc" id="L248">    public double getSkillLevel() { return this.skillLevel; }</span>
+<span class="fc" id="L249">    public double getSlipstreamBoost() { return this.slipstreamBoost; }</span>
+    public void setSkillLevel(double skillLevel) { 
+<span class="nc" id="L251">        this.skillLevel = skillLevel; </span>
+<span class="nc" id="L252">        setupAIParameters();</span>
+<span class="nc" id="L253">    }</span>
+<span class="fc" id="L254">    public List&lt;Point&gt; getRacingLine() {return this.racingLine;}</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -2,10 +2,13 @@ package es.uab.tqs.f1_2D.controlador;
 
 import es.uab.tqs.f1_2D.model.Map;
 import es.uab.tqs.f1_2D.model.TimeProvider;
+
 import javax.swing.Timer;
+
 import java.util.stream.LongStream;
 
-public class MapController {
+public class MapController 
+{
     private Map model;
     private TimeProvider timeProvider;
     private Timer resultTimer;
@@ -37,7 +40,7 @@ public class MapController {
         //Si detecta que está fuera de pista, procesar offtrack
         if (offTrack) 
         {
-            model.setCurrentState(Map.State.OFF_TRACK);
+            handleOffTrack();
             return;
         }
         
@@ -51,17 +54,25 @@ public class MapController {
         }
         
         //Si el coche se encuentra en un estado invalido para hacer tiempo en pista, resetear checkpoints y tiempos
-        if (model.getState() == Map.State.OFF_TRACK || model.getState() == Map.State.INVALID_LAP) 
+        if (model.getState() == Map.State.INVALID_LAP) 
         {
-            reset();
-            return;
+            if(model.isRaceMode())
+            {
+                return;
+            }
+            else
+            {
+                reset();
+                return;
+            }
         }
         
         //Si el coche se encuentra en medio de una vuelta, mirar si pasa por chekpoint
         if (model.getState() == Map.State.RUNNING) 
         {
             handleCheckpoints(x, y);
-            model.setLapTime(timeProvider.now() - model.getLapStartTime());
+            long baseTime = timeProvider.now() - model.getLapStartTime();
+            model.setLapTime(baseTime + model.getCurrentLapPenalty());
         }
     }
 
@@ -148,10 +159,46 @@ public class MapController {
                 } 
                 else 
                 {
-                    invalidateLap();
+                    handleInvalidLap();
                     break;
                 }
             }
+        }
+    }
+
+    private void handleOffTrack() 
+    {
+        if (model.isRaceMode()) {
+            // En modo RACE: sumar 10 segundos de penalización
+            if (!model.isLapHasPenalty()) {
+                model.setCurrentLapPenalty(model.getCurrentLapPenalty() + 10000); // +10 segundos
+                model.setLapHasPenalty(true);
+            }
+            
+            // Mostrar el estado OFF_TRACK temporalmente
+            model.setCurrentState(Map.State.OFF_TRACK);
+            stopAllTimers();
+            
+            if (!isSkipEnabled)
+            {
+                offTrackTimer = new Timer(2000, e -> {
+                    // Después de 2 segundos, volver a RUNNING pero mantener la penalización
+                    if (model.getState() == Map.State.OFF_TRACK) {
+                        model.setCurrentState(Map.State.RUNNING);
+                    }
+                    offTrackTimer.stop();
+                });
+                offTrackTimer.setRepeats(false);
+                offTrackTimer.start();
+            } 
+            else 
+            {
+                model.setCurrentState(Map.State.RUNNING);
+            }
+        } else 
+        {
+ 
+            model.setCurrentState(Map.State.OFF_TRACK);
         }
     }
     
@@ -195,23 +242,37 @@ public class MapController {
     //Si se ha pasado por línea de meta y la vuelta se da por finalizada se muestra el resultado o se incrementa vuelta en RACE
     private void endLap() 
     {
-        model.setLastCompletedLapTime(timeProvider.now() - model.getLapStartTime());
+        //Calcular el tiempo base de la vuelta
+        long baseLapTime = timeProvider.now() - model.getLapStartTime();
+
+        //Si este tiene castigo por salirse o ir en reversa, sumar el tiempo
+        model.setLastCompletedLapTime(baseLapTime + model.getCurrentLapPenalty());
+
+        //Copiar los arrays de sectores para pasarlos al overlay
         model.copyCurrentToLastSectors();
+
+        //Cambiar estado a vuelta completada
         model.setCurrentState(Map.State.RESULT);
         
-        if (model.getLastCompletedLapTime() < model.getBestLapTimeFinish()) 
+        //Si no tiene castigos y es su mejor vuelta, asignarlo
+        if (!model.isLapHasPenalty() && baseLapTime < model.getBestLapTimeFinish()) 
         {
-            model.setBestLapTime(model.getLastCompletedLapTime());
+            model.setBestLapTime(baseLapTime);
         }
 
+        //Si estamos en carrera, incrementar vuelta
         if(model.isRaceMode()) 
         { 
             model.incrementLap();
         }
+
+        //Si la carrera no se ha acabado o estamos en modo qualy
         if(model.getState() != Map.State.RACE_FINISHED)
         {
+            //Branch para poder testear sin timers
             if(!isSkipEnabled)
             {
+                //Enseñar los resultados de la vuelta y preparar la siguiente
                 stopAllTimers();
                 resultTimer = new Timer(3000, e -> 
                 {
@@ -225,28 +286,69 @@ public class MapController {
             }
             else
             {
+                //Empezar siguiente vuelta sin enseñar los resultados, solo para testing
                 model.setCurrentState(Map.State.IDLE);
                 startLap();
                 model.setLapStartTime(timeProvider.now() - 3000);
             }
         }
     }
+
+    //Controlar que el jugador no maneje en sentido contrario
+    private void handleInvalidLap() 
+    {
+        if (model.isRaceMode()) 
+        {
+            //En modo RACE: sumar 30 segundos de penalización
+            if (!model.isLapHasPenalty()) {
+                model.setCurrentLapPenalty(model.getCurrentLapPenalty() + 30000); 
+                model.setLapHasPenalty(true);
+            }
+            
+            //Mostrar el estado INVALID_LAP temporalmente
+            model.setCurrentState(Map.State.INVALID_LAP);
+            stopAllTimers();
+            
+            //Branch para poder testear sin timers
+            if (!isSkipEnabled) 
+            {
+                offTrackTimer = new Timer(2000, e -> {
+                    //Después de 2 segundos, volver a RUNNING pero mantener la penalización
+                    if (model.getState() == Map.State.INVALID_LAP) 
+                    {
+                        model.setCurrentState(Map.State.RUNNING);
+                    }
+                    offTrackTimer.stop();
+                });
+                offTrackTimer.setRepeats(false);
+                offTrackTimer.start();
+            } 
+            else 
+            {
+                model.setCurrentState(Map.State.RUNNING);
+            }
+        } 
+        else 
+        {
+            //En QUALY: se invalida el tiempo de la vuelta
+            invalidateLap();
+        }
+    }
     
     //Si el jugador no sigue el camino correcto del circuito se le invalida la vuelta
     public void invalidateLap() 
     {
-        model.setCurrentState(Map.State.INVALID_LAP);
-        stopAllTimers();
-        offTrackTimer = new Timer(3500, e -> {
-            model.setCurrentState(Map.State.IDLE);
-            if(model.isRaceMode())
-            {
-                model.setCurrentState(Map.State.RUNNING);
-            }
-            offTrackTimer.stop();
-        });
-        offTrackTimer.setRepeats(false);
-        offTrackTimer.start();
+        // Solo invalidar en modo QUALY
+        if (!model.isRaceMode()) {
+            model.setCurrentState(Map.State.INVALID_LAP);
+            stopAllTimers();
+            offTrackTimer = new Timer(3500, e -> {
+                model.setCurrentState(Map.State.IDLE);
+                offTrackTimer.stop();
+            });
+            offTrackTimer.setRepeats(false);
+            offTrackTimer.start();
+        }
     }
     
     //Función de reset de variables de vuelta
@@ -283,27 +385,31 @@ public class MapController {
     //Si se detecta que se ha finalizado un sector, se cuenta el tiempo y se determina qué color es dependiendo del tiempo
     public void recordSector(int sectorIndex, long sectorTime) 
     {
+        //Comprobar que el sector existe
         if (sectorIndex < 0 || sectorIndex >= model.getNumSectors()) return;
         
+        //Asignar el tiempo establecido
         model.setSectorTime(sectorIndex, sectorTime);
         model.setSectorRecorded(sectorIndex, true);
         
+        //Obtener los mejores tiempos de sector
         long previousLocalBest = model.getBestSectorTime(sectorIndex);
         long previousGlobalBest = LongStream.of(model.getBestSectorTimes()).min().orElse(Long.MAX_VALUE);
         
-        // Mejora local
+        //Si es una mejora local, determinar verde, en caso contrario naranja
         if (sectorTime < previousLocalBest) 
         {
             model.setBestSectorTime(sectorIndex, sectorTime);
             model.setSectorColor(sectorIndex, Map.SectorColor.GREEN);
-        } else 
+        } 
+        else 
         {
             model.setSectorColor(sectorIndex, Map.SectorColor.ORANGE);
         }
         
         long newGlobalBest = LongStream.of(model.getBestSectorTimes()).min().orElse(Long.MAX_VALUE);
         
-        // Mejora global real (y existía un global previo)
+        //Si es el mejor tiempo de todos los coches, determinar morado
         if (previousGlobalBest != Long.MAX_VALUE && newGlobalBest < previousGlobalBest) 
         {
             if (model.getBestSectorTime(sectorIndex) == newGlobalBest) 
@@ -318,10 +424,12 @@ public class MapController {
         this.model.setTimeProvider(timeProvider);
     }
 
-    //Setters/Getters
-    public void setMap(Map map) {this.model = map;}
+    //Getters
     public Map getModel() { return model;} 
     public Timer getOffTrackTimer() { return offTrackTimer; }
     public Timer getCountdownTimer() { return countdownTimer; }
+
+    //Setters
+    public void setMap(Map map) {this.model = map;}
     public void setSkip(boolean isSkip) { this.isSkipEnabled = isSkip;}
 }

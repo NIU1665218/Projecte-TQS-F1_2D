@@ -31,8 +31,10 @@ public class LapUI extends JPanel
         //Array de sujifos de color para las imagenes de sectores
         String[] colors = {"W", "G", "O", "P"};
         //Carga de todas las imagenes de sectores en sus 4 variantes de color
-        for (int sector = 0; sector < 3; sector++) {
-            for (int color = 0; color < 4; color++) {
+        for (int sector = 0; sector < 3; sector++) 
+        {
+            for (int color = 0; color < 4; color++) 
+            {
                 //Construcción de la ruta dinámica para cada imagen de sector/color
                 String path = String.format("/img/Sector%d/Sector%d%s.jpg", sector + 1, sector + 1, colors[color]);
                 loadSectorImages(path, sector, color);
@@ -43,7 +45,8 @@ public class LapUI extends JPanel
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) 
+    {
         //Lamada al método padre para asegurar comportamiento correcto
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
@@ -53,8 +56,10 @@ public class LapUI extends JPanel
         g2d.setFont(customFont.deriveFont(28f));
     
         if (map.getState() == Map.State.OFF_TRACK || map.getState() == Map.State.INVALID_LAP)
+        {
             //Si el jugador se sale de pista o se declara vuelta invalida, el timer se pone de color rojo
             g2d.setColor(Color.RED);
+        }
         else if (map.getState() == Map.State.RESULT)
         {
             //Si el jugador ha acabado la vuelta
@@ -69,9 +74,16 @@ public class LapUI extends JPanel
                 g2d.setColor(Color.GREEN);
             }   
         }    
-        else 
+        else if(map.isLapHasPenalty() && map.isRaceMode())
+        {
+            //Si está en modo carrera y la vuelta tiene penalización, timer en rojo
+            g2d.setColor(Color.RED);
+        }
+        else
+        {
             //Si el jugador está en cualquier otro estado, el color del timer es blanco
             g2d.setColor(Color.WHITE);
+        }
     
         //Dibuja el timer en la posición establecida
         g2d.drawString(formatTime(map.getLapTime()), 35, 90);
@@ -93,7 +105,8 @@ public class LapUI extends JPanel
         {
             //Obtiene el color del sector 
             Map.SectorColor color = map.getSectorColor(i);
-            int colorIndex = switch(color) {
+            int colorIndex = switch(color) 
+            {
                 case NONE -> 0;
                 case GREEN -> 1;
                 case ORANGE -> 2;
@@ -109,7 +122,8 @@ public class LapUI extends JPanel
     }
 
     //Convierte milisegundos a string formateado 
-    public String formatTime(long ms) {
+    public String formatTime(long ms) 
+    {
         if (ms <= 0) return "0.000";
         return String.format("%.3f s", ms / 1000.0);
     }

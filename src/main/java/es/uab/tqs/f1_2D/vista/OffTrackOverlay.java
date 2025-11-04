@@ -6,8 +6,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 
-public class OffTrackOverlay extends JPanel {
-
+public class OffTrackOverlay extends JPanel 
+{
     //Icono de la imagen a mostrar en el overlay
     private ImageIcon imageIcon;
     //Clip de audio para el sonido 
@@ -16,7 +16,8 @@ public class OffTrackOverlay extends JPanel {
     private boolean visible;
 
     //Constructor
-    public OffTrackOverlay(String imageResourcePath, String soundResourcePath) {
+    public OffTrackOverlay(String imageResourcePath, String soundResourcePath) 
+    {
         //Inicializar el panel de forma que no sea visible y sea transparente
         setOpaque(false);
         this.visible = false;
@@ -33,14 +34,14 @@ public class OffTrackOverlay extends JPanel {
         try {
             imageUrl = getClass().getResource(path);
         }
-        catch (NullPointerException | IllegalArgumentException e)
-        { 
+        catch (NullPointerException | IllegalArgumentException e) { 
             //Si hay excepción se queda en null
         }
 
 
         //Si se encuentra la imagen se crea el icon, en caso contrario lo deja en null
-        if (imageUrl != null) {
+        if (imageUrl != null) 
+        {
             imageIcon = new ImageIcon(imageUrl);
         }
         else
@@ -59,7 +60,8 @@ public class OffTrackOverlay extends JPanel {
             return clip;
         }
         URL soundUrl = getClass().getResource(path);
-        if (soundUrl != null) {
+        if (soundUrl != null) 
+        {
             try {
                 //obtiene el audio y lo intenta abrir
                 AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundUrl);
@@ -78,8 +80,10 @@ public class OffTrackOverlay extends JPanel {
     }
 
     //Muestra el overlay, reproduce el sonido y repinta para hacerlo visible
-    public void showOverlay() {
-        if (!visible) {
+    public void showOverlay() 
+    {
+        if (!visible) 
+        {
             visible = true;
             playSound();
             repaint();
@@ -87,14 +91,17 @@ public class OffTrackOverlay extends JPanel {
     }
 
     //Oculta el overlay y repinta para no hacerlo visible
-    public void hideOverlay() {
+    public void hideOverlay() 
+    {
         visible = false;
         repaint();
     }
 
     //Reproduce el sonido si existe
-    public void playSound() {
-        if (clip != null) {
+    public void playSound() 
+    {
+        if (clip != null) 
+        {
             clip.setFramePosition(0);
             clip.start();
         }
@@ -102,9 +109,11 @@ public class OffTrackOverlay extends JPanel {
 
     //Método para pintar el componente: si es visible y hay imagen, la dibuja centrada en la parte superior
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) 
+    {
         super.paintComponent(g);
-        if (visible && imageIcon != null) {
+        if (visible && imageIcon != null) 
+        {
             int imgWidth = imageIcon.getIconWidth();
             int x = (getWidth() - imgWidth) / 2;
             int y = 20; 
