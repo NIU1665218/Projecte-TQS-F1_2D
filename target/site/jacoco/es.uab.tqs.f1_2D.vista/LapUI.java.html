@@ -23,8 +23,8 @@ public class LapUI extends JPanel
 <span class="fc" id="L23">    private String pathOverlay = &quot;/img/laptime.jpg&quot;;</span>
 
     //Constructor
-    public LapUI(Map map) 
-<span class="fc" id="L27">    {</span>
+<span class="fc" id="L26">    public LapUI(Map map) </span>
+    {
 <span class="fc" id="L28">        this.map = map;</span>
         //Carga la fuente personalizada
 <span class="fc" id="L30">        loadFont(pathFont);</span>
@@ -59,7 +59,7 @@ public class LapUI extends JPanel
         {
             //Si el jugador se sale de pista o se declara vuelta invalida, el timer se pone de color rojo
 <span class="fc" id="L61">            g2d.setColor(Color.RED);</span>
-        }
+<span class="fc" id="L62">        }</span>
 <span class="fc bfc" id="L63" title="All 2 branches covered.">        else if (map.getState() == Map.State.RESULT)</span>
         {
             //Si el jugador ha acabado la vuelta
@@ -67,18 +67,18 @@ public class LapUI extends JPanel
             {
                 //Si el jugador tiene una peor vuelta que su mejor, timer en amarillo
 <span class="fc" id="L69">                g2d.setColor(Color.YELLOW); </span>
-            }
+<span class="fc" id="L70">            }</span>
             else
             {
                 //Si el jugador tiene una mejor vuelta que su mejor, timer en verde
 <span class="fc" id="L74">                g2d.setColor(Color.GREEN);</span>
             }   
-        }    
+<span class="fc" id="L76">        }    </span>
 <span class="pc bpc" id="L77" title="3 of 4 branches missed.">        else if(map.isLapHasPenalty() &amp;&amp; map.isRaceMode())</span>
         {
             //Si está en modo carrera y la vuelta tiene penalización, timer en rojo
 <span class="nc" id="L80">            g2d.setColor(Color.RED);</span>
-        }
+<span class="nc" id="L81">        }</span>
         else
         {
             //Si el jugador está en cualquier otro estado, el color del timer es blanco
@@ -136,7 +136,7 @@ public class LapUI extends JPanel
 <span class="fc" id="L136">        } catch (NullPointerException | IOException | IllegalArgumentException e) {</span>
             //En caso de encontrar una excepción, crea una imagen por default
 <span class="fc" id="L138">            overlayBackground = new BufferedImage(320, 150, BufferedImage.TYPE_INT_ARGB);</span>
-<span class="fc" id="L139">        }</span>
+        }
 <span class="fc" id="L140">    }</span>
 
     //Carga y registra la fuente personalizada desde recursos
@@ -152,7 +152,7 @@ public class LapUI extends JPanel
 <span class="fc" id="L152">        } catch (Exception e) {</span>
             //En caso de encontrar una excepción, carga Arial como fuente
 <span class="fc" id="L154">            customFont = new Font(&quot;Arial&quot;, Font.BOLD, 22);</span>
-<span class="fc" id="L155">        }</span>
+        }
 <span class="fc" id="L156">    }</span>
 
     //Carga una imagen específica de sector y la almacena en la matriz
@@ -164,7 +164,7 @@ public class LapUI extends JPanel
 <span class="fc" id="L164">        } catch (NullPointerException | IOException | IllegalArgumentException e) {</span>
             //En caso de encontrar una excepción, establece null para esa imagen y no se carga
 <span class="fc" id="L166">            sectorImages[sector][color] = null;</span>
-<span class="fc" id="L167">        }</span>
+        }
 <span class="fc" id="L168">    }</span>
 
     // Getter para test

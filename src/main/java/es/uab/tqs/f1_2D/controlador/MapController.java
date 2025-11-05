@@ -166,26 +166,29 @@ public class MapController
         }
     }
 
+    //Función para manejar que se ha ido fuera de pista
     private void handleOffTrack() 
     {
-        if (model.isRaceMode()) {
-            // En modo RACE: sumar 10 segundos de penalización
-            if (!model.isLapHasPenalty()) {
-                model.setCurrentLapPenalty(model.getCurrentLapPenalty() + 10000); // +10 segundos
+        //Si estamos en carrera procesar castigo, en caso contrario solo poner el estado en offtrack
+        if (model.isRaceMode()) 
+        {
+            //Si la vuelta actual no tiene castigo sumarle 10s
+            if (!model.isLapHasPenalty()) 
+            {
+                model.setCurrentLapPenalty(model.getCurrentLapPenalty() + 10000); 
                 model.setLapHasPenalty(true);
             }
             
-            // Mostrar el estado OFF_TRACK temporalmente
+            //Mostrar el estado OFF_TRACK temporalmente
             model.setCurrentState(Map.State.OFF_TRACK);
             stopAllTimers();
             
+            //Saltarse el timer si estamos testeando y volver a running
             if (!isSkipEnabled)
             {
                 offTrackTimer = new Timer(2000, e -> {
                     // Después de 2 segundos, volver a RUNNING pero mantener la penalización
-                    if (model.getState() == Map.State.OFF_TRACK) {
-                        model.setCurrentState(Map.State.RUNNING);
-                    }
+                    model.setCurrentState(Map.State.RUNNING);
                     offTrackTimer.stop();
                 });
                 offTrackTimer.setRepeats(false);
@@ -195,9 +198,9 @@ public class MapController
             {
                 model.setCurrentState(Map.State.RUNNING);
             }
-        } else 
+        } 
+        else 
         {
- 
             model.setCurrentState(Map.State.OFF_TRACK);
         }
     }
@@ -252,9 +255,10 @@ public class MapController
         model.setCurrentState(Map.State.RESULT);
         
         //Si no tiene castigos y es su mejor vuelta, asignarlo
-        if (!model.isLapHasPenalty() && baseLapTime < model.getBestLapTimeFinish()) 
+        if (!model.isLapHasPenalty()) 
         {
-            model.setBestLapTime(baseLapTime);
+            if(baseLapTime < model.getBestLapTimeFinish())
+                model.setBestLapTime(baseLapTime);
         }
 
         //Si estamos en carrera, incrementar vuelta
@@ -292,7 +296,7 @@ public class MapController
     }
 
     //Controlar que el jugador no maneje en sentido contrario
-    private void handleInvalidLap() 
+    public void handleInvalidLap() 
     {
         if (model.isRaceMode()) 
         {
@@ -311,10 +315,7 @@ public class MapController
             {
                 offTrackTimer = new Timer(2000, e -> {
                     //Después de 2 segundos, volver a RUNNING pero mantener la penalización
-                    if (model.getState() == Map.State.INVALID_LAP) 
-                    {
-                        model.setCurrentState(Map.State.RUNNING);
-                    }
+                    model.setCurrentState(Map.State.RUNNING);
                     offTrackTimer.stop();
                 });
                 offTrackTimer.setRepeats(false);

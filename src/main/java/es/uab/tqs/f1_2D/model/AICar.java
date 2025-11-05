@@ -23,7 +23,6 @@
         private long lapStartTime;
         private long bestLapTime;
         private long lapTime;
-        private long lastCompletedLapTime;
         private int currentLap;
         private TimeProvider timeProvider;
         
@@ -264,7 +263,6 @@
         //Calcular distancia hasta el coche del jugador
         private double calculateDistanceToPlayer() 
         {
-            if (playerCar == null) return Double.MAX_VALUE;
             double dx = playerCar.getX() - x;
             double dy = playerCar.getY() - y;
             return Math.sqrt(dx * dx + dy * dy);
@@ -278,7 +276,7 @@
             double dy = otherCar.getY() - y;
             double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));
             double angleDiff = normalizeAngle(relativeAngle - angle);
-            return Math.abs(angleDiff) < 90; 
+            return Math.abs(angleDiff) < 60; 
         }
         
         //Determinar si un coche se encuentra detrás del cotxes del jugador
@@ -289,11 +287,11 @@
             double dy = playerCar.getY() - y;
             double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));
             double angleDiff = normalizeAngle(relativeAngle - angle);
-            return Math.abs(angleDiff) < 90;
+            return Math.abs(angleDiff) < 60;
         }
         
         //Normalizar los cálculos de los ángulos para controlar el valor entre 0-360
-        private double normalizeAngle(double angle) 
+        public double normalizeAngle(double angle) 
         {
             while (angle > 180) angle -= 360;
             while (angle < -180) angle += 360;
@@ -338,7 +336,7 @@
         public void completeLap() 
         {
             long lapEndTime = timeProvider.now();
-            this.lastCompletedLapTime = lapEndTime - lapStartTime;
+            long lastCompletedLapTime = lapEndTime - lapStartTime;
             
             // Actualizar mejor tiempo de vuelta
             if (lastCompletedLapTime < bestLapTime) 
@@ -350,7 +348,8 @@
         //Hacer el update del Lap Time en caso necesario al pasar por un checkpoint o en update general
         public void updateLapTime() 
         {
-            if (lapStartTime > 0) {
+            if (lapStartTime > 0) 
+            {
                 this.lapTime = timeProvider.now() - lapStartTime;
             }
         }
@@ -379,12 +378,15 @@
         public double getSkillLevel() { return this.skillLevel; }
         public double getSlipstreamBoost() { return this.slipstreamBoost; }
         public List<Point> getRacingLine() {return this.racingLine;}
+        public Integer getCurrentTargetIndex() {return currentTargetIndex;}
         
         //Setters
         public void setNextCheckpointIndex(int index) { this.nextCheckpointIndex = index; }
         public void setTimeProvider(TimeProvider timeProvider) {this.timeProvider = timeProvider;}
         public void setCurrentLap(int lap) {this.currentLap = lap;}
         public void setPlayerCar(Car playerCar) {this.playerCar = playerCar;}
+        public void setCurrentTargetIndex(int index) {this.currentTargetIndex = index;}
+        public void setCheckpointPassed(int checkPoint) {this.passedCheckpoints.add(checkPoint);}
         public void setSkillLevel(double skillLevel) 
         { 
             this.skillLevel = skillLevel; 

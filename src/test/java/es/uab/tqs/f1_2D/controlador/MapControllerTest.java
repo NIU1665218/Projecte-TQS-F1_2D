@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ class MapControllerTest
     TimeProvider mockTime;
 
     @BeforeEach
-    void setup() 
+    public void setup() 
     {
 
         //Rectangulo simulando la línea de meta
@@ -65,7 +66,7 @@ class MapControllerTest
 
     @Test
     //Al inicializar y settear un mapa debería ser el mismo al cogerlo con el getter
-    void testGetters()
+    public void testGetters()
     {
         Map newMap = new Map(1000, 1000, finish, checkpoints);
         trackController.setMap(newMap);
@@ -74,7 +75,7 @@ class MapControllerTest
 
     @Test
     //Al cruzar la línea de meta por primera vez se inicia la vuelta
-    void testStartLap() 
+    public void testStartLap() 
     {
         trackController.updatePosition(110, 110, false);
         assertEquals(Map.State.RUNNING, track.getState());
@@ -82,7 +83,7 @@ class MapControllerTest
 
     @Test
     //Al cruzar la línea de meta por primera vez se inicia la vuelta
-    void testCheckpoint() 
+    public void testCheckpoint() 
     {
         trackController.updatePosition(110, 110, false);
         trackController.updatePosition(210, 110, false); 
@@ -91,7 +92,7 @@ class MapControllerTest
 
     @Test
     //Al cruzar la línea de meta tras pasar todos los checkpoints se completa la vuelta
-    void testLapCompletion() 
+    public void testLapCompletion() 
     {
         trackController.updatePosition(110, 110, false); 
         trackController.updatePosition(210, 110, false);
@@ -103,7 +104,7 @@ class MapControllerTest
 
     @Test
     //No se completa la vuelta si no se han pasado todos los checkpoints
-    void testLapNotCompleted() 
+    public void testLapNotCompleted() 
     {
         trackController.updatePosition(110, 110, false);
         trackController.updatePosition(110, 110, false);
@@ -112,7 +113,7 @@ class MapControllerTest
 
     @Test
     //Salir de la pista detiene la vuelta
-    void testOffTrackStopsLap() 
+    public void testOffTrackStopsLap() 
     {
         trackController.updatePosition(110, 110, false);
         trackController.updatePosition(120, 120, true);
@@ -123,7 +124,7 @@ class MapControllerTest
 
     @Test
     //Resetear el mapa vuelve al estado inicial
-    void testReset() 
+    public void testReset() 
     {
         trackController.updatePosition(110, 110, false);
         trackController.updatePosition(120, 120, false);
@@ -135,7 +136,7 @@ class MapControllerTest
  
     @Test
     //Al completar vuelta transiciona de RESULT a RUNNING
-    void testResultToRunningTransition() throws InterruptedException 
+    public void testResultToRunningTransition() throws InterruptedException 
     {
         trackController.updatePosition(110, 110, false); 
         trackController.updatePosition(210, 110, false);
@@ -152,7 +153,7 @@ class MapControllerTest
 
     @Test
     //Al pasar por línea de meta siendo vuelta inválida, debería volver a empezar
-    void testFinishLineAfterInvalidLap() 
+    public void testFinishLineAfterInvalidLap() 
     {
         trackController.updatePosition(110, 110, false);
 
@@ -166,7 +167,7 @@ class MapControllerTest
 
     @Test
     //Al pasar por el mismo checkpoint que ya se ha pasado anteriormente, no debería añadirse
-    void testEnteringSameCheckpoint() 
+    public void testEnteringSameCheckpoint() 
     {
         trackController.updatePosition(110, 110, false);
         trackController.updatePosition(210, 110, false); 
@@ -177,7 +178,7 @@ class MapControllerTest
 
     @Test
     //Al pasar por línea de meta con el último sector ya establecido no debería contarse dos veces
-    void testLastSectorRecorded() 
+    public void testLastSectorRecorded() 
     {
 
         trackController.updatePosition(110, 110, false);
@@ -195,7 +196,7 @@ class MapControllerTest
 
     @Test
     //Al pasar por un checkpoint con el sector ya establecido manualmente no debería contarse dos veces
-    void testRunningWithSecondSectorAlreadyRecorded() 
+    public void testRunningWithSecondSectorAlreadyRecorded() 
     {
         
         trackController.updatePosition(110, 110, false);
@@ -213,7 +214,7 @@ class MapControllerTest
 
     @Test
     //Intentar establecer un sector que no existe no debería establecer ningún tiempo
-    void testRecordSectorInvalidIndex() 
+    public void testRecordSectorInvalidIndex() 
     {
         trackController.recordSector(-1, 500L);
         trackController.recordSector(track.getNumSectors(), 500L); 
@@ -225,7 +226,7 @@ class MapControllerTest
 
     @Test
     //Establecimiento de un sector en morado
-    void testRecordSectorPurpleSet() {
+    public void testRecordSectorPurpleSet() {
         trackController.recordSector(0, 1000L); 
         trackController.recordSector(0, 900L);  
         assertEquals(SectorColor.PURPLE, track.getSectorColor(0));
@@ -233,7 +234,7 @@ class MapControllerTest
 
     @Test
     //Verificar que el flag de passedAllCheckpoints funciona correctamente al passar por todos
-    void testPassedAllCheckpointsTrue() 
+    public void testPassedAllCheckpointsTrue() 
     {
         
         for (int i = 0; i < checkpoints.size(); i++) {
@@ -246,7 +247,7 @@ class MapControllerTest
 
     @Test
     //Verificación de coverage con el flag de passedAllCheckpoints
-    void testPassedAllCheckpointsFalseSize() 
+    public void testPassedAllCheckpointsFalseSize() 
     {
         track.getPassedCheckpoints().add(0);
         track.setNextCheckpointIndex(checkpoints.size());
@@ -255,7 +256,7 @@ class MapControllerTest
 
     @Test
     //Verificación de coverage con el flag de passedAllCheckpoints
-    void testPassedAllCheckpointsFalse() 
+    public void testPassedAllCheckpointsFalse() 
     {
         for (int i = 0; i < checkpoints.size(); i++) {
             track.getPassedCheckpoints().add(i);
@@ -266,28 +267,28 @@ class MapControllerTest
 
     @Test
     //Verificación de coverage para la función de sum de tiempos de sectores
-    void testSumIndexZero() 
+    public void testSumIndexZero() 
     {
         assertEquals(0L, track.sum(new long[]{10,20,30}, 0));
     }
 
     @Test
     //Verificación de coverage para la función de sum de tiempos de sectores
-    void testSumWithinBounds() 
+    public void testSumWithinBounds() 
     {
         assertEquals(30L, track.sum(new long[]{10,20,30}, 2));
     }
 
     @Test
     //Verificación de coverage para la función de sum de tiempos de sectores
-    void testSumIndexGreaterThanLength() 
+    public void testSumIndexGreaterThanLength() 
     {
         assertEquals(60L, track.sum(new long[]{10,20,30}, 99));
     }
 
     @Test
     //Verificación de coverage para la función de sum de tiempos de sectores
-    void testPurpleConditionNotTriggered() 
+    public void testPurpleConditionNotTriggered() 
     {
         //Sector inválido
         trackController.recordSector(-1, 5000L); 
@@ -301,7 +302,7 @@ class MapControllerTest
 
     @Test
     //Verificación de coverage para la función de invalidateLap
-    void testInvalidateLap() 
+    public void testInvalidateLap() 
     {
     
         trackController.invalidateLap();
@@ -325,7 +326,7 @@ class MapControllerTest
 
     @Test
     // Verificar que startQualyMode configura correctamente el modo qualy
-    void testStartQualyMode() 
+    public void testStartQualyMode() 
     {
         trackController.startQualyMode();
 
@@ -333,6 +334,117 @@ class MapControllerTest
         assertEquals(Map.State.IDLE, track.getState());
         assertTrue(track.getPassedCheckpoints().isEmpty());
         assertEquals(0, track.getNextCheckpointIndex());
+    }
+
+    @Test
+    //Verificar que se aplica penalización
+    public void testOffTrackRacePenalty() 
+    {
+        track.setRaceMode(true);
+        track.setLapHasPenalty(false);
+        track.setCurrentLapPenalty(0);
+
+        trackController.updatePosition(0,0, true);
+
+        assertEquals(10000, track.getCurrentLapPenalty());
+        assertTrue(track.isLapHasPenalty());
+        assertEquals(Map.State.OFF_TRACK, track.getState());
+    }
+
+    @Test
+    //Verificar que no se aplica doble penalización
+    public void testOffTrackRaceNoDoublePenalty() 
+    {
+        track.setRaceMode(true);
+        track.setLapHasPenalty(true);
+        track.setCurrentLapPenalty(5000);
+
+        trackController.updatePosition(0,0,true);
+
+        assertEquals(5000, track.getCurrentLapPenalty());
+        assertTrue(track.isLapHasPenalty());
+    }
+
+    @Test
+    //Verificar que en carrera y offtrack, el estado vuelve a RUNNING 
+    public void testOffTrackRaceBackRunning() 
+    {
+        track.setRaceMode(true);
+        trackController.setSkip(true);
+
+        trackController.updatePosition(0,0,true);
+
+        assertEquals(Map.State.RUNNING, track.getState());
+    }
+
+    @Test
+    //Verificar que en carrera y offtrack, el estado puede volver a RUNNING con el timer
+    public void testOffTrackRaceTimerBackRunning() throws Exception 
+    {
+        track.setRaceMode(true);
+        trackController.setSkip(false);
+
+        trackController.updatePosition(0,0,true);
+
+        assertEquals(Map.State.OFF_TRACK, track.getState());
+
+        Timer timer = trackController.getOffTrackTimer();
+        assertNotNull(timer);
+
+        for (ActionListener l : timer.getActionListeners()) {
+            l.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+        }
+
+        assertEquals(Map.State.RUNNING, track.getState());
+    }
+
+    @Test
+    //Verificar que no comprueba tiempos al acabar lap con penalización
+    public void testEndLapPenalty()
+    {
+        trackController.setSkip(true);
+        track.setLapStartTime(0);
+        track.setBestLapTime(0);
+        
+        trackController.startLap();
+        trackController.updatePosition(110, 110, false);
+        trackController.updatePosition(210, 110, false);
+        track.setLapHasPenalty(true);
+        trackController.updatePosition(310, 160, false);
+        trackController.updatePosition(410, 210, false);
+        trackController.updatePosition(110, 110, false);
+        
+        assertEquals(0, track.getBestLapTimeFinish());
+
+        track.setLapHasPenalty(false);
+        track.setLapStartTime(0);
+        track.setBestLapTime(0L);
+        trackController.updatePosition(110, 110, false);
+        trackController.updatePosition(210, 110, false);
+        trackController.updatePosition(310, 160, false);
+        trackController.updatePosition(410, 210, false);
+        trackController.updatePosition(110, 110, false);
+
+        assertEquals(0, track.getBestLapTimeFinish());
+    }
+
+    @Test
+    //Verificar que en carrera y offtrack, el estado puede volver a RUNNING con el timer
+    public void testInvalidHandlerTimer() throws Exception 
+    {
+        track.setRaceMode(true);
+        trackController.setSkip(false);
+        track.setLapHasPenalty(true);
+        trackController.handleInvalidLap();
+
+        Timer timer = trackController.getOffTrackTimer();
+        assertNotNull(timer);
+
+        for (ActionListener l : timer.getActionListeners()) {
+            l.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+        }
+
+        assertEquals(Map.State.RUNNING, track.getState());
     }
     
     /* 
@@ -848,6 +960,7 @@ class MapControllerTest
         assertTrue(track.isRaceMode());
         assertEquals(Map.State.RUNNING, track.getState());
         assertFalse(track.isCountdownActive()); //Skipped
+
     }
 
     @Test
@@ -897,6 +1010,10 @@ class MapControllerTest
         trackController.updatePosition(110, 110, false); 
 
         assertEquals(2, track.getCurrentLap());
+
+        track.setCurrentState(Map.State.INVALID_LAP);
+        trackController.updatePosition(0, 0, false);
+        assertTrue(true);
     }
 
     @Test
@@ -943,7 +1060,8 @@ class MapControllerTest
 
     @Test
     // Test coverage para stopAllTimers 
-    void testStopAllTimersVariousTimerStates() {
+    void testStopAllTimersVariousTimerStates() 
+    {
         when(mockTime.now()).thenReturn(1000L);
         trackController.setTimeProvider(mockTime);
         

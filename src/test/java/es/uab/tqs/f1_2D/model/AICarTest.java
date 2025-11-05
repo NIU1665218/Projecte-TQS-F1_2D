@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -22,6 +25,8 @@ public class AICarTest
 {
     private AICar aiCar;
     private Car playerCar;
+    @Mock
+    private TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 
     //Lista de argumentos para tests de parametrización
     static Stream<Arguments> skillLevelProvider() 
@@ -86,11 +91,12 @@ public class AICarTest
 
 
     @BeforeEach
-    void setUp() 
+    public void setUp() 
     {
         playerCar = new Car(100, 100, 0, 0, 15, -5, 2, 0.5, 1000, 1000);
         aiCar = new AICar(100, 100, 0, 0, 15, -5, 2, 0.5, 1000, 1000, "Mercedes", 0.8);
         aiCar.setPlayerCar(playerCar);
+        aiCar.setTimeProvider(timeProvider);
     }
 
     
@@ -102,16 +108,33 @@ public class AICarTest
 
     @Test
     //AI Car debe crearse con parámetros específicos de equipo y skill
-    void testAICarCreation() 
+    public void testAICarCreation() 
     {
         assertEquals("Mercedes", aiCar.getTeam());
         assertEquals(0.8, aiCar.getSkillLevel());
         assertNotNull(aiCar.getRacingLine());
+        assertEquals(0, aiCar.getCurrentLap());
+        assertEquals(0.8, aiCar.getSkillLevel());
+        assertEquals(0.0, aiCar.getSlipstreamBoost());
+        assertEquals(0, aiCar.getLapTime());
+        assertEquals(0, aiCar.getBestLapTime());
+
+        aiCar.setSkillLevel(0.85);
+        assertEquals(0.85, aiCar.getSkillLevel());
+
+        aiCar.setNextCheckpointIndex(3);
+        assertEquals(3, aiCar.getNextCheckpointIndex());
+
+        aiCar.setCurrentLap(2);
+        assertEquals(2, aiCar.getCurrentLap());
+
+        aiCar.setCheckpointPassed(5);
+        assertTrue(aiCar.getPassedCheckpoints().contains(5));
     }
 
     @Test
     // AI Car debe calcular distancia correctamente a otro coche
-    void testDistanceCalculation()
+    public void testDistanceCalculation()
     {
         AICar otherCar = new AICar(150, 150, 0, 0, 15, -5, 2, 0.5, 1000, 1000, "Ferrari", 0.7);
 
@@ -123,7 +146,7 @@ public class AICarTest
 
     @Test
     //AI Car debe detectar correctamente slipstream en vuelta 2+
-    void testSlipstreamDetection() 
+    public void testSlipstreamDetection() 
     {
         AICar aheadCar = new AICar(120, 120, 0, 0, 15, -5, 2, 0.5, 1000, 1000, "Ferrari", 0.7);
         aiCar.applySlipstream(List.of(aheadCar), 2);
@@ -133,7 +156,7 @@ public class AICarTest
 
     @Test
     //AI Controller debe inicializar 19 coches con diferentes skills
-    void testAIControllerInitialization() 
+    public void testAIControllerInitialization() 
     {
         Map mockMap = mock(Map.class);
         RandomGenerator randomGenerator = new RandomGenerator(1234);
@@ -151,7 +174,7 @@ public class AICarTest
 
     @Test
     //Verificar que si no hay racing line, el coche no se mueve
-    void testUpdateAIRacingLineEmpty() 
+    public void testUpdateAIRacingLineEmpty() 
     {
         BufferedImage mockCollisionMap = mock(BufferedImage.class);
         List<AICar> otherCars = new ArrayList<>();
@@ -169,15 +192,16 @@ public class AICarTest
 
     @Test
     //Verificar los diferentes estados de SlipStream
-    void testApplySlipstreamBehind() 
+    public void testApplySlipstreamBehind() 
     {
         AICar aiCar = new AICar(100, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000, "Test", 1.0);
         AICar otherCarBehind = new AICar(90, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000, "Other", 1.0);
         AICar otherCarFront = new AICar(150, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000, "Other", 1.0);
         AICar farCar = new AICar(250, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000, "Other", 1.0);
         Car playerCar = new Car(400, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000);
+        Car playerCar2 = new Car(100, 200, 0, 0, 20, -5, 2, 0.5, 1000, 1000);
         farCar.setPlayerCar(playerCar);
-        
+        aiCar.setPlayerCar(playerCar2);
         // Vuelta 2 para activar slipstream
         aiCar.applySlipstream(List.of(otherCarBehind, otherCarFront, aiCar, farCar), 2);
         farCar.applySlipstream(List.of(aiCar), 2);
@@ -186,8 +210,167 @@ public class AICarTest
         assertTrue(aiCar.getSlipstreamBoost() >= 0);
         assertFalse(farCar.getSlipstreamBoost() > 0);
     }
+
+    @Test
+    public void testRacingLineResetTargetIndexExceeds() 
+    {
+        AICar aiCar = new AICar(100, 100, 0, 0, 15, -5, 2, 0.5, 1000, 1000, "Test", 0.8);
+        List<Point> racingLine = new ArrayList<>();
+        racingLine.add(new Point(100, 100));
+        racingLine.add(new Point(200, 200));
+        aiCar.setRacingLine(racingLine);
+        aiCar.setCurrentTargetIndex(2); 
+
+        aiCar.followRacingLine();
+
+        //Debe coger directamente el checkpoint "2" porque están muy cerca
+        assertEquals(1, aiCar.getCurrentTargetIndex());
+    }
+
+    @Test
+    public void testTargetSwitchCloseToWaypoint() 
+    {
+        AICar aiCarLowSkill = new AICar(100, 100, 0, 0, 15, -5, 2, 0.5, 1000, 1000, "Test", 0.4);
+        AICar aiCarHighSkill = new AICar(100, 100, 0, 0, 15, -5, 2, 0.5, 1000, 1000, "Test", 0.8);
+        List<Point> racingLine = new ArrayList<>();
+        racingLine.add(new Point(100, 100));
+        racingLine.add(new Point(350, 100));
+        racingLine.add(new Point(400, 100));
+        racingLine.add(new Point(450, 100));
+        aiCarLowSkill.setRacingLine(racingLine);
+
+        aiCarLowSkill.setCurrentTargetIndex(1);
+        aiCarLowSkill.followRacingLine();
+
+        aiCarLowSkill.setCurrentTargetIndex(2); 
+        aiCarLowSkill.setX(350);
+        aiCarLowSkill.setY(100);
+        aiCarLowSkill.followRacingLine();
+
+        aiCarLowSkill.setCurrentTargetIndex(3); 
+        aiCarLowSkill.setX(400);
+        aiCarLowSkill.setY(100);
+        aiCarLowSkill.followRacingLine();
+
+        assertEquals(0, aiCarLowSkill.getCurrentTargetIndex());
+
+        aiCarHighSkill.setRacingLine(racingLine);
+
+        aiCarHighSkill.setCurrentTargetIndex(1);
+        aiCarHighSkill.followRacingLine();
+
+        aiCarHighSkill.setCurrentTargetIndex(2); 
+        aiCarHighSkill.setX(350);
+        aiCarHighSkill.setY(100);
+        aiCarHighSkill.followRacingLine();
+
+        aiCarHighSkill.setCurrentTargetIndex(3); 
+        aiCarHighSkill.setX(400);
+        aiCarHighSkill.setY(100);
+        aiCarHighSkill.followRacingLine();
+
+        assertEquals(0, aiCarHighSkill.getCurrentTargetIndex());
+    }
+
+    @Test 
+    public void testTurningHardLowerVelocity()
+    {
+        List<Point> racingLine = new ArrayList<>();
+        racingLine.add(new Point(180, 190));
+        aiCar.setRacingLine(racingLine);
+        aiCar.setVelocity(15);
+        aiCar.followRacingLine();
+
+        assertTrue(aiCar.getVelocity() < 15);
+    }
+
+    @Test
+    void testStartNewLap() 
+    {
+        when(timeProvider.now()).thenReturn(1000L);
+
+        aiCar.startNewLap();
     
+        assertEquals(0, aiCar.getLapTime());
+        assertTrue(aiCar.getSectorTimes().length > 0);
+        assertTrue(aiCar.getSectorColors().length > 0);
+        assertEquals(1, aiCar.getCurrentLap()); 
+    }
+
+    @Test
+    void testRecordSector() 
+    {
+        when(timeProvider.now()).thenReturn(1000L);
+        
+        aiCar.startNewLap();
+        aiCar.recordSector(0, 500L); 
+
+        //En sectores invalidos no debería hacer nada
+        aiCar.recordSector(-1, 500L);
+        aiCar.recordSector(10, 500L);
+
+        assertEquals(500L, aiCar.getSectorTimes()[0]); 
+        assertEquals(Map.SectorColor.GREEN, aiCar.getSectorColors()[0]); 
+
+        // Probamos registrar un tiempo peor
+        aiCar.recordSector(0, 600L);
+        assertEquals(Map.SectorColor.ORANGE, aiCar.getSectorColors()[0]); 
+    }
+
+    @Test
+    void testCompleteLap() 
+    {
+        when(timeProvider.now()).thenReturn(1000L, 2000L, 1000L, 3000L); 
+        
+        aiCar.startNewLap();
+        aiCar.completeLap();
+         
+        assertEquals(1000L, aiCar.getBestLapTime()); 
+
+        aiCar.startNewLap();
+        aiCar.completeLap();
+         
+        assertEquals(1000L, aiCar.getBestLapTime()); 
+    }
+
+    @Test
+    void testUpdateLapTime() 
+    {
+
+        when(timeProvider.now()).thenReturn(1000L, 2000L, -1000L);
+        
+        aiCar.startNewLap();
+        aiCar.updateLapTime();
+        
+        assertEquals(1000L, aiCar.getLapTime()); 
+
+        aiCar.startNewLap();
+        aiCar.updateLapTime();
+        
+        assertEquals(-1000L, aiCar.getLapStartTime()); 
+        assertEquals(1000L, aiCar.getLapTime());
+
+    }
+
+    @Test
+    void testPassedAllCheckpoints() 
+    {
+        aiCar.setCheckpointPassed(0);
+        aiCar.setCheckpointPassed(1);
+        aiCar.setCheckpointPassed(2);
+        aiCar.setCheckpointPassed(3);
+
+        assertTrue(aiCar.passedAllCheckpoints()); 
+    }
     
+    @Test
+    void testNotPassedAllCheckpoints() 
+    {
+        aiCar.setCheckpointPassed(0);
+        aiCar.setCheckpointPassed(1);
+        aiCar.setCheckpointPassed(2);
+        assertFalse(aiCar.passedAllCheckpoints()); 
+    }
 
     /* 
     =============================================================================
@@ -294,6 +477,36 @@ public class AICarTest
         assertTrue(topLeftCar.getY() >= 0);
         assertTrue(bottomRightCar.getX() <= 1000);
         assertTrue(bottomRightCar.getY() <= 1000);
+    }
+
+    @Test
+    //Comportamiento normalizar ángulo con sus valores posibles
+    void testNormalizeAngle() 
+    {
+        //Valores dentro del rango -180 a 180
+        assertEquals(90, aiCar.normalizeAngle(90));
+        assertEquals(-90, aiCar.normalizeAngle(-90));
+        
+        //Valores mayores a 180
+        assertEquals(30, aiCar.normalizeAngle(390));
+        assertEquals(45, aiCar.normalizeAngle(405));
+        assertEquals(60, aiCar.normalizeAngle(420));
+        
+        //Valores menores a -180
+        assertEquals(-30, aiCar.normalizeAngle(-390));
+        assertEquals(-45, aiCar.normalizeAngle(-405));
+        assertEquals(-60, aiCar.normalizeAngle(-420));
+        
+        //Valores frontera
+        assertEquals(180, aiCar.normalizeAngle(180));
+        assertEquals(-180, aiCar.normalizeAngle(-180));
+        assertEquals(0, aiCar.normalizeAngle(0));
+               
+        //Valores vecinos
+        assertEquals(179, aiCar.normalizeAngle(179));
+        assertEquals(-179, aiCar.normalizeAngle(-179));
+        assertEquals(-179, aiCar.normalizeAngle(181));
+        assertEquals(179, aiCar.normalizeAngle(-181));
     }
 
     

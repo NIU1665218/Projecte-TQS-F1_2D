@@ -1,17 +1,17 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-f1_2D,es.uab.tqs.f1_2D.model,AICar,209,597,29,37,43,118,38,28,16,17
-f1_2D,es.uab.tqs.f1_2D.model,Map.SectorColor,0,27,0,0,0,1,0,1,0,1
-f1_2D,es.uab.tqs.f1_2D.model,Car,0,568,0,78,0,115,0,57,0,18
-f1_2D,es.uab.tqs.f1_2D.model,Map.State,0,45,0,0,0,1,0,1,0,1
+f1_2D,es.uab.tqs.f1_2D.model,AICar,0,813,0,64,0,169,0,68,0,36
+f1_2D,es.uab.tqs.f1_2D.model,Map.SectorColor,0,44,0,0,0,1,0,1,0,1
+f1_2D,es.uab.tqs.f1_2D.model,Car,0,568,0,78,0,117,0,57,0,18
+f1_2D,es.uab.tqs.f1_2D.model,Map.State,0,74,0,0,0,1,0,1,0,1
 f1_2D,es.uab.tqs.f1_2D.model,Map,0,506,0,30,0,124,0,72,0,57
-f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.GameMode,0,15,0,0,0,3,0,1,0,1
-f1_2D,es.uab.tqs.f1_2D.vista,OffTrackOverlay,0,161,0,14,0,52,0,20,0,13
-f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.MainMenu,10,143,0,0,0,26,2,2,2,2
-f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay,1469,590,113,21,262,128,75,23,14,17
-f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new KeyAdapter() {...},4,46,5,5,1,10,5,3,0,3
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.GameMode,0,24,0,0,0,3,0,1,0,1
+f1_2D,es.uab.tqs.f1_2D.vista,OffTrackOverlay,0,161,0,14,0,53,0,20,0,13
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.MainMenu,10,143,0,0,0,27,2,2,2,2
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay,1469,590,113,21,284,127,75,23,14,17
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new KeyAdapter() {...},4,46,5,5,2,10,5,3,0,3
 f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new ComponentAdapter() {...},0,47,1,1,0,6,1,2,0,2
-f1_2D,es.uab.tqs.f1_2D.vista,LapUI,8,337,3,21,1,67,2,20,0,9
+f1_2D,es.uab.tqs.f1_2D.vista,LapUI,8,338,3,21,2,67,2,20,0,9
 f1_2D,es.uab.tqs.f1_2D.controlador,CarController,0,19,0,0,0,7,0,3,0,3
-f1_2D,es.uab.tqs.f1_2D.controlador,MapController,89,670,14,82,22,165,12,62,2,24
-f1_2D,es.uab.tqs.f1_2D.controlador,AIController,597,997,54,12,119,55,45,10,17,5
+f1_2D,es.uab.tqs.f1_2D.controlador,MapController,0,749,1,91,0,195,1,71,0,26
+f1_2D,es.uab.tqs.f1_2D.controlador,AIController,597,997,54,12,121,144,45,10,17,5
 f1_2D,es.uab.tqs.f1_2D.controlador,RandomGenerator,8,13,0,0,3,4,1,2,1,2

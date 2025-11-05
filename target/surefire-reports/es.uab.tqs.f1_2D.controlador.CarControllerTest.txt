@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: es.uab.tqs.f1_2D.controlador.CarControllerTest
 -------------------------------------------------------------------------------
-Tests run: 37, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.732 s -- in es.uab.tqs.f1_2D.controlador.CarControllerTest
+Tests run: 37, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.739 s -- in es.uab.tqs.f1_2D.controlador.CarControllerTest

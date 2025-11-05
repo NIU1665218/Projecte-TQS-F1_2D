@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: es.uab.tqs.f1_2D.vista.LapUITest
 -------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.536 s -- in es.uab.tqs.f1_2D.vista.LapUITest
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.522 s -- in es.uab.tqs.f1_2D.vista.LapUITest

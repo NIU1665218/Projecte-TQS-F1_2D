@@ -57,8 +57,8 @@ public class CarDisplay extends JPanel
     }
 
     // Constructor
-    public CarDisplay(CarController controller, BufferedImage map, BufferedImage collisionMap1) 
-<span class="fc" id="L61">    {</span>
+<span class="fc" id="L60">    public CarDisplay(CarController controller, BufferedImage map, BufferedImage collisionMap1) </span>
+    {
         //Inicialitzar controlador
 <span class="fc" id="L63">        this.controller = controller;</span>
         
@@ -131,7 +131,7 @@ public class CarDisplay extends JPanel
 
         // Configurar listeners de teclat
 <span class="fc" id="L133">        addKeyListener(new KeyAdapter() </span>
-<span class="fc" id="L134">        {</span>
+        {
             //Quan l'event agafa una nova tecla
             @Override
             public void keyPressed(KeyEvent e) 
@@ -143,7 +143,7 @@ public class CarDisplay extends JPanel
 <span class="pc bpc" id="L143" title="1 of 2 branches missed.">                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) </span>
                     {
 <span class="nc" id="L145">                        showMainMenu();</span>
-                    }
+<span class="nc" id="L146">                    }</span>
                     //En cas contrari afegir-la a la llista per tratar-la posteriorment
 <span class="pc bpc" id="L148" title="1 of 2 branches missed.">                    else if(!trackMap.isCountdownActive())</span>
                     {
@@ -169,7 +169,7 @@ public class CarDisplay extends JPanel
 
         // Ajustar overlays al redimensionar
 <span class="fc" id="L171">        addComponentListener(new java.awt.event.ComponentAdapter() </span>
-<span class="fc" id="L172">        {</span>
+        {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) 
             {
@@ -309,14 +309,14 @@ public class CarDisplay extends JPanel
             // Mostrar overlay de fora de pista
 <span class="nc" id="L310">            offTrackOverlay.showOverlay();</span>
 <span class="nc" id="L311">            invalidLapOverlay.hideOverlay();</span>
-        } 
+<span class="nc" id="L312">        } </span>
         //Si el jugador es troba invalid lap, ensenyar l'overlay corresponent
 <span class="pc bpc" id="L314" title="1 of 2 branches missed.">        else if (trackMap.getState() == Map.State.INVALID_LAP)</span>
         {
             // Mostrar overlay de vuelta invàlida
 <span class="nc" id="L317">            invalidLapOverlay.showOverlay();</span>
 <span class="nc" id="L318">            offTrackOverlay.hideOverlay();</span>
-        }
+<span class="nc" id="L319">        }</span>
         //Si no es cap de les anteriors situacions, ocultar els overlays
         else 
         {
@@ -349,7 +349,7 @@ public class CarDisplay extends JPanel
                 {
 <span class="nc" id="L350">                    return true;</span>
                 }
-<span class="nc" id="L352">            }</span>
+            }
         }
         //Si ningú compleix els requisits, la carrera segueix
 <span class="nc" id="L355">        return false;</span>
@@ -383,7 +383,7 @@ public class CarDisplay extends JPanel
 <span class="nc" id="L383">                    return true;</span>
                 }
             }
-<span class="nc" id="L386">        }</span>
+        }
 
         //Si cap situació es compleix, no aplicar slipstram
 <span class="nc" id="L389">        return false;</span>
@@ -428,7 +428,7 @@ public class CarDisplay extends JPanel
 <span class="nc bnc" id="L428" title="All 2 branches missed.">            if(i + 1 &gt;= playerPosition)</span>
             {
 <span class="nc" id="L430">                results.append((i + 2)).append(&quot;. &quot;).append(aiCar.getTeam()).append(&quot; - &quot;).append(timeStr).append(&quot; - L&quot;).append(laps).append(&quot;\n&quot;);</span>
-            }
+<span class="nc" id="L431">            }</span>
             //En cas contrari, agafar l'ordre de la llista
             else
             {
@@ -445,7 +445,7 @@ public class CarDisplay extends JPanel
         
         //Ensenyar els resultats complets
 <span class="nc" id="L447">        JOptionPane.showMessageDialog(this, results.toString(), </span>
-            &quot;Resultados de Carrera&quot;, JOptionPane.INFORMATION_MESSAGE);
+<span class="nc" id="L448">            &quot;Resultados de Carrera&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
         
         // Volver al menú principal
 <span class="nc" id="L451">        showMainMenu();</span>
@@ -547,18 +547,18 @@ public class CarDisplay extends JPanel
 <span class="nc bnc" id="L547" title="All 2 branches missed.">            if (aiLap &gt; playerLap) </span>
             {
 <span class="nc" id="L549">                position++;</span>
-            } 
+<span class="nc" id="L550">            } </span>
             //Si el cotxe té les mateixes voltes que el jugador, però té més checkpoints, el jugador va per darrere d'aquest cotxe
 <span class="nc bnc" id="L552" title="All 4 branches missed.">            else if (aiLap == playerLap &amp;&amp; aiCheckpoints &gt; playerCheckpoints) </span>
             {
 <span class="nc" id="L554">                position++;</span>
-            }
+<span class="nc" id="L555">            }</span>
             //Si el cotxe té les mateixes voltes i checkpoints que el jugador, però està més aprop del següent checkpoint, el jugador va per darrere d'aquest cotxe
 <span class="nc bnc" id="L557" title="All 6 branches missed.">            else if (aiLap == playerLap &amp;&amp; aiCheckpoints == playerCheckpoints &amp;&amp; aiDistance &lt; playerDistance) </span>
             {
 <span class="nc" id="L559">                position++;</span>
             }
-<span class="nc" id="L561">        }</span>
+        }
         
 <span class="nc" id="L563">        return position;</span>
     }
@@ -568,12 +568,12 @@ public class CarDisplay extends JPanel
     {
         //Lista de checkpoints i finishLine
 <span class="nc" id="L570">        List&lt;Rectangle&gt; allCheckpoints = Arrays.asList</span>
-<span class="nc" id="L571">        (</span>
-            new Rectangle(4548, 940, 40, 230),  
-            new Rectangle(5484, 100, 20, 230),   
-            new Rectangle(1330, 1216, 350, 50), 
-            new Rectangle(400, 2344,350, 50),  
-            new Rectangle(280, 1200, 320, 40)
+        (
+<span class="nc" id="L572">            new Rectangle(4548, 940, 40, 230),  </span>
+<span class="nc" id="L573">            new Rectangle(5484, 100, 20, 230),   </span>
+<span class="nc" id="L574">            new Rectangle(1330, 1216, 350, 50), </span>
+<span class="nc" id="L575">            new Rectangle(400, 2344,350, 50),  </span>
+<span class="nc" id="L576">            new Rectangle(280, 1200, 320, 40)</span>
         );
         
         int nextCheckpointIndex;
@@ -582,7 +582,7 @@ public class CarDisplay extends JPanel
 <span class="nc bnc" id="L582" title="All 2 branches missed.">        if (car instanceof AICar) </span>
         {
 <span class="nc" id="L584">            nextCheckpointIndex = ((AICar) car).getNextCheckpointIndex();</span>
-        } 
+<span class="nc" id="L585">        } </span>
         else 
         {
 <span class="nc" id="L588">            nextCheckpointIndex = trackMap.getNextCheckpointIndex();</span>
@@ -644,10 +644,10 @@ public class CarDisplay extends JPanel
 
        // Dibuixar la porció visible del mapa
 <span class="nc" id="L646">        g2d.drawImage(largerMap,</span>
-                0, 0, panelWidth, panelHeight,
-                (int) cameraX, (int) cameraY,
-                (int) cameraX + panelWidth, (int) cameraY + panelHeight,
-                null);
+<span class="nc" id="L647">                0, 0, panelWidth, panelHeight,</span>
+<span class="nc" id="L648">                (int) cameraX, (int) cameraY,</span>
+<span class="nc" id="L649">                (int) cameraX + panelWidth, (int) cameraY + panelHeight,</span>
+<span class="nc" id="L650">                null);</span>
 
         //Si no es troba ni en el menú ni en el countdown, i és mode carrera, dibuixar posicions
 <span class="nc bnc" id="L653" title="All 4 branches missed.">        if (!inMainMenu &amp;&amp; !trackMap.isCountdownActive())</span>
@@ -736,7 +736,7 @@ public class CarDisplay extends JPanel
                     //Dibuixar el cotxe
 <span class="nc" id="L737">                    g2d2.drawImage(aiCar.getSprite(), transform, null);</span>
                 }
-<span class="nc" id="L739">            }</span>
+            }
 
             
             //DEBUGGING PURPOSES
@@ -772,7 +772,7 @@ public class CarDisplay extends JPanel
 <span class="nc" id="L772">                int x = (int) (point.x - cameraX);</span>
 <span class="nc" id="L773">                int y = (int) (point.y - cameraY);</span>
 <span class="nc" id="L774">                g2d.fillOval(x - 5, y - 5, 10, 10); </span>
-<span class="nc" id="L775">            }</span>
+            }
             
         }
 
@@ -799,10 +799,10 @@ public class CarDisplay extends JPanel
 
             // Dibujar la porció visible del mapa
 <span class="nc" id="L801">            g2d.drawImage(largerMap,</span>
-                    0, 0, panelWidth, panelHeight,
-                    (int) cameraX, (int) cameraY,
-                    (int) cameraX + panelWidth, (int) cameraY + panelHeight,
-                    null);
+<span class="nc" id="L802">                    0, 0, panelWidth, panelHeight,</span>
+<span class="nc" id="L803">                    (int) cameraX, (int) cameraY,</span>
+<span class="nc" id="L804">                    (int) cameraX + panelWidth, (int) cameraY + panelHeight,</span>
+<span class="nc" id="L805">                    null);</span>
 <span class="nc" id="L806">        } </span>
         else 
         {
@@ -846,19 +846,19 @@ public class CarDisplay extends JPanel
 <span class="pc bpc" id="L846" title="1 of 2 branches missed.">        if(aiController == null) return;</span>
         //Possibles noms dels cotxes rivals
 <span class="nc" id="L848">        String[] teamNames = </span>
-        {
-            &quot;mercedes&quot;, &quot;redbull&quot;, &quot;mclaren&quot;,
-            &quot;alpine&quot;, &quot;racingbulls&quot;, &quot;astonmartin&quot;, &quot;williams&quot;, 
-            &quot;sauber&quot;, &quot;haas&quot;
+<span class="nc" id="L849">        {</span>
+<span class="nc" id="L850">            &quot;mercedes&quot;, &quot;redbull&quot;, &quot;mclaren&quot;,</span>
+<span class="nc" id="L851">            &quot;alpine&quot;, &quot;racingbulls&quot;, &quot;astonmartin&quot;, &quot;williams&quot;, </span>
+<span class="nc" id="L852">            &quot;sauber&quot;, &quot;haas&quot;</span>
         };
 
         //Direccions a les imatges de cada sprite
 <span class="nc" id="L856">        String[] teamColors = </span>
-        {
-            &quot;/img/mercedes_car.png&quot;, &quot;/img/redbull_car.png&quot;,
-            &quot;/img/mclaren_car.png&quot;, &quot;/img/alpine_car.png&quot;, &quot;/img/racingbulls_car.png&quot;,
-            &quot;/img/astonmartin_car.png&quot;, &quot;/img/williams_car.png&quot;, &quot;/img/sauber_car.png&quot;,
-            &quot;/img/haas_car.png&quot;
+<span class="nc" id="L857">        {</span>
+<span class="nc" id="L858">            &quot;/img/mercedes_car.png&quot;, &quot;/img/redbull_car.png&quot;,</span>
+<span class="nc" id="L859">            &quot;/img/mclaren_car.png&quot;, &quot;/img/alpine_car.png&quot;, &quot;/img/racingbulls_car.png&quot;,</span>
+<span class="nc" id="L860">            &quot;/img/astonmartin_car.png&quot;, &quot;/img/williams_car.png&quot;, &quot;/img/sauber_car.png&quot;,</span>
+<span class="nc" id="L861">            &quot;/img/haas_car.png&quot;</span>
         };
 
         //Per cada cotxe, assignar-li el seu Sprite corresponent al nom de l'equip
@@ -885,7 +885,7 @@ public class CarDisplay extends JPanel
             
             //Carregar la direcció en la funció principal de load
 <span class="nc" id="L887">            loadCarSprite(aiCar, teamColors[teamIndex]);</span>
-<span class="nc" id="L888">        }</span>
+        }
 <span class="nc" id="L889">    }</span>
 
     // Carga i assigna el sprite del cotxe al controlador
@@ -921,7 +921,7 @@ public class CarDisplay extends JPanel
             //Si hi ha algún problema en carregar algún sprite, possar una imatge default
 <span class="fc" id="L922">            BufferedImage defaultImage = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);</span>
 <span class="fc" id="L923">            car.setSprite(defaultImage);</span>
-<span class="fc" id="L924">        }</span>
+        }
 <span class="fc" id="L925">    }</span>
 
     // Carga una imatge pel track i s'escala per cubrir tota l'àrea
@@ -933,12 +933,12 @@ public class CarDisplay extends JPanel
 <span class="fc bfc" id="L933" title="All 2 branches covered.">            if (path == null) throw new IllegalArgumentException(&quot;Path no puede ser null&quot;);</span>
             //Intentar llegir la imatge del track
 <span class="fc" id="L935">            original = ImageIO.read(CarDisplay.class.getResource(path));</span>
-        }
+<span class="fc" id="L936">        }</span>
 <span class="fc" id="L937">        catch (IOException | IllegalArgumentException e)</span>
         {
             //Si no es pot llegir, possar una default
 <span class="fc" id="L940">            original = new BufferedImage(2000, 2000, BufferedImage.TYPE_INT_RGB);</span>
-<span class="fc" id="L941">        }</span>
+        }
 
         // Escalar la imatge
 <span class="fc" id="L944">        int bigWidth = (int)(original.getWidth() * scaleFactor);</span>
@@ -985,7 +985,7 @@ public class CarDisplay extends JPanel
 <span class="fc" id="L985">        private int buttonHeight = 60;</span>
 
         //Inicialitzar el menú principal
-        public MainMenu() 
+<span class="fc" id="L988">        public MainMenu() </span>
 <span class="fc" id="L989">        {</span>
             //Definir layout a null per poder controlar a gust
 <span class="fc" id="L991">            setLayout(null);</span>
