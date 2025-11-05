@@ -1,6 +1,9 @@
 package es.uab.tqs.f1_2D.vista;
+import es.uab.tqs.f1_2D.model.AICar;
 import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.model.Map;
+import es.uab.tqs.f1_2D.vista.CarDisplay.GameMode;
+import es.uab.tqs.f1_2D.controlador.AIController;
 import es.uab.tqs.f1_2D.controlador.CarController;
 import es.uab.tqs.f1_2D.controlador.MapController;
 
@@ -15,14 +18,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+
 import java.io.IOException;
+
 import java.lang.reflect.Field;
+import java.util.List;
 
 import javax.sound.sampled.Clip;
-import javax.swing.JFrame;
 
+import javax.swing.JFrame;
 
 @ExtendWith(MockitoExtension.class)
 class CarDisplayTest {
@@ -47,11 +54,13 @@ class CarDisplayTest {
     private LapUI lapUI;
     @Mock
     private MapController mockMapController;
+    @Mock
+    private AIController mockAiController;
 
     /* 
-      ================================================================================
-        TEST SOBRE VISTA, NO ES DEMANA PERO EM SERVEIX PER VERIFICAR FUNCIONAMENT
-      ================================================================================
+      ============================================================================================
+        TEST SOBRE VISTA, NO ES DEMANA PERO EM SERVEIX PER VERIFICAR FUNCIONAMENT I FER COVERAGE
+      ============================================================================================
     */
 
     @BeforeEach
@@ -63,6 +72,7 @@ class CarDisplayTest {
         mockMap = mock(BufferedImage.class);
         mockCollisionMap = mock(BufferedImage.class);
         lapUI = new LapUI(mockMap2);
+        mockAiController = mock(AIController.class);
     }
 
     @Test
@@ -102,6 +112,107 @@ class CarDisplayTest {
         //Prueba carga con ruta invalida
         assertDoesNotThrow(() -> display.loadCarSprite(car, "/img/invalid.png"));
         assertNotNull(car.getSprite());
+    }
+
+    @Test
+    void testStartGameRaceMode() 
+    {
+        Car car = new Car(0, 0, 0, 0, 0, 0, 0, 0, 100, 100);
+        when(mockController.getCar()).thenReturn(car);
+        when(mockMap2.getFinishLine()).thenReturn(new Rectangle(0, 0, 100, 10));
+        CarDisplay display = new CarDisplay(mockController, mockMap, mockCollisionMap);
+
+        setPrivateField(display, "trackMap", mockMap2);
+        setPrivateField(display, "aiController", mockAiController);
+        setPrivateField(display, "trackMapController", mockMapController);
+
+        display.startGame(GameMode.RACE);
+    
+        assertFalse(display.isInMainMenu());
+        assertEquals(GameMode.RACE, display.getCurrentGameMode());
+    
+        assertEquals(350, car.getX());
+        assertEquals(1250, car.getY());
+        assertEquals(280, car.getAngle());
+        assertEquals(0, car.getVelocity());
+    
+        assertNotNull(getPrivateField(display, "aiController"));
+    
+        verify(mockMap2).setTotalLaps(3);
+        verify(mockMapController).startRaceMode();
+    }
+
+    @Test
+    void testStartGameQualyMode()
+    {
+        Car car = new Car(0, 0, 0, 0, 0, 0, 0, 0, 100, 100);
+        when(mockController.getCar()).thenReturn(car);
+
+        CarDisplay display = new CarDisplay(mockController, mockMap, mockCollisionMap);
+
+        setPrivateField(display, "trackMap", mockMap);
+        setPrivateField(display, "trackMapController", mockMapController);
+
+        display.startGame(GameMode.QUALY);
+
+        assertFalse(display.isInMainMenu());
+        assertEquals(GameMode.QUALY, display.getCurrentGameMode());
+        assertEquals(880, car.getX());
+        assertEquals(1780, car.getY());
+        assertEquals(267, car.getAngle());
+        assertEquals(0, car.getVelocity());
+        assertNull(getPrivateField(display, "aiController"));
+
+        verify(mockMapController).startQualyMode();
+    }
+
+    @Test
+    void testIsRaceFinished_PlayerFinished() 
+    {
+        when(mockMap2.isRaceComplete()).thenReturn(true);
+        Car car = new Car(0, 0, 0, 0, 0, 0, 0, 0, 100, 100);
+        when(mockController.getCar()).thenReturn(car);
+    
+        CarDisplay display = new CarDisplay(mockController, mockMap, mockCollisionMap);
+        display.setIsMainMenu(false);
+        setPrivateField(display, "currentGameMode", GameMode.RACE);
+        setPrivateField(display, "trackMap", mockMap2);
+        setPrivateField(display, "aiController", mockAiController);
+    
+        assertDoesNotThrow(() -> display.updateRace());
+    }
+    
+    @Test
+    void testIsRaceFinished_AIFinished() 
+    {
+        when(mockMap2.isRaceComplete()).thenReturn(false);
+        Car car = new Car(0, 0, 0, 0, 0, 0, 0, 0, 100, 100);
+        when(mockController.getCar()).thenReturn(car);
+        AICar mockAICar = mock(AICar.class);
+        when(mockAICar.getCurrentLap()).thenReturn(4);
+        when(mockMap2.getTotalLaps()).thenReturn(3);
+        when(mockAiController.getAICars()).thenReturn(List.of(mockAICar));
+        CarDisplay display = new CarDisplay(mockController, mockMap, mockCollisionMap);
+        display.setIsMainMenu(false);
+        setPrivateField(display, "aiController", mockAiController);
+        setPrivateField(display, "trackMap", mockMap2);
+        setPrivateField(display, "currentGameMode", GameMode.RACE);
+    
+        assertDoesNotThrow(() -> display.updateRace());
+    }
+    
+    @Test
+    void testIsRaceFinished_NoOneFinished() 
+    {
+        Car car = new Car(0, 0, 0, 0, 0, 0, 0, 0, 100, 100);
+        when(mockController.getCar()).thenReturn(car);
+
+        CarDisplay display = new CarDisplay(mockController, mockMap, mockCollisionMap);
+        setPrivateField(display, "aiController", mockAiController);
+        setPrivateField(display, "trackMap", mockMap2);
+        setPrivateField(display, "currentGameMode", GameMode.RACE);
+    
+        assertDoesNotThrow(() -> display.updateRace());
     }
 
     @Test
@@ -193,11 +304,47 @@ class CarDisplayTest {
         );
         assertTrue(display.getKeysPressed().contains(KeyEvent.VK_W));
 
+        display.setIsMainMenu(true);
+
+        display.getKeyListeners()[0].keyReleased(
+            new KeyEvent(display, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_W, 'W')
+        );
+        assertTrue(display.getKeysPressed().contains(KeyEvent.VK_W));
+
+        display.setIsMainMenu(false);
+        when(mockTempMap.isCountdownActive()).thenReturn(true);
+        display.getKeyListeners()[0].keyReleased(
+            new KeyEvent(display, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_W, 'W')
+        );
+        assertTrue(display.getKeysPressed().contains(KeyEvent.VK_W));
+
+
+        when(mockTempMap.isCountdownActive()).thenReturn(false);
         // Simular liberación de tecla
         display.getKeyListeners()[0].keyReleased(
             new KeyEvent(display, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_W, 'W')
         );
         assertFalse(display.getKeysPressed().contains(KeyEvent.VK_W));
+
+        // Simular pulsación de tecla
+        display.getKeyListeners()[0].keyPressed(
+            new KeyEvent(display, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ESCAPE, 'W')
+        );
+        assertTrue(display.isInMainMenu());
+
+        display.setIsMainMenu(false);
+        when(mockTempMap.isCountdownActive()).thenReturn(true);
+        display.getKeyListeners()[0].keyPressed(
+            new KeyEvent(display, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_W, 'W')
+        );
+        assertFalse(display.getKeysPressed().contains(KeyEvent.VK_W));
+
+        display.setIsMainMenu(true);
+        display.getKeyListeners()[0].keyPressed(
+            new KeyEvent(display, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_W, 'W')
+        );
+        assertFalse(display.getKeysPressed().contains(KeyEvent.VK_W));
+
     }
 
     @Test
@@ -270,5 +417,29 @@ class CarDisplayTest {
     {
         assertDoesNotThrow(() -> {CarDisplay.main(new String[]{});});
     }
+
+    //Métodos de ayuda para poder hacer una especie de caballo de troya
+    private void setPrivateField(Object obj, String fieldName, Object value) 
+    {
+        try {
+            Field field = obj.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (Exception e) {
+            return;
+        }
+    }
+
+    private Object getPrivateField(Object obj, String fieldName) 
+    {
+        try {
+            Field field = obj.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 }

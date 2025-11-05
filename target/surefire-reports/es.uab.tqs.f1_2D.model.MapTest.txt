@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: es.uab.tqs.f1_2D.model.MapTest
 -------------------------------------------------------------------------------
-Tests run: 34, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.040 s -- in es.uab.tqs.f1_2D.model.MapTest
+Tests run: 34, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in es.uab.tqs.f1_2D.model.MapTest

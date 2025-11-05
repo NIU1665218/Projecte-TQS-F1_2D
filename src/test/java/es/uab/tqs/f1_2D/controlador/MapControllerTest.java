@@ -429,7 +429,7 @@ class MapControllerTest
     }
 
     @Test
-    //Verificar que en carrera y offtrack, el estado puede volver a RUNNING con el timer
+    //Verificar que en carrera y invalid , el estado puede volver a RUNNING con el timer
     public void testInvalidHandlerTimer() throws Exception 
     {
         track.setRaceMode(true);

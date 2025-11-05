@@ -236,7 +236,7 @@ public class AIController
     }
 
     //Calcular el angulo de salida 
-    private double calculateAngleToWaypoint(double startX, double startY, int waypointIndex) 
+    public double calculateAngleToWaypoint(double startX, double startY, int waypointIndex) 
     {
         //Ángulo por default si falla la racing line
         if (racingLine.size() <= waypointIndex) return 280; 
@@ -295,7 +295,7 @@ public class AIController
     }
     
     //Si ha pasado por línea de meta, verificar si debe empezar una nueva vuelta o terminar la carrera
-    private void handleAIFinishLine(AICar aiCar) {
+    public void handleAIFinishLine(AICar aiCar) {
         
         // Si es la primera vez que pasa o ha completado todos los checkpoints
         if (aiCar.getLapStartTime() == 0 || aiCar.passedAllCheckpoints()) 
@@ -311,7 +311,7 @@ public class AIController
     }
 
     //Si ha pasado por un checkpoint, controlar sectores y tiempos
-    private void handleAICheckpoint(AICar aiCar, int checkpointIndex) 
+    public void handleAICheckpoint(AICar aiCar, int checkpointIndex) 
     {
         // Si ya ha pasado por el checkpoint, lo ignora
         if (aiCar.getPassedCheckpoints().contains(checkpointIndex)) 
@@ -360,7 +360,7 @@ public class AIController
     }
     
     //Si tiene el mejor tiempo de sector de todos los coches, asignarle sector en morado
-    private void updateGlobalSectorTime(int sectorIndex, long sectorTime, AICar aiCar) 
+    public void updateGlobalSectorTime(int sectorIndex, long sectorTime, AICar aiCar) 
     {
         if (sectorTime < bestGlobalSectorTimes[sectorIndex]) 
         {
@@ -386,7 +386,7 @@ public class AIController
     }
     
     //Sistema de posiciones
-    private void updatePositions() 
+    public void updatePositions() 
     {
         //Crear lista con todos los coches y el jugador
         List<Car> allCars = new ArrayList<>();
@@ -434,7 +434,7 @@ public class AIController
     }
 
     //Calcular la distancia al siguiente checkpoint
-    private double getDistanceToNextCheckpoint(Car car) 
+    public double getDistanceToNextCheckpoint(Car car) 
     {
         //Definir todos los checkpoints
         List<Rectangle> allCheckpoints = Arrays.asList(
@@ -480,7 +480,7 @@ public class AIController
     }
 
     //Getter del siguiente checkpoint
-    private int getNextCheckpointIndex(Car car) 
+    public int getNextCheckpointIndex(Car car) 
     {
         if (car instanceof AICar) 
         {
@@ -525,4 +525,6 @@ public class AIController
             aiCar.setSkillLevel(Math.min(1.0, newSkill));
         }
     }
+    public void setTimeProvider(TimeProvider timeProvider) {this.timeProvider = timeProvider;}
+    public void setBestGlobalSectorTime(int time, int sectorIndex) {this.bestGlobalSectorTimes[sectorIndex] = time;}
 }

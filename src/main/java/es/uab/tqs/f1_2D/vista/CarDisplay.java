@@ -10,6 +10,8 @@ import es.uab.tqs.f1_2D.model.Map;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
@@ -168,18 +170,14 @@ public class CarDisplay extends JPanel
         });
 
         // Ajustar overlays al redimensionar
-        addComponentListener(new java.awt.event.ComponentAdapter() 
+        addComponentListener(new ComponentAdapter() 
         {
             @Override
-            public void componentResized(java.awt.event.ComponentEvent e) 
+            public void componentResized(ComponentEvent e) 
             {
                 offTrackOverlay.setBounds(0, 0, getWidth(), getHeight());
                 invalidLapOverlay.setBounds(0, 0, getWidth(), getHeight());
-                
-                if (mainMenu != null) 
-                {
-                    mainMenu.setBounds(0, 0, getWidth(), getHeight());
-                }
+                mainMenu.setBounds(0, 0, getWidth(), getHeight());
             }
         });
 
@@ -219,9 +217,9 @@ public class CarDisplay extends JPanel
     public void startGame(GameMode mode) 
     {
         //Resetejar cada cop que es vol jugar
+        currentGameMode = mode;
         resetGame();
         inMainMenu = false;
-        currentGameMode = mode;
         mainMenu.setVisible(false);
         
         // Configurar el modo de juego
@@ -327,13 +325,8 @@ public class CarDisplay extends JPanel
     }
 
     //Verificar si la carrera s'ha acabat
-    private boolean isRaceFinished() 
+    public boolean isRaceFinished() 
     {
-        //Asegurar que en Qualy no debe comportarse como carrera
-        if(currentGameMode == GameMode.QUALY)
-        {
-            return false;
-        }
         // Verificar si el jugador ha completado la carrera
         if(trackMap.isRaceComplete()) 
         {
@@ -356,7 +349,7 @@ public class CarDisplay extends JPanel
     }
 
     //Comprobar si el cotxe del jugador es troba just darrere d'un altre per donar un impuls
-    private boolean checkPlayerSlipstream() 
+    public boolean checkPlayerSlipstream() 
     {
         Car playerCar = controller.getCar();
         
@@ -390,7 +383,7 @@ public class CarDisplay extends JPanel
     }
     
     //Funció d'utilitat per normalitzar un angle entre 0 i 360
-    private double normalizeAngle(double angle) 
+    public double normalizeAngle(double angle) 
     {
         while (angle > 180) angle -= 360;
         while (angle < -180) angle += 360;
@@ -398,7 +391,7 @@ public class CarDisplay extends JPanel
     }
 
     //Si algú ha finalitzat la carrera, ensenyar els resultats
-    private void showRaceResults() 
+    public void showRaceResults() 
     {
         // Obtener la clasificación final
         List<AICar> positions = aiController.getPositions();
@@ -452,7 +445,7 @@ public class CarDisplay extends JPanel
     }
 
     //Pasar de milisegons al format MM:SS.mmm (minuts, segons, milisegons)
-    private String formatTime(long time) 
+    public String formatTime(long time) 
     {
         long minutes = (time / 60000) % 60;
         long seconds = (time / 1000) % 60;
@@ -461,7 +454,7 @@ public class CarDisplay extends JPanel
     }
 
     //En carrera, funció que s'encarrega de pintar les posicions on toca
-    private void drawPositions(Graphics g) 
+    public void drawPositions(Graphics g) 
     {
         //Agafar la llista de posicions en carrera
         List<AICar> positions = aiController.getPositions();
@@ -519,7 +512,7 @@ public class CarDisplay extends JPanel
     }
     
     //Funció complementaria per determinar la posició del jugador
-    private int getPlayerPosition() 
+    public int getPlayerPosition() 
     {
         //Almacenar les posicions actuals a una llista per iterar-la
         List<AICar> positions = aiController.getPositions();
@@ -564,7 +557,7 @@ public class CarDisplay extends JPanel
     }
 
     //Funció complementaria per calcular la distància al següent checkpoint
-    private double getDistanceToNextCheckpoint(Car car) 
+    public double getDistanceToNextCheckpoint(Car car) 
     {
         //Lista de checkpoints i finishLine
         List<Rectangle> allCheckpoints = Arrays.asList
@@ -779,7 +772,7 @@ public class CarDisplay extends JPanel
     }
 
     //Funció per dibuixar la countdown abans de la carrera
-    private void drawCountdown(Graphics g) 
+    public void drawCountdown(Graphics g) 
     {
         Graphics2D g2d = (Graphics2D) g;
         
@@ -841,7 +834,7 @@ public class CarDisplay extends JPanel
     }
 
     //Funció per carregar els Sprites dels cotxes rivals
-    private void loadAICarSprites() 
+    public void loadAICarSprites() 
     {
         if(aiController == null) return;
         //Possibles noms dels cotxes rivals

@@ -74,7 +74,7 @@ public class LapUI extends JPanel
                 g2d.setColor(Color.GREEN);
             }   
         }    
-        else if(map.isLapHasPenalty() && map.isRaceMode())
+        else if(map.isLapHasPenalty())
         {
             //Si está en modo carrera y la vuelta tiene penalización, timer en rojo
             g2d.setColor(Color.RED);

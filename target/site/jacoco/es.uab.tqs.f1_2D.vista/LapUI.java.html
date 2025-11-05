@@ -74,11 +74,11 @@ public class LapUI extends JPanel
 <span class="fc" id="L74">                g2d.setColor(Color.GREEN);</span>
             }   
 <span class="fc" id="L76">        }    </span>
-<span class="pc bpc" id="L77" title="3 of 4 branches missed.">        else if(map.isLapHasPenalty() &amp;&amp; map.isRaceMode())</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        else if(map.isLapHasPenalty())</span>
         {
             //Si está en modo carrera y la vuelta tiene penalización, timer en rojo
-<span class="nc" id="L80">            g2d.setColor(Color.RED);</span>
-<span class="nc" id="L81">        }</span>
+<span class="fc" id="L80">            g2d.setColor(Color.RED);</span>
+<span class="fc" id="L81">        }</span>
         else
         {
             //Si el jugador está en cualquier otro estado, el color del timer es blanco

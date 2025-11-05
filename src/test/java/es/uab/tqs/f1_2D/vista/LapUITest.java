@@ -109,6 +109,14 @@ class LapUITest {
         when(mockMap.getSectorColor(anyInt())).thenReturn(SectorColor.ORANGE);
         assertDoesNotThrow(()-> lapUI.paintComponent(g2d));
 
+        //Estado RUNNING con penalización debería pintar en ROJO y Sector verde no debería dar excepción
+        when(mockMap.getState()).thenReturn(Map.State.RUNNING);
+        when(mockMap.isLapHasPenalty()).thenReturn(true);
+        when(mockMap.getBestLapTime()).thenReturn(1000L);
+        when(mockMap.getLapTime()).thenReturn(2000L);
+        when(mockMap.getSectorColor(anyInt())).thenReturn(SectorColor.GREEN);
+        assertDoesNotThrow(()-> lapUI.paintComponent(g2d));
+
         //Estado RESULT con tiempo peor que el mejor debería pintar en AMARILLO y Sector morado no debería dar excepción
         when(mockMap.getState()).thenReturn(Map.State.RESULT);
         when(mockMap.getBestLapTime()).thenReturn(1000L);
