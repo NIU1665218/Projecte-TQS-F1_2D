@@ -29,7 +29,6 @@ public class Map
     private long lapStartTime;
     private long bestLapTime;
     private long lapTime;
-    private long lastCompletedLapTime;
     private TimeProvider timeProvider;
     
     // Sectores
@@ -138,7 +137,6 @@ public class Map
         setCurrentState(State.IDLE);
         setCurrentLap(0);
         setBestLapTime(Long.MAX_VALUE);
-        setLastCompletedLapTime(0);
         setLapTime(0);
         setLapStartTime(0);
         getPassedCheckpoints().clear();
@@ -181,7 +179,6 @@ public class Map
     public long getBestLapTime() { return bestLapTime == Long.MAX_VALUE ? 0 : bestLapTime; }
     public long getBestLapTimeFinish() { return bestLapTime; }
     public long getLapTime() { return lapTime; }
-    public long getLastCompletedLapTime() { return lastCompletedLapTime; }
     public long getCurrentLapPenalty() { return currentLapPenalty; }
     public long getSectorTime(int i) 
     { 
@@ -231,8 +228,7 @@ public class Map
         //Temporización y tiempos
     public void setLapStartTime(long time) { this.lapStartTime = time; }
     public void setBestLapTime(long time) { this.bestLapTime = time; }
-    public void setLapTime(long time) { this.lapTime = time; }
-    public void setLastCompletedLapTime(long time) { this.lastCompletedLapTime = time; }    
+    public void setLapTime(long time) { this.lapTime = time; }   
     public void setSectorTime(int index, long time) {sectorTimes[index] = time;}
     public void setBestSectorTime(int index, long time) {bestSectorTimes[index] = time;}
     public void setCurrentLapPenalty(long penalty) { this.currentLapPenalty = penalty; }

@@ -24,13 +24,13 @@ public class AIController
     
     //Nombres de los equipos existentes
 <span class="pc" id="L26">    private final String[] F1_TEAMS = </span>
-<span class="pc" id="L27">    {</span>
-<span class="pc" id="L28">        &quot;Mercedes&quot;, &quot;Red Bull&quot;, &quot;McLaren&quot;, &quot;Alpine&quot;, </span>
-<span class="pc" id="L29">        &quot;Racing Bulls&quot;, &quot;Aston Martin&quot;, &quot;Williams&quot;, &quot;Sauber&quot;, &quot;Haas&quot;</span>
+    {
+        &quot;Mercedes&quot;, &quot;Red Bull&quot;, &quot;McLaren&quot;, &quot;Alpine&quot;, 
+        &quot;Racing Bulls&quot;, &quot;Aston Martin&quot;, &quot;Williams&quot;, &quot;Sauber&quot;, &quot;Haas&quot;
     };
     
-<span class="nc" id="L32">    public AIController(Map trackMap, Car playerCar) </span>
-    {
+    public AIController(Map trackMap, Car playerCar) 
+<span class="nc" id="L33">    {</span>
         //Inicializar las variables necesarias
 <span class="nc" id="L35">        this.trackMap = trackMap;</span>
 <span class="nc" id="L36">        this.playerCar = playerCar;</span>
@@ -48,8 +48,8 @@ public class AIController
 <span class="nc" id="L48">        initializeAICars();</span>
 <span class="nc" id="L49">    }</span>
 
-<span class="fc" id="L51">    public AIController(Map trackMap, Car playerCar, RandomGenerator randomGenerator) </span>
-    {
+    public AIController(Map trackMap, Car playerCar, RandomGenerator randomGenerator) 
+<span class="fc" id="L52">    {</span>
         //Inicializar las variables necesarias
 <span class="fc" id="L54">        this.trackMap = trackMap;</span>
 <span class="fc" id="L55">        this.playerCar = playerCar;</span>
@@ -74,70 +74,70 @@ public class AIController
         
         // Waypoints principales 
 <span class="fc" id="L76">        Point[] keyPoints = {</span>
-<span class="fc" id="L77">            new Point(431, 1166), </span>
-<span class="fc" id="L78">            new Point(600, 823), </span>
-<span class="fc" id="L79">            new Point(817, 585), //T1</span>
-<span class="fc" id="L80">            new Point(1240, 668), </span>
-<span class="fc" id="L81">            new Point(1728, 760), </span>
-<span class="fc" id="L82">            new Point(2472, 872), </span>
-<span class="fc" id="L83">            new Point(3152, 976), </span>
-<span class="fc" id="L84">            new Point(3888, 988), //T2</span>
-<span class="fc" id="L85">            new Point(4548, 1056), </span>
-<span class="fc" id="L86">            new Point(4816, 928), </span>
-<span class="fc" id="L87">            new Point(4908, 780), //T3</span>
-<span class="fc" id="L88">            new Point(4860, 632), </span>
-<span class="fc" id="L89">            new Point(4762, 462), //T4</span>
-<span class="fc" id="L90">            new Point(4888, 303), </span>
-<span class="fc" id="L91">            new Point(5032, 252), </span>
-<span class="fc" id="L92">            new Point(5324, 196), </span>
-<span class="fc" id="L93">            new Point(5632, 136), //T5</span>
-<span class="fc" id="L94">            new Point(5752, 208), </span>
-<span class="fc" id="L95">            new Point(5752, 372), </span>
+            new Point(431, 1166), 
+            new Point(600, 823), 
+            new Point(817, 585), //T1
+            new Point(1240, 668), 
+            new Point(1728, 760), 
+            new Point(2472, 872), 
+            new Point(3152, 976), 
+            new Point(3888, 988), //T2
+            new Point(4548, 1056), 
+            new Point(4816, 928), 
+            new Point(4908, 780), //T3
+            new Point(4860, 632), 
+            new Point(4762, 462), //T4
+            new Point(4888, 303), 
+            new Point(5032, 252), 
+            new Point(5324, 196), 
+            new Point(5632, 136), //T5
+            new Point(5752, 208), 
+            new Point(5752, 372), 
             //HORQUILLA 
-<span class="fc" id="L97">            new Point(5800, 520),  </span>
-<span class="fc" id="L98">            new Point(5868, 569),  </span>
-<span class="fc" id="L99">            new Point(5920, 592),  </span>
-<span class="fc" id="L100">            new Point(5970, 598),    </span>
-<span class="fc" id="L101">            new Point(6028, 585), //T6</span>
-<span class="fc" id="L102">            new Point(6070, 547),  </span>
-<span class="fc" id="L103">            new Point(6095, 472),  </span>
-<span class="fc" id="L104">            new Point(6110, 407), //T7 </span>
-<span class="fc" id="L105">            new Point(6120, 355),  </span>
-<span class="fc" id="L106">            new Point(6180, 345),</span>
-<span class="fc" id="L107">            new Point(6227, 335),        </span>
-<span class="fc" id="L108">            new Point(6296, 330), </span>
-<span class="fc" id="L109">            new Point(6369, 335),</span>
-<span class="fc" id="L110">            new Point(6436, 360),</span>
-<span class="fc" id="L111">            new Point(6490, 418), //T8</span>
-<span class="fc" id="L112">            new Point(6537, 477),</span>
-<span class="fc" id="L113">            new Point(6500, 664), </span>
-<span class="fc" id="L114">            new Point(6408, 840), </span>
-<span class="fc" id="L115">            new Point(6196, 1020), </span>
-<span class="fc" id="L116">            new Point(5808, 1180), //T9</span>
-<span class="fc" id="L117">            new Point(5032, 1236), </span>
-<span class="fc" id="L118">            new Point(3648, 1200), </span>
-<span class="fc" id="L119">            new Point(3420, 1264), //T10</span>
-<span class="fc" id="L120">            new Point(3292, 1332), </span>
-<span class="fc" id="L121">            new Point(2976, 1268), //T11</span>
-<span class="fc" id="L122">            new Point(2128, 1040), </span>
-<span class="fc" id="L123">            new Point(1856, 1024), //T12</span>
-<span class="fc" id="L124">            new Point(1492, 1220), //T13, T14 se encuentra en medio</span>
-<span class="fc" id="L125">            new Point(1612, 1810), //T15</span>
-<span class="fc" id="L126">            new Point(1494, 2006),</span>
-<span class="fc" id="L127">            new Point(1412, 2064), </span>
-<span class="fc" id="L128">            new Point(1369, 2142), //T16</span>
-<span class="fc" id="L129">            new Point(1492, 2288), </span>
-<span class="fc" id="L130">            new Point(1749, 2356), //T17</span>
-<span class="fc" id="L131">            new Point(1861, 2424),</span>
-<span class="fc" id="L132">            new Point(1880, 2636), //T18</span>
-<span class="fc" id="L133">            new Point(1734, 2700),</span>
-<span class="fc" id="L134">            new Point(1496, 2733), </span>
-<span class="fc" id="L135">            new Point(760, 2708), </span>
-<span class="fc" id="L136">            new Point(640, 2616), //T19</span>
-<span class="fc" id="L137">            new Point(472, 2232), </span>
-<span class="fc" id="L138">            new Point(344, 1744), </span>
-<span class="fc" id="L139">            new Point(360, 1480), </span>
-<span class="fc" id="L140">            new Point(444, 1344)</span>
+            new Point(5800, 520),  
+            new Point(5868, 569),  
+            new Point(5920, 592),  
+            new Point(5970, 598),    
+            new Point(6028, 585), //T6
+            new Point(6070, 547),  
+            new Point(6095, 472),  
+            new Point(6110, 407), //T7 
+            new Point(6120, 355),  
+            new Point(6180, 345),
+            new Point(6227, 335),        
+            new Point(6296, 330), 
+            new Point(6369, 335),
+            new Point(6436, 360),
+            new Point(6490, 418), //T8
+            new Point(6537, 477),
+            new Point(6500, 664), 
+            new Point(6408, 840), 
+            new Point(6196, 1020), 
+            new Point(5808, 1180), //T9
+            new Point(5032, 1236), 
+            new Point(3648, 1200), 
+            new Point(3420, 1264), //T10
+            new Point(3292, 1332), 
+            new Point(2976, 1268), //T11
+            new Point(2128, 1040), 
+            new Point(1856, 1024), //T12
+            new Point(1492, 1220), //T13, T14 se encuentra en medio
+            new Point(1612, 1810), //T15
+            new Point(1494, 2006),
+            new Point(1412, 2064), 
+            new Point(1369, 2142), //T16
+            new Point(1492, 2288), 
+            new Point(1749, 2356), //T17
+            new Point(1861, 2424),
+            new Point(1880, 2636), //T18
+            new Point(1734, 2700),
+            new Point(1496, 2733), 
+            new Point(760, 2708), 
+            new Point(640, 2616), //T19
+            new Point(472, 2232), 
+            new Point(344, 1744), 
+            new Point(360, 1480), 
+            new Point(444, 1344)
         };
         
         // Añadir waypoints intermedios para mejor navegación
@@ -175,29 +175,29 @@ public class AIController
         
         // Listas personalizables de posiciones X e Y para la parrilla de salida
 <span class="fc" id="L177">        double[] startPositionsX = {</span>
-<span class="fc" id="L178">            444, </span>
-<span class="fc" id="L179">            360, 428, </span>
-<span class="fc" id="L180">            336, 420, </span>
-<span class="fc" id="L181">            332, 424, </span>
-<span class="fc" id="L182">            324, 432, </span>
-<span class="fc" id="L183">            340, 444, </span>
-<span class="fc" id="L184">            356, 464,</span>
-<span class="fc" id="L185">            384, 496, </span>
-<span class="fc" id="L186">            412, 496, </span>
-<span class="fc" id="L187">            436, 502</span>
+            444, 
+            360, 428, 
+            336, 420, 
+            332, 424, 
+            324, 432, 
+            340, 444, 
+            356, 464,
+            384, 496, 
+            412, 496, 
+            436, 502
         };
         
 <span class="fc" id="L190">        double[] startPositionsY = {</span>
-<span class="fc" id="L191">            1344, </span>
-<span class="fc" id="L192">            1376, 1448, </span>
-<span class="fc" id="L193">            1476, 1544, </span>
-<span class="fc" id="L194">            1572, 1644, </span>
-<span class="fc" id="L195">            1676, 1736, </span>
-<span class="fc" id="L196">            1776, 1836, </span>
-<span class="fc" id="L197">            1872, 1936, </span>
-<span class="fc" id="L198">            1976, 2036, </span>
-<span class="fc" id="L199">            2076, 2132, </span>
-<span class="fc" id="L200">            2176, 2194</span>
+            1344, 
+            1376, 1448, 
+            1476, 1544, 
+            1572, 1644, 
+            1676, 1736, 
+            1776, 1836, 
+            1872, 1936, 
+            1976, 2036, 
+            2076, 2132, 
+            2176, 2194
         };
         
 <span class="fc bfc" id="L203" title="All 2 branches covered.">        for (int i = 0; i &lt; numberOfCars; i++) </span>
@@ -222,10 +222,10 @@ public class AIController
             
             //Inicializar el coche
 <span class="fc" id="L224">            AICar aiCar = new AICar(</span>
-<span class="fc" id="L225">                startX, startY, startAngle, 3.0, </span>
-<span class="fc" id="L226">                baseMaxVelocity, -5, 0.2, 0.5,</span>
+                startX, startY, startAngle, 3.0, 
+                baseMaxVelocity, -5, 0.2, 0.5,
 <span class="fc" id="L227">                trackMap.getMapHeight(), trackMap.getMapWidth(),</span>
-<span class="fc" id="L228">                team, skillLevel</span>
+                team, skillLevel
             );
 
             //Adjudicarle la racing line, el coche del jugador y añadirlo a la lista de coches rivales
@@ -266,7 +266,7 @@ public class AIController
 <span class="nc" id="L266">            aiCar.updateAI(collisionMap, aiCars, currentLap);</span>
 <span class="nc" id="L267">            updateAICheckpoints(aiCar);</span>
 <span class="nc" id="L268">            aiCar.updateLapTime();</span>
-        }
+<span class="nc" id="L269">        }</span>
 
 <span class="nc" id="L271">        updatePositions();</span>
 <span class="nc" id="L272">    }</span>
@@ -346,8 +346,8 @@ public class AIController
                 
                 // Actualizar mejor sector global
 <span class="nc" id="L348">                updateGlobalSectorTime(sectorIndex, sectorTime, aiCar);</span>
-            }
-<span class="nc" id="L350">        } </span>
+<span class="nc" id="L349">            }</span>
+        } 
         else 
         {
             // Checkpoint incorrecto, reiniciar
@@ -430,7 +430,7 @@ public class AIController
             {
 <span class="nc" id="L431">                positions.add((AICar) car);</span>
             }
-        }
+<span class="nc" id="L433">        }</span>
 <span class="nc" id="L434">    }</span>
 
     //Calcular la distancia al siguiente checkpoint
@@ -438,11 +438,11 @@ public class AIController
     {
         //Definir todos los checkpoints
 <span class="nc" id="L440">        List&lt;Rectangle&gt; allCheckpoints = Arrays.asList(</span>
-<span class="nc" id="L441">            new Rectangle(4548, 972, 40, 200),  </span>
-<span class="nc" id="L442">            new Rectangle(5484, 152, 20, 200),    </span>
-<span class="nc" id="L443">            new Rectangle(1388, 1216, 250, 50), </span>
-<span class="nc" id="L444">            new Rectangle(432, 2344, 250, 50),  </span>
-<span class="nc" id="L445">            new Rectangle(360, 1200, 200, 40)   </span>
+            new Rectangle(4548, 972, 40, 200),  
+            new Rectangle(5484, 152, 20, 200),    
+            new Rectangle(1388, 1216, 250, 50), 
+            new Rectangle(432, 2344, 250, 50),  
+            new Rectangle(360, 1200, 200, 40)   
         );
         
         //Obtener el siguiente checkpoint a pasar por
@@ -523,7 +523,7 @@ public class AIController
 <span class="nc" id="L523">            double currentSkill = aiCar.getSkillLevel();</span>
 <span class="nc" id="L524">            double newSkill = currentSkill * globalDifficulty;</span>
 <span class="nc" id="L525">            aiCar.setSkillLevel(Math.min(1.0, newSkill));</span>
-        }
+<span class="nc" id="L526">        }</span>
 <span class="nc" id="L527">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

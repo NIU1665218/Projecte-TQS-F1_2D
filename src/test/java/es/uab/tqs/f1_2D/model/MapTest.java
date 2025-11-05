@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.awt.Rectangle;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ class MapTest
 {
 
     private Map map;
+    private Map map2;
     private Rectangle finishLine;
     private List<Rectangle> checkpoints;
 
@@ -37,6 +39,18 @@ class MapTest
         
         map = new Map(1000, 1000, finishLine, checkpoints);
         map.setTimeProvider(timeProvider);
+
+        map2 = new Map(500, 500, finishLine, checkpoints);
+        map2.setTimeProvider(timeProvider);
+        map2.setCurrentState(Map.State.RUNNING);
+        map2.setCurrentLap(2);
+        map2.setBestLapTime(1500);
+        map2.setLapStartTime(1000);
+        map2.setLapTime(200);
+        map2.setNextCheckpointIndex(1);
+        map2.setCurrentLapPenalty(10);
+        map2.setLapHasPenalty(true);
+        map2.setRaceMode(true);
     }
 
     /* 
@@ -57,6 +71,37 @@ class MapTest
     }
 
     @Test
+    //Verificar funcionamiento reset
+    public void testReset() 
+    {
+        map2.reset();
+
+        assertEquals(Map.State.IDLE, map2.getState());
+        assertEquals(0, map2.getCurrentLap());
+        assertEquals(0, map2.getBestLapTime());
+        assertEquals(0, map2.getLapTime());
+        assertEquals(0, map2.getLapStartTime());
+        assertTrue(map2.getPassedCheckpoints().isEmpty());
+        assertEquals(0, map2.getNextCheckpointIndex());
+        assertEquals(0, map2.getCurrentLapPenalty());
+        assertFalse(map2.isLapHasPenalty());
+        assertFalse(map2.isRaceMode());
+    }
+
+    @Test
+    //Verificar reset de los sectores
+    public void testResetSectors() 
+    {
+        map2.resetSectors();
+
+        for (int i = 0; i < map2.getNumSectors(); i++) {
+            assertEquals(0L, map2.getSectorTime(i));
+            assertEquals(Map.SectorColor.NONE, map2.getSectorColor(i));
+            assertFalse(map2.getSectorRecorded()[i]);
+        }
+    }
+
+    @Test
     //Verificar estado inicial del modo carrera
     void testRaceInitialState() 
     {
@@ -70,7 +115,7 @@ class MapTest
 
     @Test
     //Test setters del modo carrera
-    void testRaceSetters() 
+    void testRaceSettersGetters() 
     {
         map.setRaceMode(true);
         assertTrue(map.isRaceMode());
@@ -89,6 +134,9 @@ class MapTest
 
         map.setCountdownSeconds(10);
         assertEquals(10, map.getCountdownSeconds());
+
+        assertEquals(500, map2.getMapHeight());
+        assertEquals(500, map2.getMapWidth());
     }
 
     @Test

@@ -245,9 +245,6 @@ public class MapController
         //Calcular el tiempo base de la vuelta
         long baseLapTime = timeProvider.now() - model.getLapStartTime();
 
-        //Si este tiene castigo por salirse o ir en reversa, sumar el tiempo
-        model.setLastCompletedLapTime(baseLapTime + model.getCurrentLapPenalty());
-
         //Copiar los arrays de sectores para pasarlos al overlay
         model.copyCurrentToLastSectors();
 

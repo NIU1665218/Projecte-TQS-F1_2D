@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import static org.junit.jupiter.api.Assertions.*;
-
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -148,6 +148,46 @@ public class AICarTest
             .count();
         assertEquals(5, topDrivers);
     }
+
+    @Test
+    //Verificar que si no hay racing line, el coche no se mueve
+    void testUpdateAIRacingLineEmpty() 
+    {
+        BufferedImage mockCollisionMap = mock(BufferedImage.class);
+        List<AICar> otherCars = new ArrayList<>();
+        
+        // Racing line vacía
+        AICar aiCar = new AICar(100, 100, 0, 5, 15, -5, 2, 0.5, 1000, 1000, "Test", 0.8);
+        
+        // Llamada al método
+        aiCar.updateAI(mockCollisionMap, otherCars, 1);
+        
+        // Como racingLine está vacía, el coche no debe moverse
+        assertEquals(100, aiCar.getX(), 0.01);
+        assertEquals(100, aiCar.getY(), 0.01);
+    }
+
+    @Test
+    //Verificar los diferentes estados de SlipStream
+    void testApplySlipstreamBehind() 
+    {
+        AICar aiCar = new AICar(100, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000, "Test", 1.0);
+        AICar otherCarBehind = new AICar(90, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000, "Other", 1.0);
+        AICar otherCarFront = new AICar(150, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000, "Other", 1.0);
+        AICar farCar = new AICar(250, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000, "Other", 1.0);
+        Car playerCar = new Car(400, 100, 0, 0, 20, -5, 2, 0.5, 1000, 1000);
+        farCar.setPlayerCar(playerCar);
+        
+        // Vuelta 2 para activar slipstream
+        aiCar.applySlipstream(List.of(otherCarBehind, otherCarFront, aiCar, farCar), 2);
+        farCar.applySlipstream(List.of(aiCar), 2);
+        
+        // Uno de los dos no debe aplicar slipstream (el detrás no cuenta)
+        assertTrue(aiCar.getSlipstreamBoost() >= 0);
+        assertFalse(farCar.getSlipstreamBoost() > 0);
+    }
+    
+    
 
     /* 
     =============================================================================

@@ -98,7 +98,7 @@
                 for (AICar otherCar : otherAICars) 
                 {
                     //Si el coche se encuentra justo detrás
-                    if (otherCar != this && isBehind(otherCar)) 
+                    if (isBehind(otherCar)) 
                     {
                         //Calcular la distancia hasta el coche
                         double distance = calculateDistance(otherCar);
@@ -112,7 +112,7 @@
                 }
                 
                 //Si se encuentra detrás del jugador
-                if (playerCar != null && isBehindPlayer()) 
+                if (isBehindPlayer()) 
                 {
                     //Calcular la distancia al jugador
                     double distance = calculateDistanceToPlayer();
@@ -273,6 +273,7 @@
         //Determinar si un coche se encuentra detrás o no
         private boolean isBehind(AICar otherCar) 
         {
+            if(otherCar == this) return false;
             double dx = otherCar.getX() - x;
             double dy = otherCar.getY() - y;
             double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));
@@ -364,10 +365,9 @@
             //Temporizador y tiempo
         public long getLapTime() { return lapTime; }
         public long getBestLapTime() { return bestLapTime == Long.MAX_VALUE ? 0 : bestLapTime; }
-        public long getLastCompletedLapTime() { return lastCompletedLapTime; }
         public long getLapStartTime() { return lapStartTime; }
         public long[] getSectorTimes() { return sectorTimes; }
-        public long[] getBestSectorTimes() { return bestSectorTimes; }
+
             //Checkpoints
         public Map.SectorColor[] getSectorColors() { return sectorColors; }
         public Set<Integer> getPassedCheckpoints() { return passedCheckpoints; }

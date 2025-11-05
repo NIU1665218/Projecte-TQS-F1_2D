@@ -224,6 +224,49 @@ class CarTest
         assertTrue(car.getY() >= 0);
     }
 
+    @Test
+    public void testApplySlipstreamCoverage() 
+    {
+        //Vuelta >= 2 y está en slipstream
+        car.applySlipstream(true, 2);
+        car.setVelocity(maxVelocity);
+
+        //Verifica que el boost de slipstream sea 5.0
+        assertEquals(5.0, car.getEffectiveMaxVelocity() - car.getVelocity(), 0.001);
+    }
+
+    @Test
+    public void testApplySlipstreamCoverage2() 
+    {
+        //Vuelta >= 2 pero no está en slipstream
+        car.applySlipstream(false, 2);
+        car.setVelocity(maxVelocity);
+
+        //Verifica que el boost de slipstream sea 0
+        assertEquals(0.0, car.getEffectiveMaxVelocity() - car.getVelocity(), 0.001);
+    }
+
+    @Test
+    public void testApplySlipstream3() 
+    {
+        //Vuelta < 2 y está en slipstream
+        car.applySlipstream(true, 1);
+        car.setVelocity(maxVelocity);
+
+        //Verifica que el boost de slipstream sea 0
+        assertEquals(0.0, car.getEffectiveMaxVelocity() - car.getVelocity(), 0.001);
+    }
+
+    @Test
+    public void testApplySlipstream4() {
+        //Vuelta < 2 y no está en slipstream
+        car.applySlipstream(false, 1);
+        car.setVelocity(maxVelocity);
+
+        //Verifica que el boost de slipstream sea 0
+        assertEquals(0.0, car.getEffectiveMaxVelocity() - car.getVelocity(), 0.001);
+    }
+
     /* 
       =============================================================================
         PAIRWISE TESTING + EDGE CASES + EQUIVALENT PARTITIONING 

@@ -42,7 +42,7 @@
         {
             //Llamada a clase base Car para inicializar la mayoria de variables
 <span class="fc" id="L44">            super(x, y, angle, velocity, maxVelocity, backwardsMaxVelocity, acceleration, </span>
-<span class="fc" id="L45">                backwardsAcceleration, mapHeight, mapWidth);</span>
+                backwardsAcceleration, mapHeight, mapWidth);
             
             //Inicializar el resto de variables
 <span class="fc" id="L48">            this.team = team;</span>
@@ -79,7 +79,7 @@
         //Función principal para actualizar la posición de los coches rivales
         public void updateAI(BufferedImage collisionMap, List&lt;AICar&gt; otherAICars, int currentLap)
         {       
-<span class="pc bpc" id="L82" title="1 of 2 branches missed.">            if (racingLine.isEmpty()) return;</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">            if (racingLine.isEmpty()) return;</span>
             
 <span class="fc" id="L84">            applySlipstream(otherAICars, currentLap);</span>
 <span class="fc" id="L85">            followRacingLine();</span>
@@ -98,7 +98,7 @@
 <span class="fc bfc" id="L98" title="All 2 branches covered.">                for (AICar otherCar : otherAICars) </span>
                 {
                     //Si el coche se encuentra justo detrás
-<span class="pc bpc" id="L101" title="2 of 4 branches missed.">                    if (otherCar != this &amp;&amp; isBehind(otherCar)) </span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">                    if (isBehind(otherCar)) </span>
                     {
                         //Calcular la distancia hasta el coche
 <span class="fc" id="L104">                        double distance = calculateDistance(otherCar);</span>
@@ -109,16 +109,16 @@
 <span class="fc" id="L109">                             slipstreamBoost = 5.0 * skillLevel; </span>
                         }
                     }
-                }
+<span class="fc" id="L112">                }</span>
                 
                 //Si se encuentra detrás del jugador
-<span class="pc bpc" id="L115" title="1 of 4 branches missed.">                if (playerCar != null &amp;&amp; isBehindPlayer()) </span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">                if (isBehindPlayer()) </span>
                 {
                     //Calcular la distancia al jugador
 <span class="fc" id="L118">                    double distance = calculateDistanceToPlayer();</span>
 
                     //Si la distancia es menor a 100 aplicar slipstream
-<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                    if (distance &lt; 100) </span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">                    if (distance &lt; 100) </span>
                     {
 <span class="fc" id="L123">                        slipstreamBoost = Math.max(slipstreamBoost, 5.0 * skillLevel);</span>
                     }
@@ -167,7 +167,7 @@
 <span class="fc" id="L167">                    distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
                 
                 }
-<span class="fc" id="L170">            }</span>
+            }
             //Si tienen un skill level más alto, no les hace falta tanta distancia de detección
             else
             {
@@ -202,7 +202,7 @@
 <span class="pc bpc" id="L202" title="1 of 2 branches missed.">            if (angleDiff &gt; 0) </span>
             {
 <span class="fc" id="L204">                angle += turnAmount;</span>
-<span class="fc" id="L205">            } </span>
+            } 
             else 
             {
 <span class="nc" id="L208">                angle -= turnAmount;</span>
@@ -215,11 +215,11 @@
 <span class="pc bpc" id="L215" title="1 of 2 branches missed.">            if (Math.abs(angleDiff) &gt; 90) </span>
             {
 <span class="nc" id="L217">                speedMultiplier = 0.4;</span>
-<span class="nc" id="L218">            } </span>
+            } 
 <span class="pc bpc" id="L219" title="1 of 2 branches missed.">            else if (Math.abs(angleDiff) &gt; 45) </span>
             {
 <span class="nc" id="L221">                speedMultiplier = 0.6;</span>
-<span class="nc" id="L222">            } </span>
+            } 
 <span class="pc bpc" id="L223" title="1 of 2 branches missed.">            else if (Math.abs(angleDiff) &gt; 20) </span>
             {
 <span class="fc" id="L225">                speedMultiplier = 0.8;</span>
@@ -242,7 +242,7 @@
             {
                 
 <span class="fc" id="L244">                velocity += acceleration * skillLevel * Math.min(1.0, speedDifference / 5.0);</span>
-<span class="fc" id="L245">            } </span>
+            } 
             else 
             {
                 
@@ -273,101 +273,101 @@
         //Determinar si un coche se encuentra detrás o no
         private boolean isBehind(AICar otherCar) 
         {
-<span class="fc" id="L276">            double dx = otherCar.getX() - x;</span>
-<span class="fc" id="L277">            double dy = otherCar.getY() - y;</span>
-<span class="fc" id="L278">            double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
-<span class="fc" id="L279">            double angleDiff = normalizeAngle(relativeAngle - angle);</span>
-<span class="pc bpc" id="L280" title="1 of 2 branches missed.">            return Math.abs(angleDiff) &lt; 90; </span>
+<span class="fc bfc" id="L276" title="All 2 branches covered.">            if(otherCar == this) return false;</span>
+<span class="fc" id="L277">            double dx = otherCar.getX() - x;</span>
+<span class="fc" id="L278">            double dy = otherCar.getY() - y;</span>
+<span class="fc" id="L279">            double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
+<span class="fc" id="L280">            double angleDiff = normalizeAngle(relativeAngle - angle);</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">            return Math.abs(angleDiff) &lt; 90; </span>
         }
         
         //Determinar si un coche se encuentra detrás del cotxes del jugador
         private boolean isBehindPlayer() 
         {
-<span class="pc bpc" id="L286" title="1 of 2 branches missed.">            if (playerCar == null) return false;</span>
-<span class="fc" id="L287">            double dx = playerCar.getX() - x;</span>
-<span class="fc" id="L288">            double dy = playerCar.getY() - y;</span>
-<span class="fc" id="L289">            double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
-<span class="fc" id="L290">            double angleDiff = normalizeAngle(relativeAngle - angle);</span>
-<span class="pc bpc" id="L291" title="1 of 2 branches missed.">            return Math.abs(angleDiff) &lt; 90;</span>
+<span class="fc bfc" id="L287" title="All 2 branches covered.">            if (playerCar == null) return false;</span>
+<span class="fc" id="L288">            double dx = playerCar.getX() - x;</span>
+<span class="fc" id="L289">            double dy = playerCar.getY() - y;</span>
+<span class="fc" id="L290">            double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
+<span class="fc" id="L291">            double angleDiff = normalizeAngle(relativeAngle - angle);</span>
+<span class="pc bpc" id="L292" title="1 of 2 branches missed.">            return Math.abs(angleDiff) &lt; 90;</span>
         }
         
         //Normalizar los cálculos de los ángulos para controlar el valor entre 0-360
         private double normalizeAngle(double angle) 
         {
-<span class="pc bpc" id="L297" title="1 of 2 branches missed.">            while (angle &gt; 180) angle -= 360;</span>
-<span class="pc bpc" id="L298" title="1 of 2 branches missed.">            while (angle &lt; -180) angle += 360;</span>
-<span class="fc" id="L299">            return angle;</span>
+<span class="pc bpc" id="L298" title="1 of 2 branches missed.">            while (angle &gt; 180) angle -= 360;</span>
+<span class="pc bpc" id="L299" title="1 of 2 branches missed.">            while (angle &lt; -180) angle += 360;</span>
+<span class="fc" id="L300">            return angle;</span>
         }
 
         //Resetear todos los valores necesarios para poder empezar una nueva vuelta
         public void startNewLap() 
         {
-<span class="nc" id="L305">            this.lapStartTime = timeProvider.now();</span>
-<span class="nc" id="L306">            Arrays.fill(sectorTimes, 0L);</span>
-<span class="nc" id="L307">            Arrays.fill(sectorRecorded, false);</span>
-<span class="nc" id="L308">            Arrays.fill(sectorColors, Map.SectorColor.NONE);</span>
-<span class="nc" id="L309">            passedCheckpoints.clear();</span>
-<span class="nc" id="L310">            nextCheckpointIndex = 0;</span>
-<span class="nc" id="L311">            currentLap++;</span>
-<span class="nc" id="L312">        }</span>
+<span class="nc" id="L306">            this.lapStartTime = timeProvider.now();</span>
+<span class="nc" id="L307">            Arrays.fill(sectorTimes, 0L);</span>
+<span class="nc" id="L308">            Arrays.fill(sectorRecorded, false);</span>
+<span class="nc" id="L309">            Arrays.fill(sectorColors, Map.SectorColor.NONE);</span>
+<span class="nc" id="L310">            passedCheckpoints.clear();</span>
+<span class="nc" id="L311">            nextCheckpointIndex = 0;</span>
+<span class="nc" id="L312">            currentLap++;</span>
+<span class="nc" id="L313">        }</span>
         
         //Guardar el tiempo de sector realizado por un coche AI
         public void recordSector(int sectorIndex, long sectorTime) 
         {
             //Verificiar que el sector existe
-<span class="nc bnc" id="L318" title="All 4 branches missed.">            if (sectorIndex &lt; 0 || sectorIndex &gt;= numSectors) return;</span>
+<span class="nc bnc" id="L319" title="All 4 branches missed.">            if (sectorIndex &lt; 0 || sectorIndex &gt;= numSectors) return;</span>
             
             //Asignar el valor
-<span class="nc" id="L321">            sectorTimes[sectorIndex] = sectorTime;</span>
-<span class="nc" id="L322">            sectorRecorded[sectorIndex] = true;</span>
+<span class="nc" id="L322">            sectorTimes[sectorIndex] = sectorTime;</span>
+<span class="nc" id="L323">            sectorRecorded[sectorIndex] = true;</span>
             
             // Verificar si es el mejor sector personal y determinar verde en caso correcto, naranja incorrecto
-<span class="nc bnc" id="L325" title="All 2 branches missed.">            if (sectorTime &lt; bestSectorTimes[sectorIndex]) </span>
+<span class="nc bnc" id="L326" title="All 2 branches missed.">            if (sectorTime &lt; bestSectorTimes[sectorIndex]) </span>
             {
-<span class="nc" id="L327">                bestSectorTimes[sectorIndex] = sectorTime;</span>
-<span class="nc" id="L328">                sectorColors[sectorIndex] = Map.SectorColor.GREEN;</span>
-<span class="nc" id="L329">            } </span>
+<span class="nc" id="L328">                bestSectorTimes[sectorIndex] = sectorTime;</span>
+<span class="nc" id="L329">                sectorColors[sectorIndex] = Map.SectorColor.GREEN;</span>
+            } 
             else 
             {
-<span class="nc" id="L332">                sectorColors[sectorIndex] = Map.SectorColor.ORANGE;</span>
+<span class="nc" id="L333">                sectorColors[sectorIndex] = Map.SectorColor.ORANGE;</span>
             }
-<span class="nc" id="L334">        }</span>
+<span class="nc" id="L335">        }</span>
         
         //Calcular el tiempo de vuelta al completar una
         public void completeLap() 
         {
-<span class="nc" id="L339">            long lapEndTime = timeProvider.now();</span>
-<span class="nc" id="L340">            this.lastCompletedLapTime = lapEndTime - lapStartTime;</span>
+<span class="nc" id="L340">            long lapEndTime = timeProvider.now();</span>
+<span class="nc" id="L341">            this.lastCompletedLapTime = lapEndTime - lapStartTime;</span>
             
             // Actualizar mejor tiempo de vuelta
-<span class="nc bnc" id="L343" title="All 2 branches missed.">            if (lastCompletedLapTime &lt; bestLapTime) </span>
+<span class="nc bnc" id="L344" title="All 2 branches missed.">            if (lastCompletedLapTime &lt; bestLapTime) </span>
             {
-<span class="nc" id="L345">                bestLapTime = lastCompletedLapTime;</span>
+<span class="nc" id="L346">                bestLapTime = lastCompletedLapTime;</span>
             }
-<span class="nc" id="L347">        }</span>
+<span class="nc" id="L348">        }</span>
 
         //Hacer el update del Lap Time en caso necesario al pasar por un checkpoint o en update general
         public void updateLapTime() 
         {
-<span class="nc bnc" id="L352" title="All 2 branches missed.">            if (lapStartTime &gt; 0) {</span>
-<span class="nc" id="L353">                this.lapTime = timeProvider.now() - lapStartTime;</span>
+<span class="nc bnc" id="L353" title="All 2 branches missed.">            if (lapStartTime &gt; 0) {</span>
+<span class="nc" id="L354">                this.lapTime = timeProvider.now() - lapStartTime;</span>
             }
-<span class="nc" id="L355">        }</span>
+<span class="nc" id="L356">        }</span>
         
         //Verificar que haya pasado por todos los checkpoints
         public boolean passedAllCheckpoints() 
         {
-<span class="nc bnc" id="L360" title="All 2 branches missed.">            return passedCheckpoints.size() &gt;= 4; // Asumiendo 4 checkpoints + línea de meta</span>
+<span class="nc bnc" id="L361" title="All 2 branches missed.">            return passedCheckpoints.size() &gt;= 4; // Asumiendo 4 checkpoints + línea de meta</span>
         }
         
         // Getters
             //Temporizador y tiempo
-<span class="nc" id="L365">        public long getLapTime() { return lapTime; }</span>
-<span class="nc bnc" id="L366" title="All 2 branches missed.">        public long getBestLapTime() { return bestLapTime == Long.MAX_VALUE ? 0 : bestLapTime; }</span>
-<span class="nc" id="L367">        public long getLastCompletedLapTime() { return lastCompletedLapTime; }</span>
+<span class="nc" id="L366">        public long getLapTime() { return lapTime; }</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">        public long getBestLapTime() { return bestLapTime == Long.MAX_VALUE ? 0 : bestLapTime; }</span>
 <span class="nc" id="L368">        public long getLapStartTime() { return lapStartTime; }</span>
 <span class="nc" id="L369">        public long[] getSectorTimes() { return sectorTimes; }</span>
-<span class="nc" id="L370">        public long[] getBestSectorTimes() { return bestSectorTimes; }</span>
+
             //Checkpoints
 <span class="nc" id="L372">        public Map.SectorColor[] getSectorColors() { return sectorColors; }</span>
 <span class="nc" id="L373">        public Set&lt;Integer&gt; getPassedCheckpoints() { return passedCheckpoints; }</span>
