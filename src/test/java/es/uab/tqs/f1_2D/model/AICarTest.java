@@ -1,17 +1,19 @@
 package es.uab.tqs.f1_2D.model;
 
-
 import es.uab.tqs.f1_2D.controlador.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import static org.junit.jupiter.api.Assertions.*;
+
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.util.List;
+
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.Point;
@@ -134,14 +136,15 @@ public class AICarTest
     void testAIControllerInitialization() 
     {
         Map mockMap = mock(Map.class);
+        RandomGenerator randomGenerator = new RandomGenerator(1234);
         when(mockMap.getFinishLine()).thenReturn(new Rectangle(100, 100, 50, 50));
         
-        AIController controller = new AIController(mockMap, playerCar);
+        AIController controller = new AIController(mockMap, playerCar, randomGenerator);
 
         assertEquals(19, controller.getAICars().size());
 
         long topDrivers = controller.getAICars().stream()
-            .filter(car -> car.getSkillLevel() >= 0.7)
+            .filter(car -> car.getSkillLevel() >= 0.9)
             .count();
         assertEquals(5, topDrivers);
     }

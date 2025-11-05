@@ -1,7 +1,6 @@
 es\uab\tqs\f1_2D\model\MapTest.class
 es\uab\tqs\f1_2D\vista\OffTrackOverlayTest.class
 es\uab\tqs\f1_2D\model\CarTest.class
-es\uab\tqs\f1_2D\model\AICarTest.class
 es\uab\tqs\f1_2D\vista\LapUITest.class
 es\uab\tqs\f1_2D\vista\CarDisplayTest.class
 es\uab\tqs\f1_2D\controlador\CarControllerTest.class

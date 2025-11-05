@@ -1,7 +1,6 @@
 es\uab\tqs\f1_2D\vista\LapUI$1.class
 es\uab\tqs\f1_2D\vista\CarDisplay$GameMode.class
 es\uab\tqs\f1_2D\vista\OffTrackOverlay.class
-es\uab\tqs\f1_2D\vista\CarDisplay$BufferedMenuButton.class
 es\uab\tqs\f1_2D\model\TimeProvider.class
 es\uab\tqs\f1_2D\vista\CarDisplay$1.class
 es\uab\tqs\f1_2D\controlador\CarController.class
@@ -13,6 +12,7 @@ es\uab\tqs\f1_2D\model\Car.class
 es\uab\tqs\f1_2D\vista\CarDisplay.class
 es\uab\tqs\f1_2D\vista\CarDisplay$MainMenu.class
 es\uab\tqs\f1_2D\model\AICar.class
+es\uab\tqs\f1_2D\controlador\RandomGenerator.class
 es\uab\tqs\f1_2D\vista\LapUI.class
 es\uab\tqs\f1_2D\controlador\AIController.class
 es\uab\tqs\f1_2D\model\Map$SectorColor.class

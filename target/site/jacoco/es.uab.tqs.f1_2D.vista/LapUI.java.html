@@ -23,146 +23,153 @@ public class LapUI extends JPanel
 <span class="fc" id="L23">    private String pathOverlay = &quot;/img/laptime.jpg&quot;;</span>
 
     //Constructor
-    public LapUI(Map map) 
-<span class="fc" id="L27">    {</span>
+<span class="fc" id="L26">    public LapUI(Map map) </span>
+    {
 <span class="fc" id="L28">        this.map = map;</span>
         //Carga la fuente personalizada
 <span class="fc" id="L30">        loadFont(pathFont);</span>
         //Array de sujifos de color para las imagenes de sectores
 <span class="fc" id="L32">        String[] colors = {&quot;W&quot;, &quot;G&quot;, &quot;O&quot;, &quot;P&quot;};</span>
         //Carga de todas las imagenes de sectores en sus 4 variantes de color
-<span class="fc bfc" id="L34" title="All 2 branches covered.">        for (int sector = 0; sector &lt; 3; sector++) {</span>
-<span class="fc bfc" id="L35" title="All 2 branches covered.">            for (int color = 0; color &lt; 4; color++) {</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        for (int sector = 0; sector &lt; 3; sector++) </span>
+        {
+<span class="fc bfc" id="L36" title="All 2 branches covered.">            for (int color = 0; color &lt; 4; color++) </span>
+            {
                 //Construcción de la ruta dinámica para cada imagen de sector/color
-<span class="fc" id="L37">                String path = String.format(&quot;/img/Sector%d/Sector%d%s.jpg&quot;, sector + 1, sector + 1, colors[color]);</span>
-<span class="fc" id="L38">                loadSectorImages(path, sector, color);</span>
+<span class="fc" id="L39">                String path = String.format(&quot;/img/Sector%d/Sector%d%s.jpg&quot;, sector + 1, sector + 1, colors[color]);</span>
+<span class="fc" id="L40">                loadSectorImages(path, sector, color);</span>
             }
         }
         //Carga la imagen de fondo en el overlay
-<span class="fc" id="L42">        loadOverlay(pathOverlay);</span>
-<span class="fc" id="L43">    }</span>
+<span class="fc" id="L44">        loadOverlay(pathOverlay);</span>
+<span class="fc" id="L45">    }</span>
 
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) 
+    {
         //Lamada al método padre para asegurar comportamiento correcto
-<span class="fc" id="L48">        super.paintComponent(g);</span>
-<span class="fc" id="L49">        Graphics2D g2d = (Graphics2D) g;</span>
+<span class="fc" id="L51">        super.paintComponent(g);</span>
+<span class="fc" id="L52">        Graphics2D g2d = (Graphics2D) g;</span>
         //Dibuja la imagen de fondo escalada al tamaño real
-<span class="fc" id="L51">        g2d.drawImage(overlayBackground, 0, 0, getWidth(), getHeight(), null);</span>
+<span class="fc" id="L54">        g2d.drawImage(overlayBackground, 0, 0, getWidth(), getHeight(), null);</span>
         //Establecimiento de la fuente personalizada a tamaño 28 para que sea más grande el tiempo actual que el mejor
-<span class="fc" id="L53">        g2d.setFont(customFont.deriveFont(28f));</span>
+<span class="fc" id="L56">        g2d.setFont(customFont.deriveFont(28f));</span>
     
-<span class="fc bfc" id="L55" title="All 4 branches covered.">        if (map.getState() == Map.State.OFF_TRACK || map.getState() == Map.State.INVALID_LAP)</span>
+<span class="fc bfc" id="L58" title="All 4 branches covered.">        if (map.getState() == Map.State.OFF_TRACK || map.getState() == Map.State.INVALID_LAP)</span>
+        {
             //Si el jugador se sale de pista o se declara vuelta invalida, el timer se pone de color rojo
-<span class="fc" id="L57">            g2d.setColor(Color.RED);</span>
-<span class="fc bfc" id="L58" title="All 2 branches covered.">        else if (map.getState() == Map.State.RESULT)</span>
+<span class="fc" id="L61">            g2d.setColor(Color.RED);</span>
+<span class="fc" id="L62">        }</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        else if (map.getState() == Map.State.RESULT)</span>
         {
             //Si el jugador ha acabado la vuelta
-<span class="fc bfc" id="L61" title="All 2 branches covered.">            if(map.getBestLapTime() &lt; map.getLapTime())</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            if(map.getBestLapTime() &lt; map.getLapTime())</span>
             {
                 //Si el jugador tiene una peor vuelta que su mejor, timer en amarillo
-<span class="fc" id="L64">                g2d.setColor(Color.YELLOW); </span>
-            }
+<span class="fc" id="L69">                g2d.setColor(Color.YELLOW); </span>
+<span class="fc" id="L70">            }</span>
             else
             {
                 //Si el jugador tiene una mejor vuelta que su mejor, timer en verde
-<span class="fc" id="L69">                g2d.setColor(Color.GREEN);</span>
+<span class="fc" id="L74">                g2d.setColor(Color.GREEN);</span>
             }   
-        }    
-<span class="pc bpc" id="L72" title="3 of 4 branches missed.">        else if(map.isLapHasPenalty() &amp;&amp; map.isRaceMode())</span>
+<span class="fc" id="L76">        }    </span>
+<span class="pc bpc" id="L77" title="3 of 4 branches missed.">        else if(map.isLapHasPenalty() &amp;&amp; map.isRaceMode())</span>
         {
             //Si está en modo carrera y la vuelta tiene penalización, timer en rojo
-<span class="nc" id="L75">            g2d.setColor(Color.RED);</span>
-        }
+<span class="nc" id="L80">            g2d.setColor(Color.RED);</span>
+<span class="nc" id="L81">        }</span>
         else
         {
             //Si el jugador está en cualquier otro estado, el color del timer es blanco
-<span class="fc" id="L80">            g2d.setColor(Color.WHITE);</span>
+<span class="fc" id="L85">            g2d.setColor(Color.WHITE);</span>
         }
     
         //Dibuja el timer en la posición establecida
-<span class="fc" id="L84">        g2d.drawString(formatTime(map.getLapTime()), 35, 90);</span>
+<span class="fc" id="L89">        g2d.drawString(formatTime(map.getLapTime()), 35, 90);</span>
 
         //Cambia el color a gris claro 
-<span class="fc" id="L87">        g2d.setColor(Color.LIGHT_GRAY);</span>
+<span class="fc" id="L92">        g2d.setColor(Color.LIGHT_GRAY);</span>
         //Rebaja el tamaño de la letra a 20
-<span class="fc" id="L89">        g2d.setFont(customFont.deriveFont(20f));</span>
+<span class="fc" id="L94">        g2d.setFont(customFont.deriveFont(20f));</span>
         //Dibuja el mejor tiempo en la posición establecida
-<span class="fc" id="L91">        g2d.drawString(&quot;PB: &quot; + formatTime(map.getBestLapTime()), 190, 90);</span>
+<span class="fc" id="L96">        g2d.drawString(&quot;PB: &quot; + formatTime(map.getBestLapTime()), 190, 90);</span>
 
         //Posiciones de los sectores en relación al overlay
-<span class="fc" id="L94">        int baseX = 2;</span>
-<span class="fc" id="L95">        int baseY = 113;</span>
-<span class="fc" id="L96">        int gap = 115;</span>
+<span class="fc" id="L99">        int baseX = 2;</span>
+<span class="fc" id="L100">        int baseY = 113;</span>
+<span class="fc" id="L101">        int gap = 115;</span>
 
         //Dibuja los 3 sectores con sus respectivos colores
-<span class="fc bfc" id="L99" title="All 2 branches covered.">        for(int i=0; i&lt;3; i++) </span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        for(int i=0; i&lt;3; i++) </span>
         {
             //Obtiene el color del sector 
-<span class="fc" id="L102">            Map.SectorColor color = map.getSectorColor(i);</span>
-<span class="fc bfc" id="L103" title="All 4 branches covered.">            int colorIndex = switch(color) {</span>
-<span class="fc" id="L104">                case NONE -&gt; 0;</span>
-<span class="fc" id="L105">                case GREEN -&gt; 1;</span>
-<span class="fc" id="L106">                case ORANGE -&gt; 2;</span>
-<span class="fc" id="L107">                case PURPLE -&gt; 3;</span>
+<span class="fc" id="L107">            Map.SectorColor color = map.getSectorColor(i);</span>
+<span class="fc bfc" id="L108" title="All 4 branches covered.">            int colorIndex = switch(color) </span>
+            {
+<span class="fc" id="L110">                case NONE -&gt; 0;</span>
+<span class="fc" id="L111">                case GREEN -&gt; 1;</span>
+<span class="fc" id="L112">                case ORANGE -&gt; 2;</span>
+<span class="fc" id="L113">                case PURPLE -&gt; 3;</span>
             };
             //Obtiene, de la matriz, la imagen correspondiente al sector y color
-<span class="fc" id="L110">            BufferedImage img = sectorImages[i][colorIndex];</span>
+<span class="fc" id="L116">            BufferedImage img = sectorImages[i][colorIndex];</span>
             //Dibuja la imagen del sector en posición calculada
-<span class="fc" id="L112">            g2d.drawImage(img, baseX + i * gap, baseY, img.getWidth(), img.getHeight(), null);</span>
+<span class="fc" id="L118">            g2d.drawImage(img, baseX + i * gap, baseY, img.getWidth(), img.getHeight(), null);</span>
         }
         //Libera recursos
-<span class="fc" id="L115">        g2d.dispose();</span>
-<span class="fc" id="L116">    }</span>
+<span class="fc" id="L121">        g2d.dispose();</span>
+<span class="fc" id="L122">    }</span>
 
     //Convierte milisegundos a string formateado 
-    public String formatTime(long ms) {
-<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (ms &lt;= 0) return &quot;0.000&quot;;</span>
-<span class="fc" id="L121">        return String.format(&quot;%.3f s&quot;, ms / 1000.0);</span>
+    public String formatTime(long ms) 
+    {
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (ms &lt;= 0) return &quot;0.000&quot;;</span>
+<span class="fc" id="L128">        return String.format(&quot;%.3f s&quot;, ms / 1000.0);</span>
     }
 
     //Carga la imagen de fondo del overlay desde recursos
     public void loadOverlay(String path) 
     {
         try {
-<span class="fc" id="L128">            overlayBackground = ImageIO.read(getClass().getResource(path));</span>
-<span class="fc" id="L129">        } catch (NullPointerException | IOException | IllegalArgumentException e) {</span>
+<span class="fc" id="L135">            overlayBackground = ImageIO.read(getClass().getResource(path));</span>
+<span class="fc" id="L136">        } catch (NullPointerException | IOException | IllegalArgumentException e) {</span>
             //En caso de encontrar una excepción, crea una imagen por default
-<span class="fc" id="L131">            overlayBackground = new BufferedImage(320, 150, BufferedImage.TYPE_INT_ARGB);</span>
-<span class="fc" id="L132">        }</span>
-<span class="fc" id="L133">    }</span>
+<span class="fc" id="L138">            overlayBackground = new BufferedImage(320, 150, BufferedImage.TYPE_INT_ARGB);</span>
+        }
+<span class="fc" id="L140">    }</span>
 
     //Carga y registra la fuente personalizada desde recursos
     public void loadFont(String path) 
     {
         try {
-<span class="fc" id="L139">            customFont = Font.createFont(Font.TRUETYPE_FONT, </span>
-<span class="fc" id="L140">                    getClass().getResourceAsStream(path))</span>
-<span class="fc" id="L141">                    .deriveFont(22f);</span>
+<span class="fc" id="L146">            customFont = Font.createFont(Font.TRUETYPE_FONT, </span>
+<span class="fc" id="L147">                    getClass().getResourceAsStream(path))</span>
+<span class="fc" id="L148">                    .deriveFont(22f);</span>
             //Registra la fuente en el entorno gráfico para que esté disponible
-<span class="fc" id="L143">            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();</span>
-<span class="fc" id="L144">            ge.registerFont(customFont);</span>
-<span class="fc" id="L145">        } catch (Exception e) {</span>
+<span class="fc" id="L150">            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();</span>
+<span class="fc" id="L151">            ge.registerFont(customFont);</span>
+<span class="fc" id="L152">        } catch (Exception e) {</span>
             //En caso de encontrar una excepción, carga Arial como fuente
-<span class="fc" id="L147">            customFont = new Font(&quot;Arial&quot;, Font.BOLD, 22);</span>
-<span class="fc" id="L148">        }</span>
-<span class="fc" id="L149">    }</span>
+<span class="fc" id="L154">            customFont = new Font(&quot;Arial&quot;, Font.BOLD, 22);</span>
+        }
+<span class="fc" id="L156">    }</span>
 
     //Carga una imagen específica de sector y la almacena en la matriz
     public void loadSectorImages(String path, int sector, int color) 
     {
        
         try {
-<span class="fc" id="L156">            sectorImages[sector][color] = ImageIO.read(getClass().getResource(path));</span>
-<span class="fc" id="L157">        } catch (NullPointerException | IOException | IllegalArgumentException e) {</span>
+<span class="fc" id="L163">            sectorImages[sector][color] = ImageIO.read(getClass().getResource(path));</span>
+<span class="fc" id="L164">        } catch (NullPointerException | IOException | IllegalArgumentException e) {</span>
             //En caso de encontrar una excepción, establece null para esa imagen y no se carga
-<span class="fc" id="L159">            sectorImages[sector][color] = null;</span>
-<span class="fc" id="L160">        }</span>
-<span class="fc" id="L161">    }</span>
+<span class="fc" id="L166">            sectorImages[sector][color] = null;</span>
+        }
+<span class="fc" id="L168">    }</span>
 
     // Getter para test
-<span class="fc" id="L164">    public BufferedImage getSectorImage(int sector, int colorIndex){ return sectorImages[sector][colorIndex];}</span>
-<span class="fc" id="L165">    public Font getFont(){ return customFont; }</span>
-<span class="fc" id="L166">    public BufferedImage getOverlayBackground() { return overlayBackground;}</span>
+<span class="fc" id="L171">    public BufferedImage getSectorImage(int sector, int colorIndex){ return sectorImages[sector][colorIndex];}</span>
+<span class="fc" id="L172">    public Font getFont(){ return customFont; }</span>
+<span class="fc" id="L173">    public BufferedImage getOverlayBackground() { return overlayBackground;}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

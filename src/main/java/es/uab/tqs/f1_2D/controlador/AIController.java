@@ -19,6 +19,7 @@ public class AIController
     private Car playerCar;
     private long[] bestGlobalSectorTimes;
     private TimeProvider timeProvider;
+    private RandomGenerator randomGenerator;
     private List<AICar> positions;
     
     //Nombres de los equipos existentes
@@ -37,6 +38,26 @@ public class AIController
         this.racingLine = new ArrayList<>();
         this.bestGlobalSectorTimes = new long[3]; 
         this.timeProvider = System::currentTimeMillis; 
+        this.randomGenerator = new RandomGenerator();
+        Arrays.fill(bestGlobalSectorTimes, Long.MAX_VALUE);
+        
+        //Generar la racing line para que sigan los coches
+        generateRacingLine();
+
+        //Inicializar los 19 coches
+        initializeAICars();
+    }
+
+    public AIController(Map trackMap, Car playerCar, RandomGenerator randomGenerator) 
+    {
+        //Inicializar las variables necesarias
+        this.trackMap = trackMap;
+        this.playerCar = playerCar;
+        this.aiCars = new ArrayList<>();
+        this.racingLine = new ArrayList<>();
+        this.bestGlobalSectorTimes = new long[3]; 
+        this.timeProvider = System::currentTimeMillis; 
+        this.randomGenerator = randomGenerator;
         Arrays.fill(bestGlobalSectorTimes, Long.MAX_VALUE);
         
         //Generar la racing line para que sigan los coches
@@ -150,8 +171,6 @@ public class AIController
     //Inicializar los 19 coches
     private void initializeAICars() 
     {
-        Random random = new Random();
-
         int numberOfCars = 19;
         
         // Listas personalizables de posiciones X e Y para la parrilla de salida
@@ -189,8 +208,8 @@ public class AIController
             double skillLevel;
             
             //Determinar el skill level de ese coche, los primeros 5 coches tendrán mejor skill
-            if (i < 5) skillLevel = 0.8 + random.nextDouble() * 0.3; 
-            else skillLevel = 0.65 + random.nextDouble() * 0.3;  
+            if (i < 5) skillLevel = 0.8 + randomGenerator.nextDouble() * 0.3; 
+            else skillLevel = 0.65 + randomGenerator.nextDouble() * 0.3;  
 
             // Usar las posiciones definidas en las listas
             double startX = startPositionsX[i];
@@ -199,7 +218,7 @@ public class AIController
             // Calcular ángulo hacia el primer waypoint
             double startAngle = calculateAngleToWaypoint(startX, startY, 1);
 
-            double baseMaxVelocity = 30 + (random.nextDouble() * 4);
+            double baseMaxVelocity = 30 + (randomGenerator.nextDouble() * 4);
             
             //Inicializar el coche
             AICar aiCar = new AICar(

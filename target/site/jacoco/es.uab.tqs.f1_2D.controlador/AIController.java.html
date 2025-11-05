@@ -3,9 +3,12 @@
 import es.uab.tqs.f1_2D.model.AICar;
 import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.model.Map;
+import es.uab.tqs.f1_2D.model.TimeProvider;
 
 import java.awt.image.BufferedImage;
 import java.awt.Point;
+import java.awt.Rectangle;
+
 import java.util.*;
 
 public class AIController 
@@ -14,219 +17,513 @@ public class AIController
     private Map trackMap;
     private List&lt;Point&gt; racingLine;
     private Car playerCar;
+    private long[] bestGlobalSectorTimes;
+    private TimeProvider timeProvider;
+    private RandomGenerator randomGenerator;
+    private List&lt;AICar&gt; positions;
     
-    // Equipos F1 con colores característicos
-<span class="fc" id="L19">    private final String[] F1_TEAMS = </span>
+    //Nombres de los equipos existentes
+<span class="pc" id="L26">    private final String[] F1_TEAMS = </span>
+<span class="pc" id="L27">    {</span>
+<span class="pc" id="L28">        &quot;Mercedes&quot;, &quot;Red Bull&quot;, &quot;McLaren&quot;, &quot;Alpine&quot;, </span>
+<span class="pc" id="L29">        &quot;Racing Bulls&quot;, &quot;Aston Martin&quot;, &quot;Williams&quot;, &quot;Sauber&quot;, &quot;Haas&quot;</span>
+    };
+    
+<span class="nc" id="L32">    public AIController(Map trackMap, Car playerCar) </span>
     {
-        &quot;Mercedes&quot;, &quot;Red Bull&quot;, &quot;Ferrari&quot;, &quot;McLaren&quot;, &quot;Alpine&quot;, 
-        &quot;Racing Bulls&quot;, &quot;Aston Martin&quot;, &quot;Williams&quot;, &quot;Sauber&quot;, &quot;Haas&quot;
-    };
-    
-    public AIController(Map trackMap, Car playerCar) 
-<span class="fc" id="L26">    {</span>
-<span class="fc" id="L27">        this.trackMap = trackMap;</span>
-<span class="fc" id="L28">        this.playerCar = playerCar;</span>
-<span class="fc" id="L29">        this.aiCars = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L30">        this.racingLine = new ArrayList&lt;&gt;();</span>
+        //Inicializar las variables necesarias
+<span class="nc" id="L35">        this.trackMap = trackMap;</span>
+<span class="nc" id="L36">        this.playerCar = playerCar;</span>
+<span class="nc" id="L37">        this.aiCars = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L38">        this.racingLine = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L39">        this.bestGlobalSectorTimes = new long[3]; </span>
+<span class="nc" id="L40">        this.timeProvider = System::currentTimeMillis; </span>
+<span class="nc" id="L41">        this.randomGenerator = new RandomGenerator();</span>
+<span class="nc" id="L42">        Arrays.fill(bestGlobalSectorTimes, Long.MAX_VALUE);</span>
         
-<span class="fc" id="L32">        generateRacingLine();</span>
-<span class="fc" id="L33">        initializeAICars();</span>
-<span class="fc" id="L34">    }</span>
+        //Generar la racing line para que sigan los coches
+<span class="nc" id="L45">        generateRacingLine();</span>
+
+        //Inicializar los 19 coches
+<span class="nc" id="L48">        initializeAICars();</span>
+<span class="nc" id="L49">    }</span>
+
+<span class="fc" id="L51">    public AIController(Map trackMap, Car playerCar, RandomGenerator randomGenerator) </span>
+    {
+        //Inicializar las variables necesarias
+<span class="fc" id="L54">        this.trackMap = trackMap;</span>
+<span class="fc" id="L55">        this.playerCar = playerCar;</span>
+<span class="fc" id="L56">        this.aiCars = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L57">        this.racingLine = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L58">        this.bestGlobalSectorTimes = new long[3]; </span>
+<span class="fc" id="L59">        this.timeProvider = System::currentTimeMillis; </span>
+<span class="fc" id="L60">        this.randomGenerator = randomGenerator;</span>
+<span class="fc" id="L61">        Arrays.fill(bestGlobalSectorTimes, Long.MAX_VALUE);</span>
+        
+        //Generar la racing line para que sigan los coches
+<span class="fc" id="L64">        generateRacingLine();</span>
+
+        //Inicializar los 19 coches
+<span class="fc" id="L67">        initializeAICars();</span>
+<span class="fc" id="L68">    }</span>
     
+    //Generar la racing line
     private void generateRacingLine() 
-{
-<span class="fc" id="L38">    racingLine.clear(); // Limpiar primero</span>
-    
-    // Waypoints principales con interpolación
-<span class="fc" id="L41">    Point[] keyPoints = {</span>
-        new Point(431, 1166), 
-        new Point(600, 823), 
-        new Point(817, 585), 
-        new Point(1240, 668), 
-        new Point(1728, 760), 
-        new Point(2472, 872), 
-        new Point(3152, 976), 
-        new Point(3888, 988), 
-        new Point(4548, 1056), 
-        new Point(4816, 928), 
-        new Point(4908, 780), 
-        new Point(4860, 632), 
-        new Point(4762, 462), 
-        new Point(4888, 303), 
-        new Point(5032, 252), 
-        new Point(5324, 196), 
-        new Point(5632, 136), 
-        new Point(5752, 208), 
-        new Point(5752, 372), 
+    {
+<span class="fc" id="L73">        racingLine.clear(); </span>
         
-        // HORQUILLA MEJORADA - Puntos de entrada, vértice y salida
-        new Point(5800, 520),  // Punto de frenada - ANTES de la curva
-        new Point(5868, 569),  // Entrada de curva
-        new Point(5920, 592),  // Punto intermedio 1
-        new Point(5970, 598),  // Punto intermedio 2  
-        new Point(6028, 585),  // Vértice de la curva
-        new Point(6059, 540),  // Punto intermedio 3
-        new Point(6078, 472),  // Punto intermedio 4
-        new Point(6079, 386),  // Punto intermedio 5
-        new Point(6113, 350),  // Punto intermedio 6
-        new Point(6227, 324),  // sALIDA      
-        new Point(6296, 332), 
-        new Point(6436, 444), 
-        new Point(6452, 664), 
-        new Point(6408, 840), 
-        new Point(6196, 1020), 
-        new Point(5808, 1180), 
-        new Point(5032, 1236), 
-        new Point(3648, 1200), 
-        new Point(3420, 1264), 
-        new Point(3292, 1332), 
-        new Point(2976, 1268), 
-        new Point(2128, 1040), 
-        new Point(1856, 1024), 
-        new Point(1492, 1220), 
-        new Point(1644, 1920), 
-        new Point(1412, 2064), 
-        new Point(1492, 2288), 
-        new Point(1900, 2468), 
-        new Point(1880, 2636), 
-        new Point(1496, 2716), 
-        new Point(760, 2708), 
-        new Point(640, 2616), 
-        new Point(472, 2232), 
-        new Point(344, 1744), 
-        new Point(360, 1480), 
-        new Point(444, 1344)
-    };
-    
-    // Añadir waypoints intermedios para mejor navegación
-<span class="fc bfc" id="L102" title="All 2 branches covered.">    for (int i = 0; i &lt; keyPoints.length - 1; i++) {</span>
-<span class="fc" id="L103">        Point current = keyPoints[i];</span>
-<span class="fc" id="L104">        Point next = keyPoints[i + 1];</span>
+        // Waypoints principales 
+<span class="fc" id="L76">        Point[] keyPoints = {</span>
+<span class="fc" id="L77">            new Point(431, 1166), </span>
+<span class="fc" id="L78">            new Point(600, 823), </span>
+<span class="fc" id="L79">            new Point(817, 585), //T1</span>
+<span class="fc" id="L80">            new Point(1240, 668), </span>
+<span class="fc" id="L81">            new Point(1728, 760), </span>
+<span class="fc" id="L82">            new Point(2472, 872), </span>
+<span class="fc" id="L83">            new Point(3152, 976), </span>
+<span class="fc" id="L84">            new Point(3888, 988), //T2</span>
+<span class="fc" id="L85">            new Point(4548, 1056), </span>
+<span class="fc" id="L86">            new Point(4816, 928), </span>
+<span class="fc" id="L87">            new Point(4908, 780), //T3</span>
+<span class="fc" id="L88">            new Point(4860, 632), </span>
+<span class="fc" id="L89">            new Point(4762, 462), //T4</span>
+<span class="fc" id="L90">            new Point(4888, 303), </span>
+<span class="fc" id="L91">            new Point(5032, 252), </span>
+<span class="fc" id="L92">            new Point(5324, 196), </span>
+<span class="fc" id="L93">            new Point(5632, 136), //T5</span>
+<span class="fc" id="L94">            new Point(5752, 208), </span>
+<span class="fc" id="L95">            new Point(5752, 372), </span>
+            //HORQUILLA 
+<span class="fc" id="L97">            new Point(5800, 520),  </span>
+<span class="fc" id="L98">            new Point(5868, 569),  </span>
+<span class="fc" id="L99">            new Point(5920, 592),  </span>
+<span class="fc" id="L100">            new Point(5970, 598),    </span>
+<span class="fc" id="L101">            new Point(6028, 585), //T6</span>
+<span class="fc" id="L102">            new Point(6070, 547),  </span>
+<span class="fc" id="L103">            new Point(6095, 472),  </span>
+<span class="fc" id="L104">            new Point(6110, 407), //T7 </span>
+<span class="fc" id="L105">            new Point(6120, 355),  </span>
+<span class="fc" id="L106">            new Point(6180, 345),</span>
+<span class="fc" id="L107">            new Point(6227, 335),        </span>
+<span class="fc" id="L108">            new Point(6296, 330), </span>
+<span class="fc" id="L109">            new Point(6369, 335),</span>
+<span class="fc" id="L110">            new Point(6436, 360),</span>
+<span class="fc" id="L111">            new Point(6490, 418), //T8</span>
+<span class="fc" id="L112">            new Point(6537, 477),</span>
+<span class="fc" id="L113">            new Point(6500, 664), </span>
+<span class="fc" id="L114">            new Point(6408, 840), </span>
+<span class="fc" id="L115">            new Point(6196, 1020), </span>
+<span class="fc" id="L116">            new Point(5808, 1180), //T9</span>
+<span class="fc" id="L117">            new Point(5032, 1236), </span>
+<span class="fc" id="L118">            new Point(3648, 1200), </span>
+<span class="fc" id="L119">            new Point(3420, 1264), //T10</span>
+<span class="fc" id="L120">            new Point(3292, 1332), </span>
+<span class="fc" id="L121">            new Point(2976, 1268), //T11</span>
+<span class="fc" id="L122">            new Point(2128, 1040), </span>
+<span class="fc" id="L123">            new Point(1856, 1024), //T12</span>
+<span class="fc" id="L124">            new Point(1492, 1220), //T13, T14 se encuentra en medio</span>
+<span class="fc" id="L125">            new Point(1612, 1810), //T15</span>
+<span class="fc" id="L126">            new Point(1494, 2006),</span>
+<span class="fc" id="L127">            new Point(1412, 2064), </span>
+<span class="fc" id="L128">            new Point(1369, 2142), //T16</span>
+<span class="fc" id="L129">            new Point(1492, 2288), </span>
+<span class="fc" id="L130">            new Point(1749, 2356), //T17</span>
+<span class="fc" id="L131">            new Point(1861, 2424),</span>
+<span class="fc" id="L132">            new Point(1880, 2636), //T18</span>
+<span class="fc" id="L133">            new Point(1734, 2700),</span>
+<span class="fc" id="L134">            new Point(1496, 2733), </span>
+<span class="fc" id="L135">            new Point(760, 2708), </span>
+<span class="fc" id="L136">            new Point(640, 2616), //T19</span>
+<span class="fc" id="L137">            new Point(472, 2232), </span>
+<span class="fc" id="L138">            new Point(344, 1744), </span>
+<span class="fc" id="L139">            new Point(360, 1480), </span>
+<span class="fc" id="L140">            new Point(444, 1344)</span>
+        };
         
-        // Añadir punto actual
-<span class="fc" id="L107">        racingLine.add(current);</span>
-        
-        // Añadir puntos intermedios si la distancia es grande
-<span class="fc" id="L110">        double distance = Math.sqrt(Math.pow(next.x - current.x, 2) + Math.pow(next.y - current.y, 2));</span>
-<span class="fc bfc" id="L111" title="All 2 branches covered.">        if (distance &gt; 150) {</span>
-<span class="fc" id="L112">            int intermediatePoints = (int)(distance / 75); // Punto cada ~100 pixels</span>
-<span class="fc bfc" id="L113" title="All 2 branches covered.">            for (int j = 1; j &lt; intermediatePoints; j++) {</span>
-<span class="fc" id="L114">                double t = (double)j / intermediatePoints;</span>
-<span class="fc" id="L115">                int interX = (int)(current.x + (next.x - current.x) * t);</span>
-<span class="fc" id="L116">                int interY = (int)(current.y + (next.y - current.y) * t);</span>
-<span class="fc" id="L117">                racingLine.add(new Point(interX, interY));</span>
+        // Añadir waypoints intermedios para mejor navegación
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        for (int i = 0; i &lt; keyPoints.length - 1; i++) {</span>
+<span class="fc" id="L145">            Point current = keyPoints[i];</span>
+<span class="fc" id="L146">            Point next = keyPoints[i + 1];</span>
+            
+            // Añadir punto actual
+<span class="fc" id="L149">            racingLine.add(current);</span>
+            
+            // Añadir puntos intermedios si la distancia es grande
+<span class="fc" id="L152">            double distance = Math.sqrt(Math.pow(next.x - current.x, 2) + Math.pow(next.y - current.y, 2));</span>
+            //Si la distancia es mayor a 150 píxeles añadir uno cada 75 píxeles
+<span class="fc bfc" id="L154" title="All 2 branches covered.">            if (distance &gt; 150) </span>
+            {
+<span class="fc" id="L156">                int intermediatePoints = (int)(distance / 75); </span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">                for (int j = 1; j &lt; intermediatePoints; j++) {</span>
+<span class="fc" id="L158">                    double t = (double)j / intermediatePoints;</span>
+<span class="fc" id="L159">                    int interX = (int)(current.x + (next.x - current.x) * t);</span>
+<span class="fc" id="L160">                    int interY = (int)(current.y + (next.y - current.y) * t);</span>
+<span class="fc" id="L161">                    racingLine.add(new Point(interX, interY));</span>
+                }
             }
         }
-    }
+        
+        // Añadir el último punto
+<span class="fc" id="L167">        racingLine.add(keyPoints[keyPoints.length - 1]);</span>
+        
+<span class="fc" id="L169">    }</span>
     
-    // Añadir el último punto
-<span class="fc" id="L123">    racingLine.add(keyPoints[keyPoints.length - 1]);</span>
-    
-<span class="fc" id="L125">}</span>
-    
+    //Inicializar los 19 coches
     private void initializeAICars() 
     {
-<span class="fc" id="L129">        Random random = new Random();</span>
-
-<span class="fc" id="L131">        int numberOfCars = 19;</span>
+<span class="fc" id="L174">        int numberOfCars = 19;</span>
         
         // Listas personalizables de posiciones X e Y para la parrilla de salida
-<span class="fc" id="L134">        double[] startPositionsX = {</span>
-            444, 
-            360, 428, 
-            336, 420, 
-            332, 424, 
-            324, 432, 
-            340, 444, 
-            356, 464,
-            384, 496, 
-            412, 496, 
-            436, 502
+<span class="fc" id="L177">        double[] startPositionsX = {</span>
+<span class="fc" id="L178">            444, </span>
+<span class="fc" id="L179">            360, 428, </span>
+<span class="fc" id="L180">            336, 420, </span>
+<span class="fc" id="L181">            332, 424, </span>
+<span class="fc" id="L182">            324, 432, </span>
+<span class="fc" id="L183">            340, 444, </span>
+<span class="fc" id="L184">            356, 464,</span>
+<span class="fc" id="L185">            384, 496, </span>
+<span class="fc" id="L186">            412, 496, </span>
+<span class="fc" id="L187">            436, 502</span>
         };
         
-<span class="fc" id="L147">        double[] startPositionsY = {</span>
-            1344, 
-            1376, 1448, 
-            1476, 1544, 
-            1572, 1644, 
-            1676, 1736, 
-            1776, 1836, 
-            1872, 1936, 
-            1976, 2036, 
-            2076, 2132, 
-            2176, 2194
+<span class="fc" id="L190">        double[] startPositionsY = {</span>
+<span class="fc" id="L191">            1344, </span>
+<span class="fc" id="L192">            1376, 1448, </span>
+<span class="fc" id="L193">            1476, 1544, </span>
+<span class="fc" id="L194">            1572, 1644, </span>
+<span class="fc" id="L195">            1676, 1736, </span>
+<span class="fc" id="L196">            1776, 1836, </span>
+<span class="fc" id="L197">            1872, 1936, </span>
+<span class="fc" id="L198">            1976, 2036, </span>
+<span class="fc" id="L199">            2076, 2132, </span>
+<span class="fc" id="L200">            2176, 2194</span>
         };
         
-<span class="fc bfc" id="L160" title="All 2 branches covered.">        for (int i = 0; i &lt; numberOfCars; i++) { </span>
-<span class="fc" id="L161">            String team = F1_TEAMS[i % F1_TEAMS.length];</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        for (int i = 0; i &lt; numberOfCars; i++) </span>
+        { 
+            //Determinar equipo del coche
+<span class="fc" id="L206">            String team = F1_TEAMS[i % F1_TEAMS.length];</span>
             
             double skillLevel;
- 
-<span class="fc bfc" id="L165" title="All 2 branches covered.">            if (i &lt; 5) skillLevel = 0.7 + random.nextDouble() * 0.3; </span>
-<span class="fc bfc" id="L166" title="All 2 branches covered.">            else if (i &lt; 13) skillLevel = 0.4 + random.nextDouble() * 0.3; </span>
-<span class="fc" id="L167">            else skillLevel = 0.2 + random.nextDouble() * 0.3; </span>
+            
+            //Determinar el skill level de ese coche, los primeros 5 coches tendrán mejor skill
+<span class="fc bfc" id="L211" title="All 2 branches covered.">            if (i &lt; 5) skillLevel = 0.8 + randomGenerator.nextDouble() * 0.3; </span>
+<span class="fc" id="L212">            else skillLevel = 0.65 + randomGenerator.nextDouble() * 0.3;  </span>
 
             // Usar las posiciones definidas en las listas
-<span class="fc" id="L170">            double startX = startPositionsX[i];</span>
-<span class="fc" id="L171">            double startY = startPositionsY[i];</span>
+<span class="fc" id="L215">            double startX = startPositionsX[i];</span>
+<span class="fc" id="L216">            double startY = startPositionsY[i];</span>
             
             // Calcular ángulo hacia el primer waypoint
-<span class="fc" id="L174">            double startAngle = calculateAngleToWaypoint(startX, startY, 1);</span>
+<span class="fc" id="L219">            double startAngle = calculateAngleToWaypoint(startX, startY, 1);</span>
 
-<span class="fc" id="L176">            double baseMaxVelocity = 22 + (random.nextDouble() * 4);</span>
+<span class="fc" id="L221">            double baseMaxVelocity = 30 + (randomGenerator.nextDouble() * 4);</span>
             
-<span class="fc" id="L178">            AICar aiCar = new AICar(</span>
-                startX, startY, startAngle, 3.0, 
-                baseMaxVelocity, -5, 0.2, 0.5,
-<span class="fc" id="L181">                trackMap.getMapHeight(), trackMap.getMapWidth(),</span>
-                team, skillLevel
+            //Inicializar el coche
+<span class="fc" id="L224">            AICar aiCar = new AICar(</span>
+<span class="fc" id="L225">                startX, startY, startAngle, 3.0, </span>
+<span class="fc" id="L226">                baseMaxVelocity, -5, 0.2, 0.5,</span>
+<span class="fc" id="L227">                trackMap.getMapHeight(), trackMap.getMapWidth(),</span>
+<span class="fc" id="L228">                team, skillLevel</span>
             );
 
-<span class="fc" id="L185">            aiCar.setRacingLine(new ArrayList&lt;&gt;(racingLine));</span>
-<span class="fc" id="L186">            aiCar.setPlayerCar(playerCar);</span>
-<span class="fc" id="L187">            aiCars.add(aiCar);</span>
+            //Adjudicarle la racing line, el coche del jugador y añadirlo a la lista de coches rivales
+<span class="fc" id="L232">            aiCar.setRacingLine(new ArrayList&lt;&gt;(racingLine));</span>
+<span class="fc" id="L233">            aiCar.setPlayerCar(playerCar);</span>
+<span class="fc" id="L234">            aiCars.add(aiCar);</span>
         }
-<span class="fc" id="L189">    }</span>
+<span class="fc" id="L236">    }</span>
 
+    //Calcular el angulo de salida 
     private double calculateAngleToWaypoint(double startX, double startY, int waypointIndex) 
     {
-<span class="pc bpc" id="L193" title="1 of 2 branches missed.">        if (racingLine.size() &lt;= waypointIndex) {</span>
-<span class="nc" id="L194">            return 280; // Ángulo por defecto</span>
-        }
+        //Ángulo por default si falla la racing line
+<span class="pc bpc" id="L242" title="1 of 2 branches missed.">        if (racingLine.size() &lt;= waypointIndex) return 280; </span>
         
-<span class="fc" id="L197">        Point waypoint = racingLine.get(waypointIndex);</span>
-<span class="fc" id="L198">        double dx = waypoint.x - startX;</span>
-<span class="fc" id="L199">        double dy = waypoint.y - startY;</span>
-<span class="fc" id="L200">        double angle = Math.toDegrees(Math.atan2(dy, dx));</span>
+        //Calcular el ángulo
+<span class="fc" id="L245">        Point waypoint = racingLine.get(waypointIndex);</span>
+<span class="fc" id="L246">        double dx = waypoint.x - startX;</span>
+<span class="fc" id="L247">        double dy = waypoint.y - startY;</span>
+<span class="fc" id="L248">        double angle = Math.toDegrees(Math.atan2(dy, dx));</span>
         
         // Asegurar que el ángulo esté en el rango correcto
-<span class="pc bpc" id="L203" title="1 of 2 branches missed.">        if (angle &lt; 0) {</span>
-<span class="fc" id="L204">            angle += 360;</span>
+<span class="pc bpc" id="L251" title="1 of 2 branches missed.">        if (angle &lt; 0) </span>
+        {
+<span class="fc" id="L253">            angle += 360;</span>
         }
-<span class="fc" id="L206">        return angle;</span>
+
+<span class="fc" id="L256">        return angle;</span>
     }
     
+    //Función principal para actualizar la posición de los coches rivales
     public void updateAllAI(BufferedImage collisionMap) 
     {
-<span class="fc" id="L211">        int currentLap = trackMap.getCurrentLap();</span>
+<span class="nc" id="L262">        int currentLap = trackMap.getCurrentLap();</span>
         
-<span class="fc bfc" id="L213" title="All 2 branches covered.">        for (AICar aiCar : aiCars)</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        for (AICar aiCar : aiCars)</span>
         {
-<span class="fc" id="L215">            aiCar.updateAI(collisionMap, aiCars, currentLap);</span>
-<span class="fc" id="L216">        }</span>
-<span class="fc" id="L217">    }</span>
+<span class="nc" id="L266">            aiCar.updateAI(collisionMap, aiCars, currentLap);</span>
+<span class="nc" id="L267">            updateAICheckpoints(aiCar);</span>
+<span class="nc" id="L268">            aiCar.updateLapTime();</span>
+        }
+
+<span class="nc" id="L271">        updatePositions();</span>
+<span class="nc" id="L272">    }</span>
     
-<span class="fc" id="L219">    public List&lt;AICar&gt; getAICars() {return aiCars;}</span>
-<span class="nc" id="L220">    public List&lt;Point&gt; getRacingLine() {return racingLine;}</span>
+    //Verificar si se encuentra en la finish line o encima de un checkpoint
+    private void updateAICheckpoints(AICar aiCar)
+    {
+        //Verificar línea de meta
+<span class="nc bnc" id="L278" title="All 2 branches missed.">        if (trackMap.getFinishLine().contains((int)(aiCar.getX() + 40), (int)(aiCar.getY() + 40))) </span>
+        {
+<span class="nc" id="L280">            handleAIFinishLine(aiCar);</span>
+<span class="nc" id="L281">            return; </span>
+        }
+        
+        //Verificar checkpoints normales
+<span class="nc" id="L285">        var checkpoints = trackMap.getCheckpoints();</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">        for (int i = 0; i &lt; checkpoints.size(); i++) </span>
+        {
+<span class="nc" id="L288">            Rectangle checkpoint = checkpoints.get(i);</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">            if (checkpoint.contains((int)(aiCar.getX() + 40), (int)(aiCar.getY() + 40))) </span>
+            {
+<span class="nc" id="L291">                handleAICheckpoint(aiCar, i);</span>
+<span class="nc" id="L292">                break; </span>
+            }
+        }
+<span class="nc" id="L295">    }</span>
     
+    //Si ha pasado por línea de meta, verificar si debe empezar una nueva vuelta o terminar la carrera
+    private void handleAIFinishLine(AICar aiCar) {
+        
+        // Si es la primera vez que pasa o ha completado todos los checkpoints
+<span class="nc bnc" id="L301" title="All 4 branches missed.">        if (aiCar.getLapStartTime() == 0 || aiCar.passedAllCheckpoints()) </span>
+        {
+            //Si el tiempo es mayor a 0, verificar si debe aumentar una vuelta o finalizar la carrera
+<span class="nc bnc" id="L304" title="All 2 branches missed.">            if (aiCar.getLapStartTime() &gt; 0) </span>
+            {
+<span class="nc" id="L306">                aiCar.completeLap();</span>
+            }
+            //De todos modos empezar una nueva vuelta y resetar los valores
+<span class="nc" id="L309">            aiCar.startNewLap();</span>
+        }
+<span class="nc" id="L311">    }</span>
+
+    //Si ha pasado por un checkpoint, controlar sectores y tiempos
+    private void handleAICheckpoint(AICar aiCar, int checkpointIndex) 
+    {
+        // Si ya ha pasado por el checkpoint, lo ignora
+<span class="nc bnc" id="L317" title="All 2 branches missed.">        if (aiCar.getPassedCheckpoints().contains(checkpointIndex)) </span>
+        {
+<span class="nc" id="L319">            return;</span>
+        }
+        
+        // Verificar si es el checkpoint correcto
+<span class="nc bnc" id="L323" title="All 2 branches missed.">        if (checkpointIndex == aiCar.getNextCheckpointIndex()) </span>
+        {
+<span class="nc" id="L325">            aiCar.getPassedCheckpoints().add(checkpointIndex);</span>
+<span class="nc" id="L326">            aiCar.setNextCheckpointIndex(aiCar.getNextCheckpointIndex() + 1);</span>
+                        
+            // Grabar sector 
+<span class="nc bnc" id="L329" title="All 4 branches missed.">            if (checkpointIndex &gt;= 1 &amp;&amp; checkpointIndex &lt;= 3) </span>
+            {
+                //Calcular tiempo de sector
+<span class="nc" id="L332">                int sectorIndex = checkpointIndex - 1;</span>
+<span class="nc" id="L333">                long now = timeProvider.now();</span>
+<span class="nc" id="L334">                long totalSinceStart = now - aiCar.getLapStartTime();</span>
+                
+                // Calcular suma de sectores anteriores
+<span class="nc" id="L337">                long prevSum = 0;</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">                for (int i = 0; i &lt; sectorIndex; i++) </span>
+                {
+<span class="nc" id="L340">                    prevSum += aiCar.getSectorTimes()[i];</span>
+                }
+                
+                //Grabar tiempo de sector
+<span class="nc" id="L344">                long sectorTime = totalSinceStart - prevSum;</span>
+<span class="nc" id="L345">                aiCar.recordSector(sectorIndex, sectorTime);</span>
+                
+                // Actualizar mejor sector global
+<span class="nc" id="L348">                updateGlobalSectorTime(sectorIndex, sectorTime, aiCar);</span>
+            }
+<span class="nc" id="L350">        } </span>
+        else 
+        {
+            // Checkpoint incorrecto, reiniciar
+<span class="nc bnc" id="L354" title="All 2 branches missed.">            if (trackMap.isRaceMode()) </span>
+            {
+<span class="nc" id="L356">                aiCar.getPassedCheckpoints().clear();</span>
+<span class="nc" id="L357">                aiCar.setNextCheckpointIndex(0);</span>
+            }
+        }
+<span class="nc" id="L360">    }</span>
+    
+    //Si tiene el mejor tiempo de sector de todos los coches, asignarle sector en morado
+    private void updateGlobalSectorTime(int sectorIndex, long sectorTime, AICar aiCar) 
+    {
+<span class="nc bnc" id="L365" title="All 2 branches missed.">        if (sectorTime &lt; bestGlobalSectorTimes[sectorIndex]) </span>
+        {
+<span class="nc" id="L367">            bestGlobalSectorTimes[sectorIndex] = sectorTime;</span>
+            
+            //Actualizar color a PURPLE para este coche
+<span class="nc" id="L370">            aiCar.getSectorColors()[sectorIndex] = Map.SectorColor.PURPLE;</span>
+            
+<span class="nc bnc" id="L372" title="All 2 branches missed.">            if (sectorTime &lt; trackMap.getBestSectorTime(sectorIndex)) </span>
+            {
+<span class="nc" id="L374">                trackMap.setBestSectorTime(sectorIndex, sectorTime);</span>
+            }
+        }
+<span class="nc" id="L377">    }</span>
+
+    //Resetar todos los valores para empezar de nuevo una carrera
+    public void reset()
+    {
+<span class="nc" id="L382">        aiCars.clear();</span>
+<span class="nc" id="L383">        initializeAICars();</span>
+<span class="nc" id="L384">        Arrays.fill(bestGlobalSectorTimes, Long.MAX_VALUE);</span>
+<span class="nc" id="L385">        positions = null;</span>
+<span class="nc" id="L386">    }</span>
+    
+    //Sistema de posiciones
+    private void updatePositions() 
+    {
+        //Crear lista con todos los coches y el jugador
+<span class="nc" id="L392">        List&lt;Car&gt; allCars = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L393">        allCars.add(playerCar);</span>
+<span class="nc" id="L394">        allCars.addAll(aiCars);</span>
+        
+        //Ordenar por posición
+<span class="nc" id="L397">        allCars.sort((c1, c2) -&gt; {</span>
+<span class="nc bnc" id="L398" title="All 2 branches missed.">            int lap1 = (c1 instanceof AICar) ? ((AICar)c1).getCurrentLap() : trackMap.getCurrentLap();</span>
+<span class="nc bnc" id="L399" title="All 2 branches missed.">            int lap2 = (c2 instanceof AICar) ? ((AICar)c2).getCurrentLap() : trackMap.getCurrentLap();</span>
+            
+            //Más vueltas primero
+<span class="nc bnc" id="L402" title="All 2 branches missed.">            if (lap1 != lap2) </span>
+            {
+<span class="nc" id="L404">                return Integer.compare(lap2, lap1);</span>
+            }
+            
+            //Misma vuelta, comparar por checkpoints pasados
+<span class="nc" id="L408">            int checkpoints1 = getCheckpointsPassed(c1);</span>
+<span class="nc" id="L409">            int checkpoints2 = getCheckpointsPassed(c2);</span>
+            
+            //Más checkpoints primero
+<span class="nc bnc" id="L412" title="All 2 branches missed.">            if (checkpoints1 != checkpoints2) </span>
+            {
+<span class="nc" id="L414">                return Integer.compare(checkpoints2, checkpoints1); </span>
+            }
+            
+            //Mismos checkpoints, comparar por distancia al siguiente checkpoint
+<span class="nc" id="L418">            double distance1 = getDistanceToNextCheckpoint(c1);</span>
+<span class="nc" id="L419">            double distance2 = getDistanceToNextCheckpoint(c2);</span>
+            
+            //Menor distancia primero
+<span class="nc" id="L422">            return Double.compare(distance1, distance2); </span>
+        });
+        
+        //Actualizar lista de posiciones 
+<span class="nc" id="L426">        positions = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">        for (Car car : allCars) </span>
+        {
+<span class="nc bnc" id="L429" title="All 2 branches missed.">            if (car instanceof AICar) </span>
+            {
+<span class="nc" id="L431">                positions.add((AICar) car);</span>
+            }
+        }
+<span class="nc" id="L434">    }</span>
+
+    //Calcular la distancia al siguiente checkpoint
+    private double getDistanceToNextCheckpoint(Car car) 
+    {
+        //Definir todos los checkpoints
+<span class="nc" id="L440">        List&lt;Rectangle&gt; allCheckpoints = Arrays.asList(</span>
+<span class="nc" id="L441">            new Rectangle(4548, 972, 40, 200),  </span>
+<span class="nc" id="L442">            new Rectangle(5484, 152, 20, 200),    </span>
+<span class="nc" id="L443">            new Rectangle(1388, 1216, 250, 50), </span>
+<span class="nc" id="L444">            new Rectangle(432, 2344, 250, 50),  </span>
+<span class="nc" id="L445">            new Rectangle(360, 1200, 200, 40)   </span>
+        );
+        
+        //Obtener el siguiente checkpoint a pasar por
+<span class="nc" id="L449">        int nextCheckpointIndex = getNextCheckpointIndex(car);</span>
+        
+        //Si ya ha pasado por todos los checkpoints, se considera la distancia a la línea de meta
+<span class="nc bnc" id="L452" title="All 2 branches missed.">        if (nextCheckpointIndex &gt;= allCheckpoints.size()) {</span>
+<span class="nc" id="L453">            nextCheckpointIndex = allCheckpoints.size() - 1; </span>
+        }
+        
+<span class="nc" id="L456">        Rectangle nextCheckpoint = allCheckpoints.get(nextCheckpointIndex);</span>
+        
+        // Calcular distancia desde el centro del coche al centro del checkpoint
+<span class="nc" id="L459">        double carCenterX = car.getX() + 40;</span>
+<span class="nc" id="L460">        double carCenterY = car.getY() + 40;</span>
+<span class="nc" id="L461">        double checkpointCenterX = nextCheckpoint.getX() + nextCheckpoint.getWidth() / 2.0;</span>
+<span class="nc" id="L462">        double checkpointCenterY = nextCheckpoint.getY() + nextCheckpoint.getHeight() / 2.0;</span>
+        
+<span class="nc" id="L464">        return Math.sqrt(Math.pow(checkpointCenterX - carCenterX, 2) + </span>
+<span class="nc" id="L465">                        Math.pow(checkpointCenterY - carCenterY, 2));</span>
+    }
+
+    //Getter para obtener el número de checkpoints pasados
+    private int getCheckpointsPassed(Car car) 
+    {
+<span class="nc bnc" id="L471" title="All 2 branches missed.">        if (car instanceof AICar) </span>
+        {
+<span class="nc" id="L473">            AICar aiCar = (AICar) car;</span>
+<span class="nc" id="L474">            return aiCar.getPassedCheckpoints().size();</span>
+        } 
+        else 
+        {
+<span class="nc" id="L478">            return trackMap.getPassedCheckpoints().size();</span>
+        }
+    }
+
+    //Getter del siguiente checkpoint
+    private int getNextCheckpointIndex(Car car) 
+    {
+<span class="nc bnc" id="L485" title="All 2 branches missed.">        if (car instanceof AICar) </span>
+        {
+<span class="nc" id="L487">            AICar aiCar = (AICar) car;</span>
+<span class="nc" id="L488">            return aiCar.getNextCheckpointIndex();</span>
+        } 
+        else 
+        {
+<span class="nc" id="L492">            return trackMap.getNextCheckpointIndex();</span>
+        }
+    }
+    
+    //Getter para posiciones
+    public List&lt;AICar&gt; getPositions() 
+    {
+<span class="nc bnc" id="L499" title="All 2 branches missed.">        if (positions == null) </span>
+        {
+<span class="nc" id="L501">            updatePositions();</span>
+        }
+<span class="nc" id="L503">        return positions;</span>
+    }
+    
+    //Getter de la posición de un coche
+    public int getAIPosition(AICar aiCar) 
+    {
+<span class="nc" id="L509">        List&lt;AICar&gt; positions = getPositions();</span>
+<span class="nc" id="L510">        return positions.indexOf(aiCar) + 1;</span>
+    }
+    
+    //Getters
+<span class="nc" id="L514">    public long[] getBestGlobalSectorTimes() {return bestGlobalSectorTimes;}</span>
+<span class="fc" id="L515">    public List&lt;AICar&gt; getAICars() {return aiCars;}</span>
+<span class="nc" id="L516">    public List&lt;Point&gt; getRacingLine() {return racingLine;}</span>
+    
+    //Setters
     public void setAIDifficulty(double globalDifficulty) 
     {
-<span class="nc bnc" id="L224" title="All 2 branches missed.">        for (AICar aiCar : aiCars) </span>
+<span class="nc bnc" id="L521" title="All 2 branches missed.">        for (AICar aiCar : aiCars) </span>
         {
-<span class="nc" id="L226">            double currentSkill = aiCar.getSkillLevel();</span>
-<span class="nc" id="L227">            double newSkill = currentSkill * globalDifficulty;</span>
-<span class="nc" id="L228">            aiCar.setSkillLevel(Math.min(1.0, newSkill));</span>
-<span class="nc" id="L229">        }</span>
-<span class="nc" id="L230">    }</span>
+<span class="nc" id="L523">            double currentSkill = aiCar.getSkillLevel();</span>
+<span class="nc" id="L524">            double newSkill = currentSkill * globalDifficulty;</span>
+<span class="nc" id="L525">            aiCar.setSkillLevel(Math.min(1.0, newSkill));</span>
+        }
+<span class="nc" id="L527">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
