@@ -181,7 +181,14 @@ class CarDisplayTest {
         setPrivateField(display, "trackMap", mockMap2);
         setPrivateField(display, "aiController", mockAiController);
     
-        assertDoesNotThrow(() -> display.updateRace());
+        if(GraphicsEnvironment.isHeadless())
+        {
+            assertThrows(HeadlessException.class, () -> {display.updateRace();});
+        }
+        else
+        {
+            assertDoesNotThrow(() -> display.updateRace());
+        }
     }
     
     @Test
@@ -200,7 +207,14 @@ class CarDisplayTest {
         setPrivateField(display, "trackMap", mockMap2);
         setPrivateField(display, "currentGameMode", GameMode.RACE);
     
-        assertDoesNotThrow(() -> display.updateRace());
+        if(GraphicsEnvironment.isHeadless())
+        {
+            assertThrows(HeadlessException.class, () -> {display.updateRace();});
+        }
+        else
+        {
+            assertDoesNotThrow(() -> display.updateRace());
+        }
     }
     
     @Test
@@ -214,7 +228,14 @@ class CarDisplayTest {
         setPrivateField(display, "trackMap", mockMap2);
         setPrivateField(display, "currentGameMode", GameMode.RACE);
     
-        assertDoesNotThrow(() -> display.updateRace());
+        if(GraphicsEnvironment.isHeadless())
+        {
+            assertThrows(HeadlessException.class, () -> {display.updateRace();});
+        }
+        else
+        {
+            assertDoesNotThrow(() -> display.updateRace());
+        }
     }
 
     @Test

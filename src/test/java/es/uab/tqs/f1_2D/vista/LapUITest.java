@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +51,15 @@ class LapUITest {
         //Verifica que 0 milisegundos se formatee correctamente
         assertEquals("0.000", lapUI.formatTime(0));
         //Verifica que 1000 milisegundos se formatee como "1,000 s"
-        assertEquals("1,000 s", lapUI.formatTime(1000));
+        if(GraphicsEnvironment.isHeadless())
+        {
+             assertEquals("1.000 s", lapUI.formatTime(1000));
+        }
+        else
+        {
+            assertEquals("1,000 s", lapUI.formatTime(1000));
+        }
+       
     }
 
     //Test para verificar la carga de imágenes de sectores

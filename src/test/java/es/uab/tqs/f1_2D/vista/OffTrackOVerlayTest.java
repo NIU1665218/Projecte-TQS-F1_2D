@@ -12,7 +12,6 @@ import static org.mockito.Mockito.*;
 
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
 
 import static org.junit.jupiter.api.Assertions.*;
