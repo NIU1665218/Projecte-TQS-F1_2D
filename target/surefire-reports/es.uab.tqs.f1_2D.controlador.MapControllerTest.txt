@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: es.uab.tqs.f1_2D.controlador.MapControllerTest
 -------------------------------------------------------------------------------
-Tests run: 64, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.546 s -- in es.uab.tqs.f1_2D.controlador.MapControllerTest
+Tests run: 64, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.482 s -- in es.uab.tqs.f1_2D.controlador.MapControllerTest

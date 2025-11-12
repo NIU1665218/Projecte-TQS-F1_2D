@@ -422,14 +422,7 @@ public class MapController
 
             if(min > sectorTime)
             {
-                if(previousLocalBest > sectorTime)
-                {
-                    model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);
-                }
-                else
-                {
-                    model.setSectorColor(sectorIndex, Map.SectorColor.GREEN);
-                }
+                model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);
             }
         }
     }

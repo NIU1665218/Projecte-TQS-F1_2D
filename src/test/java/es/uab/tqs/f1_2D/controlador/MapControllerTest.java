@@ -800,6 +800,7 @@ class MapControllerTest
         trackController.recordSector(0, 800L);
         
         assertEquals(Map.SectorColor.PURPLE, track.getSectorColor(0));
+
         track.setBestSectorTime(0, 1750L);
         
         trackController.recordSector(0, 1800L);
@@ -810,6 +811,7 @@ class MapControllerTest
 
         trackController.recordSector(1, 1700L);
         assertEquals(Map.SectorColor.GREEN, track.getSectorColor(0));
+
     }
 
     /* 
