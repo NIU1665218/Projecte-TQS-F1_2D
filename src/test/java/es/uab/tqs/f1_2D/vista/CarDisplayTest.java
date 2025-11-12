@@ -18,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -415,7 +417,14 @@ class CarDisplayTest {
     //Test para asegurar que el método main no lanza excepciones (No sé si es necesario)
     void testMainDoesNotThrow() 
     {
-        assertDoesNotThrow(() -> {CarDisplay.main(new String[]{});});
+        if(GraphicsEnvironment.isHeadless())
+        {
+            assertThrows(HeadlessException.class,() -> {CarDisplay.main(new String[]{});});
+        }
+        else
+        {
+            assertDoesNotThrow(() -> {CarDisplay.main(new String[]{});});
+        }
     }
 
     //Métodos de ayuda para poder hacer una especie de caballo de troya

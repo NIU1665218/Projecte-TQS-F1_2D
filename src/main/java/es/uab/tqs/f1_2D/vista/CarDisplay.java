@@ -63,11 +63,11 @@ public class CarDisplay extends JPanel
     {
         try 
         {
-            screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            this.screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         }
         catch(Exception e)
         {
-            screenSize.setSize(1920, 1080);
+            this.screenSize = new Dimension(1920, 1080);
         }
         //Inicialitzar controlador
         this.controller = controller;

@@ -11,6 +11,8 @@ import javax.sound.sampled.Clip;
 import static org.mockito.Mockito.*;
 
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,9 +65,18 @@ class OffTrackOverlayTest {
     @Test
     void testLoadSound()
     {
-        //Verifica carga exitosa de overlay existente
-        assertDoesNotThrow(() -> overlay.loadSound(soundPath));
-        assertNotNull(overlay.getSound());
+        if(GraphicsEnvironment.isHeadless())
+        {
+            //Verifica carga exitosa de overlay existente
+            assertDoesNotThrow(() -> overlay.loadSound(soundPath));
+            assertNull(overlay.getSound());
+        }
+        else
+        {
+           //Verifica carga exitosa de overlay existente
+            assertDoesNotThrow(() -> overlay.loadSound(soundPath));
+            assertNotNull(overlay.getSound());
+        }
 
         //Verifica comportamiento con rutas inválidas
         assertDoesNotThrow(()-> overlay.loadSound("/sound/noexiste.wav"));
