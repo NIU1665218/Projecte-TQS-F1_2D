@@ -65,7 +65,11 @@ public class OffTrackOverlay extends JPanel
             try {
                 //obtiene el audio y lo intenta abrir
                 AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundUrl);
-                clip = AudioSystem.getClip();
+                try {
+                    clip = AudioSystem.getClip();
+                } catch (IllegalArgumentException | LineUnavailableException e) {
+                    clip = null;
+                }
                 clip.open(audioStream);
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 clip = null; //Si hay error, lo dejamos en null
