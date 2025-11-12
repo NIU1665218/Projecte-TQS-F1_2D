@@ -228,30 +228,26 @@ class CarDisplayTest {
         setPrivateField(display, "trackMap", mockMap2);
         setPrivateField(display, "currentGameMode", GameMode.RACE);
     
-        if(GraphicsEnvironment.isHeadless())
-        {
-            assertThrows(HeadlessException.class, () -> {display.updateRace();});
-        }
-        else
-        {
-            assertDoesNotThrow(() -> display.updateRace());
-        }
+        assertDoesNotThrow(() -> display.updateRace());
     }
 
     @Test
     //Test diseñado para verificar la creación de la ventana del juego
     void testCreateGameWindow() 
     {
-        //Creación de los componentes necesarios para el test
-        Car car = new Car(0, 0, 0, 0, 0, 0, 0, 0, 100, 100);
-        CarController controller = new CarController(car);
-        BufferedImage dummy = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        if(!GraphicsEnvironment.isHeadless())
+        {
+            //Creación de los componentes necesarios para el test
+            Car car = new Car(0, 0, 0, 0, 0, 0, 0, 0, 100, 100);
+            CarController controller = new CarController(car);
+            BufferedImage dummy = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 
-        JFrame frame = CarDisplay.createGame(controller, dummy, dummy);
+            JFrame frame = CarDisplay.createGame(controller, dummy, dummy);
 
-        //Verificar que la ventana se ha creado correctamente
-        assertEquals("F1 2D", frame.getTitle());
-        assertTrue(frame.getContentPane().getComponent(0) instanceof CarDisplay);
+            //Verificar que la ventana se ha creado correctamente
+            assertEquals("F1 2D", frame.getTitle());
+            assertTrue(frame.getContentPane().getComponent(0) instanceof CarDisplay);
+        }
     }
 
     @Test
