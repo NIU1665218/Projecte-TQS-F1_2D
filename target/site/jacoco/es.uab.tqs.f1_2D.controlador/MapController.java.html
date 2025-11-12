@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.controlador</a> &gt; <span class="el_source">MapController.java</span></div><h1>MapController.java</h1><pre class="source lang-java linenums">package es.uab.tqs.f1_2D.controlador;
 
+import es.uab.tqs.f1_2D.model.AICar;
 import es.uab.tqs.f1_2D.model.Map;
 import es.uab.tqs.f1_2D.model.TimeProvider;
 
 import javax.swing.Timer;
-
-import java.util.stream.LongStream;
 
 public class MapController 
 {
@@ -14,10 +13,11 @@ public class MapController
     private Timer resultTimer;
     private Timer offTrackTimer;
     private Timer countdownTimer;
-<span class="fc" id="L17">    private boolean isSkipEnabled = false; //variable para testing timer</span>
+<span class="fc" id="L16">    private boolean isSkipEnabled = false; //variable para testing timer</span>
+    private AIController aiController;
     
-<span class="fc" id="L19">    public MapController(Map model) </span>
-    {
+    public MapController(Map model) 
+<span class="fc" id="L20">    {</span>
 <span class="fc" id="L21">        this.model = model;</span>
 <span class="fc" id="L22">    }</span>
     
@@ -102,333 +102,353 @@ public class MapController
 <span class="fc bfc" id="L102" title="All 2 branches covered.">        if (currentState == Map.State.IDLE) </span>
         {
 <span class="fc" id="L104">            startLap();</span>
-<span class="fc" id="L105">        } </span>
+        } 
         else 
         {
            //Si está corriendo mira si es el último checkpoint y cuenta el último sector
 <span class="fc" id="L109">            int lastSectorIndex = model.getNumSectors() - 1;</span>
 <span class="fc bfc" id="L110" title="All 2 branches covered.">            if (!model.getSectorRecorded()[lastSectorIndex]) </span>
             {
-<span class="fc" id="L112">                long now = timeProvider.now();</span>
-<span class="fc" id="L113">                long totalSinceStart = now - model.getLapStartTime();</span>
-<span class="fc" id="L114">                long prevSum = model.sum(model.getSectorTimes(), lastSectorIndex);</span>
-<span class="fc" id="L115">                long sectorTime = totalSinceStart - prevSum;</span>
-<span class="fc" id="L116">                recordSector(lastSectorIndex, sectorTime);</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">                if(model.getNextCheckpointIndex() != 0)</span>
+                {
+<span class="fc" id="L114">                    long now = timeProvider.now();</span>
+<span class="fc" id="L115">                    long totalSinceStart = now - model.getLapStartTime();</span>
+<span class="fc" id="L116">                    long prevSum = model.sum(model.getSectorTimes(), lastSectorIndex);</span>
+<span class="fc" id="L117">                    long sectorTime = totalSinceStart - prevSum;</span>
+<span class="fc" id="L118">                    recordSector(lastSectorIndex, sectorTime);</span>
+                }
             }
             
             //Si ya ha pasado por todos los checkpoints acaba vuelta, en caso contrario la vuelve a empezar
-<span class="fc bfc" id="L120" title="All 2 branches covered.">            if (model.passedAllCheckpoints()) </span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            if (model.passedAllCheckpoints()) </span>
             {
-<span class="fc" id="L122">                endLap();</span>
-<span class="fc" id="L123">            } else </span>
+<span class="fc" id="L125">                endLap();</span>
+            } else 
             {
-<span class="fc" id="L125">                startLap();</span>
+<span class="fc" id="L128">                startLap();</span>
             }
         }
-<span class="fc" id="L128">    }</span>
+<span class="fc" id="L131">    }</span>
     
     //Función para comprobar si el coche se encuentra encima de un checkpoint
     private void handleCheckpoints(double x, double y) 
     {
-<span class="fc" id="L133">        var checkpoints = model.getCheckpoints();</span>
+<span class="fc" id="L136">        var checkpoints = model.getCheckpoints();</span>
         //Iterar sobre la lista de checkpoints que contiene el circuito actual
-<span class="fc bfc" id="L135" title="All 2 branches covered.">        for (int i = 0; i &lt; checkpoints.size(); i++) </span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        for (int i = 0; i &lt; checkpoints.size(); i++) </span>
         {
-<span class="fc bfc" id="L137" title="All 2 branches covered.">            if (checkpoints.get(i).contains(x + 40, y + 40)) </span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">            if (checkpoints.get(i).contains(x + 40, y + 40)) </span>
             {
                 //Si se encuentra encima de un checkpoint donde ya ha pasado no hace nada
-<span class="fc bfc" id="L140" title="All 2 branches covered.">                if (model.getPassedCheckpoints().contains(i)) break;</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">                if (model.getPassedCheckpoints().contains(i)) break;</span>
                 
                 //Si el checkpoint es el siguiente que debe visitar por orden de circuito, graba sector y tiempo
                 //En caso contrario invalida vuelta ya que no está siguiendo el circuito correctamente
-<span class="fc bfc" id="L144" title="All 2 branches covered.">                if (i == model.getNextCheckpointIndex()) </span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">                if (i == model.getNextCheckpointIndex()) </span>
                 {
-<span class="fc" id="L146">                    model.getPassedCheckpoints().add(i);</span>
-<span class="fc" id="L147">                    model.setNextCheckpointIndex(model.getNextCheckpointIndex() + 1);</span>
+<span class="fc" id="L149">                    model.getPassedCheckpoints().add(i);</span>
+<span class="fc" id="L150">                    model.setNextCheckpointIndex(model.getNextCheckpointIndex() + 1);</span>
                     
                     // Grabar sector (excepto para el primer y último checkpoint)
-<span class="fc bfc" id="L150" title="All 4 branches covered.">                    if (i &gt;= 1 &amp;&amp; i &lt;= checkpoints.size() - 2) </span>
+<span class="fc bfc" id="L153" title="All 4 branches covered.">                    if (i &gt;= 1 &amp;&amp; i &lt;= checkpoints.size() - 2) </span>
                     {
-<span class="fc" id="L152">                        int sectorIndex = i - 1;</span>
-<span class="fc" id="L153">                        long now = timeProvider.now();</span>
-<span class="fc" id="L154">                        long totalSinceStart = now - model.getLapStartTime();</span>
-<span class="fc" id="L155">                        long prevSum = model.sum(model.getSectorTimes(), sectorIndex);</span>
-<span class="fc" id="L156">                        long sectorTime = totalSinceStart - prevSum;</span>
-<span class="fc" id="L157">                        recordSector(sectorIndex, sectorTime);</span>
-                    }
-<span class="fc" id="L159">                } </span>
+<span class="fc" id="L155">                        int sectorIndex = i - 1;</span>
+<span class="fc" id="L156">                        long now = timeProvider.now();</span>
+<span class="fc" id="L157">                        long totalSinceStart = now - model.getLapStartTime();</span>
+<span class="fc" id="L158">                        long prevSum = model.sum(model.getSectorTimes(), sectorIndex);</span>
+<span class="fc" id="L159">                        long sectorTime = totalSinceStart - prevSum;</span>
+<span class="fc" id="L160">                        recordSector(sectorIndex, sectorTime);</span>
+<span class="fc" id="L161">                    }</span>
+                } 
                 else 
                 {
-<span class="fc" id="L162">                    handleInvalidLap();</span>
-<span class="fc" id="L163">                    break;</span>
+<span class="fc" id="L165">                    handleInvalidLap();</span>
+<span class="fc" id="L166">                    break;</span>
                 }
             }
         }
-<span class="fc" id="L167">    }</span>
+<span class="fc" id="L170">    }</span>
 
     //Función para manejar que se ha ido fuera de pista
     private void handleOffTrack() 
     {
         //Si estamos en carrera procesar castigo, en caso contrario solo poner el estado en offtrack
-<span class="fc bfc" id="L173" title="All 2 branches covered.">        if (model.isRaceMode()) </span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">        if (model.isRaceMode()) </span>
         {
             //Si la vuelta actual no tiene castigo sumarle 10s
-<span class="fc bfc" id="L176" title="All 2 branches covered.">            if (!model.isLapHasPenalty()) </span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">            if (!model.isLapHasPenalty()) </span>
             {
-<span class="fc" id="L178">                model.setCurrentLapPenalty(model.getCurrentLapPenalty() + 10000); </span>
-<span class="fc" id="L179">                model.setLapHasPenalty(true);</span>
+<span class="fc" id="L181">                model.setCurrentLapPenalty(model.getCurrentLapPenalty() + 10000); </span>
+<span class="fc" id="L182">                model.setLapHasPenalty(true);</span>
             }
             
             //Mostrar el estado OFF_TRACK temporalmente
-<span class="fc" id="L183">            model.setCurrentState(Map.State.OFF_TRACK);</span>
-<span class="fc" id="L184">            stopAllTimers();</span>
+<span class="fc" id="L186">            model.setCurrentState(Map.State.OFF_TRACK);</span>
+<span class="fc" id="L187">            stopAllTimers();</span>
             
             //Saltarse el timer si estamos testeando y volver a running
-<span class="fc bfc" id="L187" title="All 2 branches covered.">            if (!isSkipEnabled)</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">            if (!isSkipEnabled)</span>
             {
-<span class="fc" id="L189">                offTrackTimer = new Timer(2000, e -&gt; {</span>
+<span class="fc" id="L192">                offTrackTimer = new Timer(2000, e -&gt; {</span>
                     // Después de 2 segundos, volver a RUNNING pero mantener la penalización
-<span class="fc" id="L191">                    model.setCurrentState(Map.State.RUNNING);</span>
-<span class="fc" id="L192">                    offTrackTimer.stop();</span>
-<span class="fc" id="L193">                });</span>
-<span class="fc" id="L194">                offTrackTimer.setRepeats(false);</span>
-<span class="fc" id="L195">                offTrackTimer.start();</span>
-<span class="fc" id="L196">            } </span>
+<span class="fc" id="L194">                    model.setCurrentState(Map.State.RUNNING);</span>
+<span class="fc" id="L195">                    offTrackTimer.stop();</span>
+<span class="fc" id="L196">                });</span>
+<span class="fc" id="L197">                offTrackTimer.setRepeats(false);</span>
+<span class="fc" id="L198">                offTrackTimer.start();</span>
+            } 
             else 
             {
-<span class="fc" id="L199">                model.setCurrentState(Map.State.RUNNING);</span>
+<span class="fc" id="L202">                model.setCurrentState(Map.State.RUNNING);</span>
             }
-<span class="fc" id="L201">        } </span>
+        } 
         else 
         {
-<span class="fc" id="L204">            model.setCurrentState(Map.State.OFF_TRACK);</span>
+<span class="fc" id="L207">            model.setCurrentState(Map.State.OFF_TRACK);</span>
         }
-<span class="fc" id="L206">    }</span>
+<span class="fc" id="L209">    }</span>
     
     //Función para empezar la vuelta una vez pasado por línea de meta, resetando todos los valores necesarios
     public void startLap() 
     {
-<span class="fc" id="L211">        stopAllTimers();</span>
-<span class="fc" id="L212">        model.setLapStartTime(timeProvider.now());</span>
-<span class="fc" id="L213">        model.resetSectors();</span>
-<span class="fc" id="L214">        model.getPassedCheckpoints().clear();</span>
-<span class="fc" id="L215">        model.setNextCheckpointIndex(0);</span>
-<span class="fc" id="L216">        model.setCurrentState(Map.State.RUNNING);</span>
-<span class="fc" id="L217">    }</span>
+<span class="fc" id="L214">        stopAllTimers();</span>
+<span class="fc" id="L215">        model.setLapStartTime(timeProvider.now());</span>
+<span class="fc" id="L216">        model.resetSectors();</span>
+<span class="fc" id="L217">        model.getPassedCheckpoints().clear();</span>
+<span class="fc" id="L218">        model.setNextCheckpointIndex(0);</span>
+<span class="fc" id="L219">        model.setCurrentState(Map.State.RUNNING);</span>
+<span class="fc" id="L220">    }</span>
 
     //Función para empezar una carrera, visualizando la cuenta atrás
     public void startRaceMode() {
-<span class="fc" id="L221">        stopAllTimers();</span>
-<span class="fc" id="L222">        model.setRaceMode(true);</span>
-<span class="fc" id="L223">        model.startCountdown();</span>
+<span class="fc" id="L224">        stopAllTimers();</span>
+<span class="fc" id="L225">        model.setRaceMode(true);</span>
+<span class="fc" id="L226">        model.startCountdown();</span>
         //Simular que el countdown termina directament pels tests
-<span class="fc bfc" id="L225" title="All 2 branches covered.">        if(isSkipEnabled)</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        if(isSkipEnabled)</span>
         {
-<span class="fc" id="L227">            model.startRace();</span>
-<span class="fc" id="L228">        }</span>
+<span class="fc" id="L230">            model.startRace();</span>
+        }
         else 
         {
             // Timer para actualizar la cuenta atrás
-<span class="fc" id="L232">            countdownTimer = new Timer(100, e -&gt; {updateCountdown();});</span>
-<span class="fc" id="L233">            countdownTimer.start();</span>
+<span class="fc" id="L235">            countdownTimer = new Timer(100, e -&gt; {updateCountdown();});</span>
+<span class="fc" id="L236">            countdownTimer.start();</span>
         }
-<span class="fc" id="L235">    }</span>
+<span class="fc" id="L238">    }</span>
     
     //Función para empezar qualy/practice mode
     public void startQualyMode() 
     {
-<span class="fc" id="L240">        stopAllTimers();</span>
-<span class="fc" id="L241">        model.setRaceMode(false);</span>
-<span class="fc" id="L242">        reset();</span>
-<span class="fc" id="L243">    }</span>
+<span class="fc" id="L243">        stopAllTimers();</span>
+<span class="fc" id="L244">        model.setRaceMode(false);</span>
+<span class="fc" id="L245">        reset();</span>
+<span class="fc" id="L246">    }</span>
     
     //Si se ha pasado por línea de meta y la vuelta se da por finalizada se muestra el resultado o se incrementa vuelta en RACE
     private void endLap() 
     {
         //Calcular el tiempo base de la vuelta
-<span class="fc" id="L249">        long baseLapTime = timeProvider.now() - model.getLapStartTime();</span>
+<span class="fc" id="L252">        long baseLapTime = timeProvider.now() - model.getLapStartTime();</span>
 
         //Copiar los arrays de sectores para pasarlos al overlay
-<span class="fc" id="L252">        model.copyCurrentToLastSectors();</span>
+<span class="fc" id="L255">        model.copyCurrentToLastSectors();</span>
 
         //Cambiar estado a vuelta completada
-<span class="fc" id="L255">        model.setCurrentState(Map.State.RESULT);</span>
+<span class="fc" id="L258">        model.setCurrentState(Map.State.RESULT);</span>
         
         //Si no tiene castigos y es su mejor vuelta, asignarlo
-<span class="fc bfc" id="L258" title="All 2 branches covered.">        if (!model.isLapHasPenalty()) </span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">        if (!model.isLapHasPenalty()) </span>
         {
-<span class="fc bfc" id="L260" title="All 2 branches covered.">            if(baseLapTime &lt; model.getBestLapTimeFinish())</span>
-<span class="fc" id="L261">                model.setBestLapTime(baseLapTime);</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">            if(baseLapTime &lt; model.getBestLapTimeFinish())</span>
+<span class="fc" id="L264">                model.setBestLapTime(baseLapTime);</span>
         }
 
         //Si estamos en carrera, incrementar vuelta
-<span class="fc bfc" id="L265" title="All 2 branches covered.">        if(model.isRaceMode()) </span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">        if(model.isRaceMode()) </span>
         { 
-<span class="fc" id="L267">            model.incrementLap();</span>
+<span class="fc" id="L270">            model.incrementLap();</span>
         }
 
         //Si la carrera no se ha acabado o estamos en modo qualy
-<span class="fc bfc" id="L271" title="All 2 branches covered.">        if(model.getState() != Map.State.RACE_FINISHED)</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">        if(model.getState() != Map.State.RACE_FINISHED)</span>
         {
             //Branch para poder testear sin timers
-<span class="fc bfc" id="L274" title="All 2 branches covered.">            if(!isSkipEnabled)</span>
+<span class="fc bfc" id="L277" title="All 2 branches covered.">            if(!isSkipEnabled)</span>
             {
                 //Enseñar los resultados de la vuelta y preparar la siguiente
-<span class="fc" id="L277">                stopAllTimers();</span>
-<span class="fc" id="L278">                resultTimer = new Timer(3000, e -&gt; </span>
+<span class="fc" id="L280">                stopAllTimers();</span>
+<span class="fc" id="L281">                resultTimer = new Timer(3000, e -&gt; </span>
                 {
-<span class="fc" id="L280">                    model.setCurrentState(Map.State.IDLE);</span>
-<span class="fc" id="L281">                    startLap();</span>
-<span class="fc" id="L282">                    model.setLapStartTime(timeProvider.now() - 3000);</span>
-<span class="fc" id="L283">                    resultTimer.stop();</span>
-<span class="fc" id="L284">                });</span>
-<span class="fc" id="L285">                resultTimer.setRepeats(false);</span>
-<span class="fc" id="L286">                resultTimer.start();</span>
-<span class="fc" id="L287">            }</span>
+<span class="fc" id="L283">                    model.setCurrentState(Map.State.IDLE);</span>
+<span class="fc" id="L284">                    startLap();</span>
+<span class="fc" id="L285">                    model.setLapStartTime(timeProvider.now() - 3000);</span>
+<span class="fc" id="L286">                    resultTimer.stop();</span>
+<span class="fc" id="L287">                });</span>
+<span class="fc" id="L288">                resultTimer.setRepeats(false);</span>
+<span class="fc" id="L289">                resultTimer.start();</span>
+            }
             else
             {
                 //Empezar siguiente vuelta sin enseñar los resultados, solo para testing
-<span class="fc" id="L291">                model.setCurrentState(Map.State.IDLE);</span>
-<span class="fc" id="L292">                startLap();</span>
-<span class="fc" id="L293">                model.setLapStartTime(timeProvider.now() - 3000);</span>
+<span class="fc" id="L294">                model.setCurrentState(Map.State.IDLE);</span>
+<span class="fc" id="L295">                startLap();</span>
+<span class="fc" id="L296">                model.setLapStartTime(timeProvider.now() - 3000);</span>
             }
         }
-<span class="fc" id="L296">    }</span>
+<span class="fc" id="L299">    }</span>
 
     //Controlar que el jugador no maneje en sentido contrario
     public void handleInvalidLap() 
     {
-<span class="fc bfc" id="L301" title="All 2 branches covered.">        if (model.isRaceMode()) </span>
+<span class="fc bfc" id="L304" title="All 2 branches covered.">        if (model.isRaceMode()) </span>
         {
             //En modo RACE: sumar 30 segundos de penalización
-<span class="fc bfc" id="L304" title="All 2 branches covered.">            if (!model.isLapHasPenalty()) {</span>
-<span class="fc" id="L305">                model.setCurrentLapPenalty(model.getCurrentLapPenalty() + 30000); </span>
-<span class="fc" id="L306">                model.setLapHasPenalty(true);</span>
+<span class="fc bfc" id="L307" title="All 2 branches covered.">            if (!model.isLapHasPenalty()) {</span>
+<span class="fc" id="L308">                model.setCurrentLapPenalty(model.getCurrentLapPenalty() + 30000); </span>
+<span class="fc" id="L309">                model.setLapHasPenalty(true);</span>
             }
             
             //Mostrar el estado INVALID_LAP temporalmente
-<span class="fc" id="L310">            model.setCurrentState(Map.State.INVALID_LAP);</span>
-<span class="fc" id="L311">            stopAllTimers();</span>
+<span class="fc" id="L313">            model.setCurrentState(Map.State.INVALID_LAP);</span>
+<span class="fc" id="L314">            stopAllTimers();</span>
             
             //Branch para poder testear sin timers
-<span class="fc bfc" id="L314" title="All 2 branches covered.">            if (!isSkipEnabled) </span>
+<span class="fc bfc" id="L317" title="All 2 branches covered.">            if (!isSkipEnabled) </span>
             {
-<span class="fc" id="L316">                offTrackTimer = new Timer(2000, e -&gt; {</span>
+<span class="fc" id="L319">                offTrackTimer = new Timer(2000, e -&gt; {</span>
                     //Después de 2 segundos, volver a RUNNING pero mantener la penalización
-<span class="fc" id="L318">                    model.setCurrentState(Map.State.RUNNING);</span>
-<span class="fc" id="L319">                    offTrackTimer.stop();</span>
-<span class="fc" id="L320">                });</span>
-<span class="fc" id="L321">                offTrackTimer.setRepeats(false);</span>
-<span class="fc" id="L322">                offTrackTimer.start();</span>
-<span class="fc" id="L323">            } </span>
+<span class="fc" id="L321">                    model.setCurrentState(Map.State.RUNNING);</span>
+<span class="fc" id="L322">                    offTrackTimer.stop();</span>
+<span class="fc" id="L323">                });</span>
+<span class="fc" id="L324">                offTrackTimer.setRepeats(false);</span>
+<span class="fc" id="L325">                offTrackTimer.start();</span>
+            } 
             else 
             {
-<span class="fc" id="L326">                model.setCurrentState(Map.State.RUNNING);</span>
+<span class="fc" id="L329">                model.setCurrentState(Map.State.RUNNING);</span>
             }
-<span class="fc" id="L328">        } </span>
+        } 
         else 
         {
             //En QUALY: se invalida el tiempo de la vuelta
-<span class="fc" id="L332">            invalidateLap();</span>
+<span class="fc" id="L335">            invalidateLap();</span>
         }
-<span class="fc" id="L334">    }</span>
+<span class="fc" id="L337">    }</span>
     
     //Si el jugador no sigue el camino correcto del circuito se le invalida la vuelta
     public void invalidateLap() 
     {
         // Solo invalidar en modo QUALY
-<span class="fc bfc" id="L340" title="All 2 branches covered.">        if (!model.isRaceMode()) {</span>
-<span class="fc" id="L341">            model.setCurrentState(Map.State.INVALID_LAP);</span>
-<span class="fc" id="L342">            stopAllTimers();</span>
-<span class="fc" id="L343">            offTrackTimer = new Timer(3500, e -&gt; {</span>
-<span class="fc" id="L344">                model.setCurrentState(Map.State.IDLE);</span>
-<span class="fc" id="L345">                offTrackTimer.stop();</span>
-<span class="fc" id="L346">            });</span>
-<span class="fc" id="L347">            offTrackTimer.setRepeats(false);</span>
-<span class="fc" id="L348">            offTrackTimer.start();</span>
+<span class="fc bfc" id="L343" title="All 2 branches covered.">        if (!model.isRaceMode()) {</span>
+<span class="fc" id="L344">            model.setCurrentState(Map.State.INVALID_LAP);</span>
+<span class="fc" id="L345">            stopAllTimers();</span>
+<span class="fc" id="L346">            offTrackTimer = new Timer(3500, e -&gt; {</span>
+<span class="fc" id="L347">                model.setCurrentState(Map.State.IDLE);</span>
+<span class="fc" id="L348">                offTrackTimer.stop();</span>
+<span class="fc" id="L349">            });</span>
+<span class="fc" id="L350">            offTrackTimer.setRepeats(false);</span>
+<span class="fc" id="L351">            offTrackTimer.start();</span>
         }
-<span class="fc" id="L350">    }</span>
+<span class="fc" id="L353">    }</span>
     
     //Función de reset de variables de vuelta
     public void reset() 
     {
-<span class="fc" id="L355">        stopAllTimers();</span>
-<span class="fc bfc" id="L356" title="All 2 branches covered.">        if (model.getState() == Map.State.RUNNING) </span>
+<span class="fc" id="L358">        stopAllTimers();</span>
+<span class="fc bfc" id="L359" title="All 2 branches covered.">        if (model.getState() == Map.State.RUNNING) </span>
         {
-<span class="fc" id="L358">            model.setCurrentState(Map.State.IDLE);</span>
+<span class="fc" id="L361">            model.setCurrentState(Map.State.IDLE);</span>
         }
-<span class="fc" id="L360">        model.getPassedCheckpoints().clear();</span>
-<span class="fc" id="L361">        model.setNextCheckpointIndex(0);</span>
-<span class="fc" id="L362">        model.setLapTime(0);</span>
-<span class="fc" id="L363">        model.resetSectors();</span>
-<span class="fc" id="L364">    }</span>
+<span class="fc" id="L363">        model.getPassedCheckpoints().clear();</span>
+<span class="fc" id="L364">        model.setNextCheckpointIndex(0);</span>
+<span class="fc" id="L365">        model.setLapTime(0);</span>
+<span class="fc" id="L366">        model.resetSectors();</span>
+<span class="fc" id="L367">    }</span>
     
     //Función para parar todos los timers y evitar descontrol de variables sobreescritas
     public void stopAllTimers() 
     {
-<span class="fc bfc" id="L369" title="All 4 branches covered.">        if (resultTimer != null &amp;&amp; resultTimer.isRunning()) </span>
+<span class="fc bfc" id="L372" title="All 4 branches covered.">        if (resultTimer != null &amp;&amp; resultTimer.isRunning()) </span>
         {
-<span class="fc" id="L371">            resultTimer.stop();</span>
+<span class="fc" id="L374">            resultTimer.stop();</span>
         }
-<span class="fc bfc" id="L373" title="All 4 branches covered.">        if (offTrackTimer != null &amp;&amp; offTrackTimer.isRunning()) </span>
+<span class="fc bfc" id="L376" title="All 4 branches covered.">        if (offTrackTimer != null &amp;&amp; offTrackTimer.isRunning()) </span>
         {
-<span class="fc" id="L375">            offTrackTimer.stop();</span>
+<span class="fc" id="L378">            offTrackTimer.stop();</span>
         }
-<span class="fc bfc" id="L377" title="All 4 branches covered.">        if (countdownTimer != null &amp;&amp; countdownTimer.isRunning()) </span>
+<span class="fc bfc" id="L380" title="All 4 branches covered.">        if (countdownTimer != null &amp;&amp; countdownTimer.isRunning()) </span>
         {
-<span class="fc" id="L379">            countdownTimer.stop();</span>
+<span class="fc" id="L382">            countdownTimer.stop();</span>
         }
-<span class="fc" id="L381">    }</span>
+<span class="fc" id="L384">    }</span>
     
     //Si se detecta que se ha finalizado un sector, se cuenta el tiempo y se determina qué color es dependiendo del tiempo
     public void recordSector(int sectorIndex, long sectorTime) 
     {
         //Comprobar que el sector existe
-<span class="fc bfc" id="L387" title="All 4 branches covered.">        if (sectorIndex &lt; 0 || sectorIndex &gt;= model.getNumSectors()) return;</span>
+<span class="fc bfc" id="L390" title="All 4 branches covered.">        if (sectorIndex &lt; 0 || sectorIndex &gt;= model.getNumSectors()) return;</span>
         
         //Asignar el tiempo establecido
-<span class="fc" id="L390">        model.setSectorTime(sectorIndex, sectorTime);</span>
-<span class="fc" id="L391">        model.setSectorRecorded(sectorIndex, true);</span>
+<span class="fc" id="L393">        model.setSectorTime(sectorIndex, sectorTime);</span>
+<span class="fc" id="L394">        model.setSectorRecorded(sectorIndex, true);</span>
         
         //Obtener los mejores tiempos de sector
-<span class="fc" id="L394">        long previousLocalBest = model.getBestSectorTime(sectorIndex);</span>
-<span class="fc" id="L395">        long previousGlobalBest = LongStream.of(model.getBestSectorTimes()).min().orElse(Long.MAX_VALUE);</span>
+<span class="fc" id="L397">        long previousLocalBest = model.getBestSectorTime(sectorIndex);</span>
         
         //Si es una mejora local, determinar verde, en caso contrario naranja
-<span class="fc bfc" id="L398" title="All 2 branches covered.">        if (sectorTime &lt; previousLocalBest) </span>
+<span class="fc bfc" id="L400" title="All 2 branches covered.">        if (sectorTime &lt; previousLocalBest) </span>
         {
-<span class="fc" id="L400">            model.setBestSectorTime(sectorIndex, sectorTime);</span>
-<span class="fc" id="L401">            model.setSectorColor(sectorIndex, Map.SectorColor.GREEN);</span>
-<span class="fc" id="L402">        } </span>
+<span class="fc" id="L402">            model.setBestSectorTime(sectorIndex, sectorTime);</span>
+<span class="fc" id="L403">            model.setSectorColor(sectorIndex, Map.SectorColor.GREEN);</span>
+        } 
         else 
         {
-<span class="fc" id="L405">            model.setSectorColor(sectorIndex, Map.SectorColor.ORANGE);</span>
+<span class="fc" id="L407">            model.setSectorColor(sectorIndex, Map.SectorColor.ORANGE);</span>
+<span class="fc" id="L408">            return;</span>
         }
         
-<span class="fc" id="L408">        long newGlobalBest = LongStream.of(model.getBestSectorTimes()).min().orElse(Long.MAX_VALUE);</span>
-        
-        //Si es el mejor tiempo de todos los coches, determinar morado
-<span class="fc bfc" id="L411" title="All 4 branches covered.">        if (previousGlobalBest != Long.MAX_VALUE &amp;&amp; newGlobalBest &lt; previousGlobalBest) </span>
+<span class="fc" id="L411">        long min = Long.MAX_VALUE;</span>
+<span class="fc bfc" id="L412" title="All 2 branches covered.">        if(model.isRaceMode())</span>
         {
-<span class="pc bpc" id="L413" title="1 of 2 branches missed.">            if (model.getBestSectorTime(sectorIndex) == newGlobalBest) </span>
-<span class="fc" id="L414">                model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);</span>
+<span class="fc bfc" id="L414" title="All 2 branches covered.">            for(AICar aicar : aiController.getAICars())</span>
+            {
+<span class="fc" id="L416">                Long aiTime = aicar.getSectorTimes()[sectorIndex];</span>
+<span class="fc bfc" id="L417" title="All 2 branches covered.">                if(aiTime &lt; min)</span>
+                {
+<span class="fc" id="L419">                    min = aiTime;</span>
+                }
+<span class="fc" id="L421">            }</span>
+
+<span class="fc bfc" id="L423" title="All 2 branches covered.">            if(min &gt; sectorTime)</span>
+            {
+<span class="pc bpc" id="L425" title="1 of 2 branches missed.">                if(previousLocalBest &gt; sectorTime)</span>
+                {
+<span class="fc" id="L427">                    model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);</span>
+                }
+                else
+                {
+<span class="nc" id="L431">                    model.setSectorColor(sectorIndex, Map.SectorColor.GREEN);</span>
+                }
+            }
         }
-<span class="fc" id="L416">    }</span>
+<span class="fc" id="L435">    }</span>
     
     //Función para pruebas mock
     public void setTimeProvider(TimeProvider timeProvider)
     {
-<span class="fc" id="L421">        this.timeProvider = timeProvider;</span>
-<span class="fc" id="L422">        this.model.setTimeProvider(timeProvider);</span>
-<span class="fc" id="L423">    }</span>
+<span class="fc" id="L440">        this.timeProvider = timeProvider;</span>
+<span class="fc" id="L441">        this.model.setTimeProvider(timeProvider);</span>
+<span class="fc" id="L442">    }</span>
 
     //Getters
-<span class="fc" id="L426">    public Map getModel() { return model;} </span>
-<span class="fc" id="L427">    public Timer getOffTrackTimer() { return offTrackTimer; }</span>
-<span class="fc" id="L428">    public Timer getCountdownTimer() { return countdownTimer; }</span>
+<span class="fc" id="L445">    public Map getModel() { return model;} </span>
+<span class="fc" id="L446">    public Timer getOffTrackTimer() { return offTrackTimer; }</span>
+<span class="fc" id="L447">    public Timer getCountdownTimer() { return countdownTimer; }</span>
 
     //Setters
-<span class="fc" id="L431">    public void setMap(Map map) {this.model = map;}</span>
-<span class="fc" id="L432">    public void setSkip(boolean isSkip) { this.isSkipEnabled = isSkip;}</span>
+<span class="fc" id="L450">    public void setMap(Map map) {this.model = map;}</span>
+<span class="fc" id="L451">    public void setSkip(boolean isSkip) { this.isSkipEnabled = isSkip;}</span>
+<span class="fc" id="L452">    public void setAIController(AIController aiController) { this.aiController = aiController;}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

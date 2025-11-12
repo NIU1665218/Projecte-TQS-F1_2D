@@ -1,6 +1,7 @@
 package es.uab.tqs.f1_2D.controlador;
 
 
+import es.uab.tqs.f1_2D.model.AICar;
 import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.model.Map;
 import es.uab.tqs.f1_2D.model.TimeProvider;
@@ -29,7 +30,9 @@ class MapControllerTest
 {
 
     private Map track;
+    private Car playerCar;
     private MapController trackController;
+    private AIController aiController;
     private static final int testMapHeight = 500;
     private static final int testMapWidth = 500;
     private Rectangle finish;
@@ -52,9 +55,12 @@ class MapControllerTest
         checkpoints.add(new Rectangle(400, 200, 80, 80));
 
         track = new Map(testMapWidth, testMapHeight, finish, checkpoints);
+
         trackController = new MapController(track);
         trackController.setTimeProvider(System::currentTimeMillis);
         mockTime = Mockito.mock(TimeProvider.class);
+        playerCar = new Car(0, 0, 0, 0, 10, -5, 0.2, 0.1, 400, 400);
+        aiController = new AIController(track, playerCar);
     }
 
     /* 
@@ -226,7 +232,10 @@ class MapControllerTest
 
     @Test
     //Establecimiento de un sector en morado
-    public void testRecordSectorPurpleSet() {
+    public void testRecordSectorPurpleSet() 
+    {
+        track.setRaceMode(true);
+        trackController.setAIController(aiController);
         trackController.recordSector(0, 1000L); 
         trackController.recordSector(0, 900L);  
         assertEquals(SectorColor.PURPLE, track.getSectorColor(0));
@@ -775,25 +784,33 @@ class MapControllerTest
         assertEquals(Map.State.RUNNING, track.getState());
     }
 
-    /*
+    
     @Test
     void testSectorPartitions() 
     {
         // Configurar mejores tiempos existentes
+        track.setRaceMode(true);
         track.setBestSectorTime(0, 1000L);
         track.setBestSectorTime(1, 2000L);
+        trackController.setAIController(aiController);
+        List<AICar> aiCars = aiController.getAICars();
+        aiCars.get(0).setSectorTime(1, 200L);
+        aiCars.get(1).setSectorTime(0, 950L);
         
         trackController.recordSector(0, 800L);
         
         assertEquals(Map.SectorColor.PURPLE, track.getSectorColor(0));
+        track.setBestSectorTime(0, 1750L);
         
         trackController.recordSector(0, 1800L);
         assertEquals(Map.SectorColor.ORANGE, track.getSectorColor(0));
 
         trackController.recordSector(0, 1700L);
         assertEquals(Map.SectorColor.GREEN, track.getSectorColor(0));
+
+        trackController.recordSector(1, 1700L);
+        assertEquals(Map.SectorColor.GREEN, track.getSectorColor(0));
     }
-    */
 
     /* 
       =============================================================================
@@ -998,6 +1015,7 @@ class MapControllerTest
     void testIncrementLapInRaceMode() 
     {
         when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L, 3500L);
+        trackController.setAIController(aiController);
         trackController.setTimeProvider(mockTime);
         trackController.setSkip(true);
         trackController.startRaceMode();
@@ -1021,6 +1039,7 @@ class MapControllerTest
     void testRaceCompletion() 
     {
         when(mockTime.now()).thenReturn(1000L, 1500L, 2000L, 2500L, 3000L, 3500L, 4000L, 4500L, 5000L, 5500L);
+        trackController.setAIController(aiController);
         trackController.setTimeProvider(mockTime);
         trackController.setSkip(true);
         trackController.startRaceMode();

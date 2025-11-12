@@ -63,6 +63,7 @@
             Arrays.fill(bestSectorTimes, Long.MAX_VALUE);
             Arrays.fill(sectorColors, Map.SectorColor.NONE);
             Arrays.fill(sectorRecorded, false);
+            Arrays.fill(sectorTimes, Long.MAX_VALUE);
             
             //Inicializar variables que dependen de skill level
             setupAIParameters();
@@ -302,7 +303,7 @@
         public void startNewLap() 
         {
             this.lapStartTime = timeProvider.now();
-            Arrays.fill(sectorTimes, 0L);
+            Arrays.fill(sectorTimes, Long.MAX_VALUE);
             Arrays.fill(sectorRecorded, false);
             Arrays.fill(sectorColors, Map.SectorColor.NONE);
             passedCheckpoints.clear();
@@ -384,6 +385,7 @@
         public void setNextCheckpointIndex(int index) { this.nextCheckpointIndex = index; }
         public void setTimeProvider(TimeProvider timeProvider) {this.timeProvider = timeProvider;}
         public void setCurrentLap(int lap) {this.currentLap = lap;}
+        public void setSectorTime(int index, long time) {sectorTimes[index] = time;}
         public void setPlayerCar(Car playerCar) {this.playerCar = playerCar;}
         public void setCurrentTargetIndex(int index) {this.currentTargetIndex = index;}
         public void setCheckpointPassed(int checkPoint) {this.passedCheckpoints.add(checkPoint);}

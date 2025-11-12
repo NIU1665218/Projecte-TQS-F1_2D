@@ -78,8 +78,8 @@ public class CarDisplay extends JPanel
         this.collisionMap = collisionMap1;
 
         // Configurar el mapa de la pista
-        checkpoints.add(new Rectangle(4548, 940, 40, 230)); 
-        checkpoints.add(new Rectangle(5484, 100, 20, 230));
+        checkpoints.add(new Rectangle(4548, 900, 40, 270)); 
+        checkpoints.add(new Rectangle(5484, 100, 40, 230));
         checkpoints.add(new Rectangle(1330, 1216, 350, 50));
         checkpoints.add(new Rectangle(400, 2344, 350, 50));
 
@@ -124,13 +124,15 @@ public class CarDisplay extends JPanel
 
         // Cargar el sprite del coche i dels IACars
         loadCarSprite(controller.getCar(), "/img/ferrari_car.png");
+        /* 
         Timer initializationTimer = new Timer(100, e -> {
             loadAICarSprites();
         });
         //Indicar que nomès es realitzi un cop el timer i l'executem
         initializationTimer.setRepeats(false);
         initializationTimer.start();
-
+        */
+        loadAICarSprites();
         // Configurar listeners de teclat
         addKeyListener(new KeyAdapter() 
         {
@@ -234,7 +236,8 @@ public class CarDisplay extends JPanel
             trackMapController.startRaceMode();
             trackMap.setTotalLaps(3); 
             //Inicialitzar el controlador pels cotxes IA
-            this.aiController = new AIController(trackMap, controller.getCar());     
+            this.aiController = new AIController(trackMap, controller.getCar());   
+            trackMapController.setAIController(aiController);  
             loadAICarSprites();     
         }
         else
@@ -464,7 +467,7 @@ public class CarDisplay extends JPanel
         
         //Definició del layout semitransparent
         g.setColor(new Color(0, 0, 0, 180)); 
-        g.fillRect(10, 120, 250, 550);
+        g.fillRect(10, 120, 300, 550);
         
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 18));
@@ -483,7 +486,7 @@ public class CarDisplay extends JPanel
         g.setColor(Color.YELLOW);
         int playerPosition = getPlayerPosition();
         String playerTime = formatTime(trackMap.getLapTime());
-        g.drawString(playerPosition + ". PLAYER - " + playerTime, startX, startY + lineHeight);
+        g.drawString(playerPosition + ". PLAYER - " + playerTime + " - L" + trackMap.getCurrentLap() + "/3", startX, startY + lineHeight);
         
         //AI Cars
         g.setColor(Color.WHITE);
@@ -694,8 +697,8 @@ public class CarDisplay extends JPanel
 
         g2d.setColor(new Color(255, 0, 0, 100)); 
         checkpoints.add(new Rectangle(1600, 650, 100, 250));
-        checkpoints.add(new Rectangle(4548, 940, 40, 230));
-        checkpoints.add(new Rectangle(5484, 100, 20, 230));
+        checkpoints.add(new Rectangle(4548, 900, 40, 270));
+        checkpoints.add(new Rectangle(5484, 100, 40, 230));
         checkpoints.add(new Rectangle(1330, 1216, 350, 50));
         checkpoints.add(new Rectangle(400, 2344, 350, 50));
         for (Rectangle cp : checkpoints) 
@@ -708,7 +711,7 @@ public class CarDisplay extends JPanel
             );
         }
         */
-
+    
         if(trackMap.isRaceMode())
         {
             //Dibujar  tots els cotxes IA

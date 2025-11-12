@@ -368,11 +368,6 @@ public class AIController
             
             //Actualizar color a PURPLE para este coche
             aiCar.getSectorColors()[sectorIndex] = Map.SectorColor.PURPLE;
-            
-            if (sectorTime < trackMap.getBestSectorTime(sectorIndex)) 
-            {
-                trackMap.setBestSectorTime(sectorIndex, sectorTime);
-            }
         }
     }
 

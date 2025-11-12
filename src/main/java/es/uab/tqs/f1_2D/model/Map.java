@@ -145,6 +145,10 @@ public class Map
         setCurrentLapPenalty(0);
         setLapHasPenalty(false);
         setRaceMode(false);
+        Arrays.fill(bestSectorTimes, Long.MAX_VALUE);
+        Arrays.fill(sectorColors, SectorColor.NONE);
+        Arrays.fill(sectorRecorded, false);
+        Arrays.fill(lastCompletedSectorColors, SectorColor.NONE);
     }
     
     // Incrementar vuelta
@@ -191,7 +195,6 @@ public class Map
         if(i < 0 || i >= numSectors) return 0L;
         return bestSectorTimes[i]; 
     }
-    public long[] getBestSectorTimes() { return bestSectorTimes; }
     public long getCountdownEndTime() { return countdownEndTime; }    
     public int getCountdownSeconds() { return countdownSeconds; }
     public boolean isCountdownActive() { return currentState == State.COUNTDOWN; }

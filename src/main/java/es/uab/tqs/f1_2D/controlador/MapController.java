@@ -1,11 +1,10 @@
 package es.uab.tqs.f1_2D.controlador;
 
+import es.uab.tqs.f1_2D.model.AICar;
 import es.uab.tqs.f1_2D.model.Map;
 import es.uab.tqs.f1_2D.model.TimeProvider;
 
 import javax.swing.Timer;
-
-import java.util.stream.LongStream;
 
 public class MapController 
 {
@@ -15,6 +14,7 @@ public class MapController
     private Timer offTrackTimer;
     private Timer countdownTimer;
     private boolean isSkipEnabled = false; //variable para testing timer
+    private AIController aiController;
     
     public MapController(Map model) 
     {
@@ -109,11 +109,14 @@ public class MapController
             int lastSectorIndex = model.getNumSectors() - 1;
             if (!model.getSectorRecorded()[lastSectorIndex]) 
             {
-                long now = timeProvider.now();
-                long totalSinceStart = now - model.getLapStartTime();
-                long prevSum = model.sum(model.getSectorTimes(), lastSectorIndex);
-                long sectorTime = totalSinceStart - prevSum;
-                recordSector(lastSectorIndex, sectorTime);
+                if(model.getNextCheckpointIndex() != 0)
+                {
+                    long now = timeProvider.now();
+                    long totalSinceStart = now - model.getLapStartTime();
+                    long prevSum = model.sum(model.getSectorTimes(), lastSectorIndex);
+                    long sectorTime = totalSinceStart - prevSum;
+                    recordSector(lastSectorIndex, sectorTime);
+                }
             }
             
             //Si ya ha pasado por todos los checkpoints acaba vuelta, en caso contrario la vuelve a empezar
@@ -392,7 +395,6 @@ public class MapController
         
         //Obtener los mejores tiempos de sector
         long previousLocalBest = model.getBestSectorTime(sectorIndex);
-        long previousGlobalBest = LongStream.of(model.getBestSectorTimes()).min().orElse(Long.MAX_VALUE);
         
         //Si es una mejora local, determinar verde, en caso contrario naranja
         if (sectorTime < previousLocalBest) 
@@ -403,15 +405,32 @@ public class MapController
         else 
         {
             model.setSectorColor(sectorIndex, Map.SectorColor.ORANGE);
+            return;
         }
         
-        long newGlobalBest = LongStream.of(model.getBestSectorTimes()).min().orElse(Long.MAX_VALUE);
-        
-        //Si es el mejor tiempo de todos los coches, determinar morado
-        if (previousGlobalBest != Long.MAX_VALUE && newGlobalBest < previousGlobalBest) 
+        long min = Long.MAX_VALUE;
+        if(model.isRaceMode())
         {
-            if (model.getBestSectorTime(sectorIndex) == newGlobalBest) 
-                model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);
+            for(AICar aicar : aiController.getAICars())
+            {
+                Long aiTime = aicar.getSectorTimes()[sectorIndex];
+                if(aiTime < min)
+                {
+                    min = aiTime;
+                }
+            }
+
+            if(min > sectorTime)
+            {
+                if(previousLocalBest > sectorTime)
+                {
+                    model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);
+                }
+                else
+                {
+                    model.setSectorColor(sectorIndex, Map.SectorColor.GREEN);
+                }
+            }
         }
     }
     
@@ -430,4 +449,5 @@ public class MapController
     //Setters
     public void setMap(Map map) {this.model = map;}
     public void setSkip(boolean isSkip) { this.isSkipEnabled = isSkip;}
+    public void setAIController(AIController aiController) { this.aiController = aiController;}
 }

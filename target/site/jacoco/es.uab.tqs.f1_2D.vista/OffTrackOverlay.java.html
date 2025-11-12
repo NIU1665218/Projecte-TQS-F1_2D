@@ -16,8 +16,8 @@ public class OffTrackOverlay extends JPanel
     private boolean visible;
 
     //Constructor
-<span class="fc" id="L19">    public OffTrackOverlay(String imageResourcePath, String soundResourcePath) </span>
-    {
+    public OffTrackOverlay(String imageResourcePath, String soundResourcePath) 
+<span class="fc" id="L20">    {</span>
         //Inicializar el panel de forma que no sea visible y sea transparente
 <span class="fc" id="L22">        setOpaque(false);</span>
 <span class="fc" id="L23">        this.visible = false;</span>
@@ -33,17 +33,17 @@ public class OffTrackOverlay extends JPanel
 <span class="fc" id="L33">        URL imageUrl = null;</span>
         try {
 <span class="fc" id="L35">            imageUrl = getClass().getResource(path);</span>
-<span class="fc" id="L36">        }</span>
+        }
 <span class="fc" id="L37">        catch (NullPointerException | IllegalArgumentException e) { </span>
             //Si hay excepción se queda en null
-        }
+<span class="fc" id="L39">        }</span>
 
 
         //Si se encuentra la imagen se crea el icon, en caso contrario lo deja en null
 <span class="fc bfc" id="L43" title="All 2 branches covered.">        if (imageUrl != null) </span>
         {
 <span class="fc" id="L45">            imageIcon = new ImageIcon(imageUrl);</span>
-<span class="fc" id="L46">        }</span>
+        }
         else
         {
 <span class="fc" id="L49">            imageIcon = null;</span>
@@ -69,8 +69,8 @@ public class OffTrackOverlay extends JPanel
 <span class="fc" id="L69">                clip.open(audioStream);</span>
 <span class="fc" id="L70">            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {</span>
 <span class="fc" id="L71">                clip = null; //Si hay error, lo dejamos en null</span>
-            }
-<span class="fc" id="L73">        }</span>
+<span class="fc" id="L72">            }</span>
+        }
         else
         {
 <span class="fc" id="L76">            clip = null; //si no encuentra el audio, lo dejamos en null</span>
