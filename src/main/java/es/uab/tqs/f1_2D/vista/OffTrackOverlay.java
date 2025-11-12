@@ -70,7 +70,7 @@ public class OffTrackOverlay extends JPanel
                 } catch (IllegalArgumentException | LineUnavailableException e) {
                     clip = null;
                 }
-                clip.open(audioStream);
+                if(clip != null) clip.open(audioStream);
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 clip = null; //Si hay error, lo dejamos en null
             }

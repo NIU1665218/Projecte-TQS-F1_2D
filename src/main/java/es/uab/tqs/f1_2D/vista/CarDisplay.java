@@ -49,7 +49,7 @@ public class CarDisplay extends JPanel
     private boolean inMainMenu = true;
     private MainMenu mainMenu;
     private GameMode currentGameMode = GameMode.QUALY;
-    private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    private Dimension screenSize;
 
     //Diferents modes de Joc
     public enum GameMode 
@@ -61,6 +61,14 @@ public class CarDisplay extends JPanel
     // Constructor
     public CarDisplay(CarController controller, BufferedImage map, BufferedImage collisionMap1) 
     {
+        try 
+        {
+            screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        }
+        catch(Exception e)
+        {
+            screenSize.setSize(1920, 1080);
+        }
         //Inicialitzar controlador
         this.controller = controller;
         
