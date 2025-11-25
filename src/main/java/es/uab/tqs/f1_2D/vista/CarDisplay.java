@@ -16,7 +16,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-
+import java.io.Console;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -354,6 +354,10 @@ public class CarDisplay extends JPanel
                     return true;
                 }
             }
+        }
+        else
+        {
+            System.out.println("fghwioeb");
         }
         //Si ningú compleix els requisits, la carrera segueix
         return false;
