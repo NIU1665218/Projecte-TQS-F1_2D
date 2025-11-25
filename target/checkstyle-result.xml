@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="8.29">
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\controlador\AIController.java">
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\controlador\CarController.java">
+<error line="5" severity="error" message="Separación extra en el grupo de importación antes &apos;java.awt.image.BufferedImage&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="7" severity="error" message="Separación extra en el grupo de importación antes &apos;java.util.Set&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\controlador\MapController.java">
+<error line="1" severity="error" message="El fichero no termina con un retorno de carro." source="com.puppycrawl.tools.checkstyle.checks.NewlineAtEndOfFileCheck"/>
+<error line="7" severity="error" message="Separación extra en el grupo de importación antes &apos;javax.swing.Timer&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="248" severity="error" message="La línea es mayor de 120 caracteres (encontrado 127)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="386" severity="error" message="La línea es mayor de 120 caracteres (encontrado 122)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\controlador\RandomGenerator.java">
+<error line="1" severity="error" message="El fichero no termina con un retorno de carro." source="com.puppycrawl.tools.checkstyle.checks.NewlineAtEndOfFileCheck"/>
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\model\AICar.java">
+<error line="1" severity="error" message="El fichero no termina con un retorno de carro." source="com.puppycrawl.tools.checkstyle.checks.NewlineAtEndOfFileCheck"/>
+<error line="4" severity="error" message="Orden incorrecto para el import &apos;java.awt.Point&apos;." source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="6" severity="error" message="Separación extra en el grupo de importación antes &apos;java.util.ArrayList&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="109" severity="error" message="if el descendiente en el nivel de sangrado 28 no está al nivel correcto, 24" source="com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"/>
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\model\Car.java">
+<error line="1" severity="error" message="El fichero no termina con un retorno de carro." source="com.puppycrawl.tools.checkstyle.checks.NewlineAtEndOfFileCheck"/>
+<error line="4" severity="error" message="Orden incorrecto para el import &apos;java.awt.Color&apos;." source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="7" severity="error" message="Separación extra en el grupo de importación antes &apos;java.util.Set&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="25" severity="error" message="La línea es mayor de 120 caracteres (encontrado 195)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\model\Map.java">
+<error line="1" severity="error" message="El fichero no termina con un retorno de carro." source="com.puppycrawl.tools.checkstyle.checks.NewlineAtEndOfFileCheck"/>
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\model\TimeProvider.java">
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\vista\CarDisplay.java">
+<error line="5" severity="error" message="Orden incorrecto para el import &apos;es.uab.tqs.f1_2D.controlador.AIController&apos;." source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="10" severity="error" message="Separación extra en el grupo de importación antes &apos;javax.swing.*&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="12" severity="error" message="Orden incorrecto para el import &apos;java.awt.*&apos;." source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="12" severity="error" message="Separación extra en el grupo de importación antes &apos;java.awt.*&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="19" column="8" severity="error" message="import no usado - java.io.Console." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<error line="22" severity="error" message="Separación extra en el grupo de importación antes &apos;java.util.ArrayList&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="26" severity="error" message="Orden incorrecto para el import &apos;java.util.List&apos;." source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="28" severity="error" message="Separación extra en el grupo de importación antes &apos;javax.imageio.ImageIO&apos;" source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="433" severity="error" message="La línea es mayor de 120 caracteres (encontrado 189)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="435" severity="error" message="La línea es mayor de 120 caracteres (encontrado 124)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="438" severity="error" message="La línea es mayor de 120 caracteres (encontrado 148)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="443" severity="error" message="La línea es mayor de 120 caracteres (encontrado 148)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="451" severity="error" message="La línea es mayor de 120 caracteres (encontrado 172)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="501" severity="error" message="La línea es mayor de 120 caracteres (encontrado 138)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="521" severity="error" message="La línea es mayor de 120 caracteres (encontrado 124)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="559" severity="error" message="La línea es mayor de 120 caracteres (encontrado 130)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="564" severity="error" message="La línea es mayor de 120 caracteres (encontrado 163)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
+<error line="579" severity="error" message="( en el nivel de sangrado 8 no está al nivel correcto, 12" source="com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"/>
+<error line="1009" column="21" severity="error" message="El nombre &apos;QualyButton&apos; debe coincidir con el patrón &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameCheck"/>
+<error line="1015" column="21" severity="error" message="El nombre &apos;RaceButton&apos; debe coincidir con el patrón &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameCheck"/>
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\vista\LapUI.java">
+<error line="6" severity="error" message="Orden incorrecto para el import &apos;java.awt.image.BufferedImage&apos;." source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+<error line="8" severity="error" message="Orden incorrecto para el import &apos;java.io.IOException&apos;." source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+</file>
+<file name="C:\Users\adrik\Documents\GitHub\Projecte-TQS\src\main\java\es\uab\tqs\f1_2D\vista\OffTrackOverlay.java">
+<error line="5" severity="error" message="Orden incorrecto para el import &apos;java.awt.*&apos;." source="com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck"/>
+</file>
+</checkstyle>
