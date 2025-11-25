@@ -5,13 +5,13 @@ f1_2D,es.uab.tqs.f1_2D.model,Car,0,568,0,78,0,115,0,57,0,18
 f1_2D,es.uab.tqs.f1_2D.model,Map.State,0,45,0,0,0,1,0,1,0,1
 f1_2D,es.uab.tqs.f1_2D.model,Map,0,519,0,30,0,127,0,71,0,56
 f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.GameMode,0,15,0,0,0,3,0,1,0,1
-f1_2D,es.uab.tqs.f1_2D.vista,OffTrackOverlay,0,161,0,14,0,52,0,20,0,13
-f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.MainMenu,10,143,0,0,0,26,2,2,2,2
-f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay,917,1131,73,59,153,232,49,47,4,26
+f1_2D,es.uab.tqs.f1_2D.vista,OffTrackOverlay,0,161,0,14,0,53,0,20,0,13
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.MainMenu,0,167,0,0,0,28,0,6,0,6
+f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay,801,1139,65,61,141,234,43,50,3,27
 f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new KeyAdapter() {...},0,50,0,10,0,11,0,8,0,3
 f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new ComponentAdapter() {...},0,43,0,0,0,5,0,2,0,2
-f1_2D,es.uab.tqs.f1_2D.vista,LapUI,0,341,0,22,0,68,0,21,0,9
+f1_2D,es.uab.tqs.f1_2D.vista,LapUI,0,346,1,22,0,73,1,21,0,9
 f1_2D,es.uab.tqs.f1_2D.controlador,CarController,0,19,0,0,0,7,0,3,0,3
-f1_2D,es.uab.tqs.f1_2D.controlador,MapController,0,764,0,96,0,201,0,75,0,27
+f1_2D,es.uab.tqs.f1_2D.controlador,MapController,0,764,0,96,0,193,0,75,0,27
 f1_2D,es.uab.tqs.f1_2D.controlador,AIController,0,1593,0,64,0,174,0,56,0,24
 f1_2D,es.uab.tqs.f1_2D.controlador,RandomGenerator,0,21,0,0,0,7,0,3,0,3

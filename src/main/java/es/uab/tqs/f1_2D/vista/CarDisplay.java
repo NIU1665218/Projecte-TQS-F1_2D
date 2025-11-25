@@ -751,7 +751,7 @@ public class CarDisplay extends JPanel
                 }
             }
 
-            
+            /*
             //DEBUGGING PURPOSES
             //RACING LINE DRAWING
             List<Point> racingLine = aiController.getRacingLine();
@@ -786,7 +786,7 @@ public class CarDisplay extends JPanel
                 int y = (int) (point.y - cameraY);
                 g2d.fillOval(x - 5, y - 5, 10, 10); 
             }
-            
+            */
         }
 
     }
@@ -988,14 +988,19 @@ public class CarDisplay extends JPanel
     public boolean isInMainMenu() { return inMainMenu; }
     public GameMode getCurrentGameMode() { return currentGameMode; }
     public void setIsMainMenu(boolean active) {this.inMainMenu = active;} 
-    public AIController getAIController() { return aiController; }
+    public MainMenu getMainMenu() {return mainMenu;}
+    
 
     // Classe interna necessaria pel menú principal
-    private class MainMenu extends JPanel 
+    class MainMenu extends JPanel 
     {
         //Variables pels botons
         private int buttonWidth = 200;
         private int buttonHeight = 60;
+
+        //Botons
+        JButton qualyButton = new JButton("QUALY");
+        JButton raceButton = new JButton("RACE");
 
         //Inicialitzar el menú principal
         public MainMenu() 
@@ -1011,13 +1016,11 @@ public class CarDisplay extends JPanel
             int buttonsY = panelHeight / 2 + 50; 
             
             //Crear botó de Qualy i assignar startGame de Qualy al prèmer
-            JButton qualyButton = new JButton("QUALY");
             qualyButton.setBounds(centerX - buttonWidth - 20, buttonsY, buttonWidth, buttonHeight);
             qualyButton.addActionListener(d -> startGame(GameMode.QUALY));
             add(qualyButton);
             
             //Crear botó de Race i assignar startGame de Race al prèmer
-            JButton raceButton = new JButton("RACE");
             raceButton.setBounds(centerX + buttonWidth + 20, buttonsY, buttonWidth, buttonHeight);
             raceButton.addActionListener(f -> startGame(GameMode.RACE));
             add(raceButton);
@@ -1040,6 +1043,9 @@ public class CarDisplay extends JPanel
             int titleWidth = g.getFontMetrics().stringWidth(title);
             g.drawString(title, (getWidth() - titleWidth) / 2, getHeight() / 3);
         }
+
+        public JButton getRaceButton() {return raceButton;}
+        public JButton getQualyButton() {return qualyButton;}
     }
     
     //Main per executar el joc

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Map.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.model</a> &gt; <span class="el_source">Map.java</span></div><h1>Map.java</h1><pre class="source lang-java linenums">package es.uab.tqs.f1_2D.model;
 
 import java.awt.Rectangle;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,8 +10,8 @@ import java.util.Set;
 public class Map
 {
     //Enumeraciones necesarias para los estados del juego y possibles sectores
-<span class="fc" id="L14">    public enum State {IDLE, RUNNING, OFF_TRACK, RESULT, INVALID_LAP, COUNTDOWN, RACE_FINISHED}</span>
-<span class="fc" id="L15">    public enum SectorColor { NONE, GREEN, ORANGE, PURPLE }</span>
+<span class="fc" id="L13">    public enum State {IDLE, RUNNING, OFF_TRACK, RESULT, INVALID_LAP, COUNTDOWN, RACE_FINISHED}</span>
+<span class="fc" id="L14">    public enum SectorColor { NONE, GREEN, ORANGE, PURPLE }</span>
     
     // Datos del mapa
     private final Rectangle finishLine;
@@ -41,207 +40,207 @@ public class Map
     private SectorColor[] lastCompletedSectorColors;
 
     //Carrera
-<span class="fc" id="L44">    private boolean raceMode = false;</span>
-<span class="fc" id="L45">    private int totalLaps = 3; </span>
-<span class="fc" id="L46">    private int currentLap = 0;</span>
+<span class="fc" id="L43">    private boolean raceMode = false;</span>
+<span class="fc" id="L44">    private int totalLaps = 3; </span>
+<span class="fc" id="L45">    private int currentLap = 0;</span>
     private long raceStartTime;
     private long countdownEndTime;
-<span class="fc" id="L49">    private int countdownSeconds = 5;</span>
-<span class="fc" id="L50">    private long currentLapPenalty = 0;</span>
-<span class="fc" id="L51">    private boolean lapHasPenalty = false;</span>
+<span class="fc" id="L48">    private int countdownSeconds = 5;</span>
+<span class="fc" id="L49">    private long currentLapPenalty = 0;</span>
+<span class="fc" id="L50">    private boolean lapHasPenalty = false;</span>
 
     public Map(int mapWidth, int mapHeight, Rectangle finishLine, List&lt;Rectangle&gt; checkpoints) 
-<span class="fc" id="L54">    {</span>
+<span class="fc" id="L53">    {</span>
         //Inicializar todas las variables a sus respectivos valores
-<span class="fc" id="L56">        this.finishLine = finishLine;</span>
-<span class="fc" id="L57">        this.checkpoints = new ArrayList&lt;&gt;(checkpoints);</span>
-<span class="fc" id="L58">        this.mapWidth = mapWidth;</span>
-<span class="fc" id="L59">        this.mapHeight  = mapHeight;</span>
+<span class="fc" id="L55">        this.finishLine = finishLine;</span>
+<span class="fc" id="L56">        this.checkpoints = new ArrayList&lt;&gt;(checkpoints);</span>
+<span class="fc" id="L57">        this.mapWidth = mapWidth;</span>
+<span class="fc" id="L58">        this.mapHeight  = mapHeight;</span>
 
-<span class="fc" id="L61">        this.currentState = State.IDLE;</span>
-<span class="fc" id="L62">        this.passedCheckpoints = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L63">        this.nextCheckpointIndex = 0;</span>
-<span class="fc" id="L64">        this.bestLapTime = Long.MAX_VALUE;</span>
+<span class="fc" id="L60">        this.currentState = State.IDLE;</span>
+<span class="fc" id="L61">        this.passedCheckpoints = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L62">        this.nextCheckpointIndex = 0;</span>
+<span class="fc" id="L63">        this.bestLapTime = Long.MAX_VALUE;</span>
         
-<span class="fc" id="L66">        this.numSectors = 3;</span>
-<span class="fc" id="L67">        initializeSectors();</span>
-<span class="fc" id="L68">    }</span>
+<span class="fc" id="L65">        this.numSectors = 3;</span>
+<span class="fc" id="L66">        initializeSectors();</span>
+<span class="fc" id="L67">    }</span>
     
     //Inicialización de estado de los sectores
     private void initializeSectors() 
     {
-<span class="fc" id="L73">        this.sectorTimes = new long[numSectors];</span>
-<span class="fc" id="L74">        this.bestSectorTimes = new long[numSectors];</span>
-<span class="fc" id="L75">        this.sectorColors = new SectorColor[numSectors];</span>
-<span class="fc" id="L76">        this.sectorRecorded = new boolean[numSectors];</span>
-<span class="fc" id="L77">        this.lastCompletedSectorTimes = new long[numSectors];</span>
-<span class="fc" id="L78">        this.lastCompletedSectorColors = new SectorColor[numSectors];</span>
+<span class="fc" id="L72">        this.sectorTimes = new long[numSectors];</span>
+<span class="fc" id="L73">        this.bestSectorTimes = new long[numSectors];</span>
+<span class="fc" id="L74">        this.sectorColors = new SectorColor[numSectors];</span>
+<span class="fc" id="L75">        this.sectorRecorded = new boolean[numSectors];</span>
+<span class="fc" id="L76">        this.lastCompletedSectorTimes = new long[numSectors];</span>
+<span class="fc" id="L77">        this.lastCompletedSectorColors = new SectorColor[numSectors];</span>
         
-<span class="fc" id="L80">        Arrays.fill(bestSectorTimes, Long.MAX_VALUE);</span>
-<span class="fc" id="L81">        Arrays.fill(sectorColors, SectorColor.NONE);</span>
-<span class="fc" id="L82">        Arrays.fill(sectorRecorded, false);</span>
-<span class="fc" id="L83">        Arrays.fill(lastCompletedSectorColors, SectorColor.NONE);</span>
-<span class="fc" id="L84">    }</span>
+<span class="fc" id="L79">        Arrays.fill(bestSectorTimes, Long.MAX_VALUE);</span>
+<span class="fc" id="L80">        Arrays.fill(sectorColors, SectorColor.NONE);</span>
+<span class="fc" id="L81">        Arrays.fill(sectorRecorded, false);</span>
+<span class="fc" id="L82">        Arrays.fill(lastCompletedSectorColors, SectorColor.NONE);</span>
+<span class="fc" id="L83">    }</span>
        
     //Comprobación si se ha pasado por todos los checkpoints que contiene el circuito
     public boolean passedAllCheckpoints() 
     {
-<span class="fc bfc" id="L89" title="All 4 branches covered.">        return passedCheckpoints.size() == checkpoints.size() &amp;&amp; nextCheckpointIndex == checkpoints.size();</span>
+<span class="fc bfc" id="L88" title="All 4 branches covered.">        return passedCheckpoints.size() == checkpoints.size() &amp;&amp; nextCheckpointIndex == checkpoints.size();</span>
     }
     
     //Función que suma los tiempos de los sectores 
     public long sum(long[] array, int index) 
     {
-<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (index &lt;= 0) return 0L;</span>
-<span class="fc" id="L96">        long suma = 0L;</span>
-<span class="fc bfc" id="L97" title="All 4 branches covered.">        for (int i = 0; i &lt; index &amp;&amp; i &lt; array.length; i++) suma += array[i];</span>
-<span class="fc" id="L98">        return suma;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (index &lt;= 0) return 0L;</span>
+<span class="fc" id="L95">        long suma = 0L;</span>
+<span class="fc bfc" id="L96" title="All 4 branches covered.">        for (int i = 0; i &lt; index &amp;&amp; i &lt; array.length; i++) suma += array[i];</span>
+<span class="fc" id="L97">        return suma;</span>
     }
 
     //Reset de los sectores para volver a empezar
     public void resetSectors() 
     {
-<span class="fc" id="L104">        Arrays.fill(sectorTimes, 0L);</span>
-<span class="fc" id="L105">        Arrays.fill(sectorRecorded, false);</span>
-<span class="fc" id="L106">        Arrays.fill(sectorColors, SectorColor.NONE);</span>
-<span class="fc" id="L107">        currentLapPenalty = 0;</span>
-<span class="fc" id="L108">        lapHasPenalty = false;</span>
-<span class="fc" id="L109">    }</span>
+<span class="fc" id="L103">        Arrays.fill(sectorTimes, 0L);</span>
+<span class="fc" id="L104">        Arrays.fill(sectorRecorded, false);</span>
+<span class="fc" id="L105">        Arrays.fill(sectorColors, SectorColor.NONE);</span>
+<span class="fc" id="L106">        currentLapPenalty = 0;</span>
+<span class="fc" id="L107">        lapHasPenalty = false;</span>
+<span class="fc" id="L108">    }</span>
     
     //Función para copiar los arrays al momento de visualizar los resultados de una vuelta
     public void copyCurrentToLastSectors() 
     {
-<span class="fc" id="L114">        System.arraycopy(sectorTimes, 0, lastCompletedSectorTimes, 0, numSectors);</span>
-<span class="fc" id="L115">        System.arraycopy(sectorColors, 0, lastCompletedSectorColors, 0, numSectors);</span>
-<span class="fc" id="L116">    }</span>
+<span class="fc" id="L113">        System.arraycopy(sectorTimes, 0, lastCompletedSectorTimes, 0, numSectors);</span>
+<span class="fc" id="L114">        System.arraycopy(sectorColors, 0, lastCompletedSectorColors, 0, numSectors);</span>
+<span class="fc" id="L115">    }</span>
 
     //Iniciar cuenta atrás
     public void startCountdown() 
     {
-<span class="fc" id="L121">        currentState = State.COUNTDOWN;</span>
-<span class="fc" id="L122">        countdownEndTime = timeProvider.now() + (countdownSeconds * 1000);</span>
-<span class="fc" id="L123">    }</span>
+<span class="fc" id="L120">        currentState = State.COUNTDOWN;</span>
+<span class="fc" id="L121">        countdownEndTime = timeProvider.now() + (countdownSeconds * 1000);</span>
+<span class="fc" id="L122">    }</span>
     
     // Finalizar cuenta atrás e iniciar carrera
     public void startRace() 
     {
-<span class="fc" id="L128">        currentState = State.RUNNING;</span>
-<span class="fc" id="L129">        raceStartTime = timeProvider.now();</span>
-<span class="fc" id="L130">        lapStartTime = raceStartTime;</span>
-<span class="fc" id="L131">        currentLap = 1; </span>
-<span class="fc" id="L132">    }</span>
+<span class="fc" id="L127">        currentState = State.RUNNING;</span>
+<span class="fc" id="L128">        raceStartTime = timeProvider.now();</span>
+<span class="fc" id="L129">        lapStartTime = raceStartTime;</span>
+<span class="fc" id="L130">        currentLap = 1; </span>
+<span class="fc" id="L131">    }</span>
 
     // Método para resetear completamente el estado del mapa
     public void reset() 
     {
-<span class="fc" id="L137">        setCurrentState(State.IDLE);</span>
-<span class="fc" id="L138">        setCurrentLap(0);</span>
-<span class="fc" id="L139">        setBestLapTime(Long.MAX_VALUE);</span>
-<span class="fc" id="L140">        setLapTime(0);</span>
-<span class="fc" id="L141">        setLapStartTime(0);</span>
-<span class="fc" id="L142">        getPassedCheckpoints().clear();</span>
-<span class="fc" id="L143">        setNextCheckpointIndex(0);</span>
-<span class="fc" id="L144">        resetSectors();</span>
-<span class="fc" id="L145">        setCurrentLapPenalty(0);</span>
-<span class="fc" id="L146">        setLapHasPenalty(false);</span>
-<span class="fc" id="L147">        setRaceMode(false);</span>
-<span class="fc" id="L148">        Arrays.fill(bestSectorTimes, Long.MAX_VALUE);</span>
-<span class="fc" id="L149">        Arrays.fill(sectorColors, SectorColor.NONE);</span>
-<span class="fc" id="L150">        Arrays.fill(sectorRecorded, false);</span>
-<span class="fc" id="L151">        Arrays.fill(lastCompletedSectorColors, SectorColor.NONE);</span>
-<span class="fc" id="L152">    }</span>
+<span class="fc" id="L136">        setCurrentState(State.IDLE);</span>
+<span class="fc" id="L137">        setCurrentLap(0);</span>
+<span class="fc" id="L138">        setBestLapTime(Long.MAX_VALUE);</span>
+<span class="fc" id="L139">        setLapTime(0);</span>
+<span class="fc" id="L140">        setLapStartTime(0);</span>
+<span class="fc" id="L141">        getPassedCheckpoints().clear();</span>
+<span class="fc" id="L142">        setNextCheckpointIndex(0);</span>
+<span class="fc" id="L143">        resetSectors();</span>
+<span class="fc" id="L144">        setCurrentLapPenalty(0);</span>
+<span class="fc" id="L145">        setLapHasPenalty(false);</span>
+<span class="fc" id="L146">        setRaceMode(false);</span>
+<span class="fc" id="L147">        Arrays.fill(bestSectorTimes, Long.MAX_VALUE);</span>
+<span class="fc" id="L148">        Arrays.fill(sectorColors, SectorColor.NONE);</span>
+<span class="fc" id="L149">        Arrays.fill(sectorRecorded, false);</span>
+<span class="fc" id="L150">        Arrays.fill(lastCompletedSectorColors, SectorColor.NONE);</span>
+<span class="fc" id="L151">    }</span>
     
     // Incrementar vuelta
     public void incrementLap() 
     {
-<span class="fc" id="L157">        currentLap++;</span>
+<span class="fc" id="L156">        currentLap++;</span>
         
-<span class="fc" id="L159">        lapStartTime = timeProvider.now();                   </span>
-<span class="fc" id="L160">        passedCheckpoints.clear();         </span>
-<span class="fc" id="L161">        nextCheckpointIndex = 0;</span>
-<span class="fc" id="L162">        currentLapPenalty = 0;</span>
-<span class="fc" id="L163">        lapHasPenalty = false;</span>
+<span class="fc" id="L158">        lapStartTime = timeProvider.now();                   </span>
+<span class="fc" id="L159">        passedCheckpoints.clear();         </span>
+<span class="fc" id="L160">        nextCheckpointIndex = 0;</span>
+<span class="fc" id="L161">        currentLapPenalty = 0;</span>
+<span class="fc" id="L162">        lapHasPenalty = false;</span>
         
-<span class="fc bfc" id="L165" title="All 2 branches covered.">        if (isRaceComplete()) </span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        if (isRaceComplete()) </span>
         {
-<span class="fc" id="L167">            currentState = State.RACE_FINISHED;</span>
+<span class="fc" id="L166">            currentState = State.RACE_FINISHED;</span>
         } 
-<span class="fc" id="L169">    }</span>
+<span class="fc" id="L168">    }</span>
 
     // Getters
         //Estado de la carrera
-<span class="fc" id="L173">    public State getState() { return currentState; }</span>
-<span class="fc" id="L174">    public boolean isRaceMode() { return raceMode; }</span>
-<span class="fc bfc" id="L175" title="All 4 branches covered.">    public boolean isRaceComplete() { return raceMode &amp;&amp; currentLap &gt; totalLaps;}  </span>
-<span class="fc" id="L176">    public int getTotalLaps() { return totalLaps; }   </span>
-<span class="fc" id="L177">    public int getCurrentLap() { return currentLap; }   </span>
-<span class="fc" id="L178">    public long getRaceStartTime() { return raceStartTime; }  </span>
-<span class="fc" id="L179">    public boolean isLapHasPenalty() { return lapHasPenalty; }</span>
+<span class="fc" id="L172">    public State getState() { return currentState; }</span>
+<span class="fc" id="L173">    public boolean isRaceMode() { return raceMode; }</span>
+<span class="fc bfc" id="L174" title="All 4 branches covered.">    public boolean isRaceComplete() { return raceMode &amp;&amp; currentLap &gt; totalLaps;}  </span>
+<span class="fc" id="L175">    public int getTotalLaps() { return totalLaps; }   </span>
+<span class="fc" id="L176">    public int getCurrentLap() { return currentLap; }   </span>
+<span class="fc" id="L177">    public long getRaceStartTime() { return raceStartTime; }  </span>
+<span class="fc" id="L178">    public boolean isLapHasPenalty() { return lapHasPenalty; }</span>
 
         //Temporización y tiempos
-<span class="fc" id="L182">    public long getLapStartTime() { return lapStartTime; }</span>
-<span class="fc bfc" id="L183" title="All 2 branches covered.">    public long getBestLapTime() { return bestLapTime == Long.MAX_VALUE ? 0 : bestLapTime; }</span>
-<span class="fc" id="L184">    public long getBestLapTimeFinish() { return bestLapTime; }</span>
-<span class="fc" id="L185">    public long getLapTime() { return lapTime; }</span>
-<span class="fc" id="L186">    public long getCurrentLapPenalty() { return currentLapPenalty; }</span>
+<span class="fc" id="L181">    public long getLapStartTime() { return lapStartTime; }</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">    public long getBestLapTime() { return bestLapTime == Long.MAX_VALUE ? 0 : bestLapTime; }</span>
+<span class="fc" id="L183">    public long getBestLapTimeFinish() { return bestLapTime; }</span>
+<span class="fc" id="L184">    public long getLapTime() { return lapTime; }</span>
+<span class="fc" id="L185">    public long getCurrentLapPenalty() { return currentLapPenalty; }</span>
     public long getSectorTime(int i) 
     { 
-<span class="fc bfc" id="L189" title="All 4 branches covered.">        if (i &lt; 0 || i &gt;= numSectors) return 0L;</span>
-<span class="fc" id="L190">        return sectorTimes[i];</span>
+<span class="fc bfc" id="L188" title="All 4 branches covered.">        if (i &lt; 0 || i &gt;= numSectors) return 0L;</span>
+<span class="fc" id="L189">        return sectorTimes[i];</span>
     }
-<span class="fc" id="L192">    public long[] getSectorTimes() { return sectorTimes; }</span>
+<span class="fc" id="L191">    public long[] getSectorTimes() { return sectorTimes; }</span>
     public long getBestSectorTime(int i) 
     { 
-<span class="fc bfc" id="L195" title="All 4 branches covered.">        if(i &lt; 0 || i &gt;= numSectors) return 0L;</span>
-<span class="fc" id="L196">        return bestSectorTimes[i]; </span>
+<span class="fc bfc" id="L194" title="All 4 branches covered.">        if(i &lt; 0 || i &gt;= numSectors) return 0L;</span>
+<span class="fc" id="L195">        return bestSectorTimes[i]; </span>
     }
-<span class="fc" id="L198">    public long getCountdownEndTime() { return countdownEndTime; }    </span>
-<span class="fc" id="L199">    public int getCountdownSeconds() { return countdownSeconds; }</span>
-<span class="fc bfc" id="L200" title="All 2 branches covered.">    public boolean isCountdownActive() { return currentState == State.COUNTDOWN; }</span>
+<span class="fc" id="L197">    public long getCountdownEndTime() { return countdownEndTime; }    </span>
+<span class="fc" id="L198">    public int getCountdownSeconds() { return countdownSeconds; }</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">    public boolean isCountdownActive() { return currentState == State.COUNTDOWN; }</span>
     public int getRemainingCountdown() 
     {
-<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (!isCountdownActive()) return 0;</span>
-<span class="fc" id="L204">        long now = timeProvider.now();</span>
-<span class="fc" id="L205">        long remaining = countdownEndTime - now;</span>
-<span class="fc" id="L206">        return (int) Math.max(0, (remaining / 1000) + 1);</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        if (!isCountdownActive()) return 0;</span>
+<span class="fc" id="L203">        long now = timeProvider.now();</span>
+<span class="fc" id="L204">        long remaining = countdownEndTime - now;</span>
+<span class="fc" id="L205">        return (int) Math.max(0, (remaining / 1000) + 1);</span>
     }
 
         //Estado de los checkpoints y sectores
-<span class="fc" id="L210">    public Rectangle getFinishLine() { return finishLine; }</span>
-<span class="fc" id="L211">    public List&lt;Rectangle&gt; getCheckpoints() { return checkpoints; }</span>
-<span class="fc" id="L212">    public int getNextCheckpointIndex() { return nextCheckpointIndex; }</span>
-<span class="fc" id="L213">    public Set&lt;Integer&gt; getPassedCheckpoints() { return passedCheckpoints; }</span>
-<span class="fc" id="L214">    public int getNumSectors() { return numSectors; }</span>
-<span class="fc" id="L215">    public SectorColor getSectorColor(int i) { return sectorColors[i]; }</span>
-<span class="fc" id="L216">    public boolean[] getSectorRecorded() { return sectorRecorded; } </span>
+<span class="fc" id="L209">    public Rectangle getFinishLine() { return finishLine; }</span>
+<span class="fc" id="L210">    public List&lt;Rectangle&gt; getCheckpoints() { return checkpoints; }</span>
+<span class="fc" id="L211">    public int getNextCheckpointIndex() { return nextCheckpointIndex; }</span>
+<span class="fc" id="L212">    public Set&lt;Integer&gt; getPassedCheckpoints() { return passedCheckpoints; }</span>
+<span class="fc" id="L213">    public int getNumSectors() { return numSectors; }</span>
+<span class="fc" id="L214">    public SectorColor getSectorColor(int i) { return sectorColors[i]; }</span>
+<span class="fc" id="L215">    public boolean[] getSectorRecorded() { return sectorRecorded; } </span>
 
         //Info de pista
-<span class="fc" id="L219">    public int getMapHeight() { return mapHeight;}</span>
-<span class="fc" id="L220">    public int getMapWidth() { return mapWidth;}    </span>
+<span class="fc" id="L218">    public int getMapHeight() { return mapHeight;}</span>
+<span class="fc" id="L219">    public int getMapWidth() { return mapWidth;}    </span>
             
     // Setters
         //Estado de la carrera
-<span class="fc" id="L224">    public void setCurrentState(State state) { this.currentState = state; }</span>
-<span class="fc" id="L225">    public void setRaceMode(boolean raceMode) { this.raceMode = raceMode; }</span>
-<span class="fc" id="L226">    public void setTotalLaps(int totalLaps) { this.totalLaps = totalLaps; }</span>
-<span class="fc" id="L227">    public void setCurrentLap(int currentLap) { this.currentLap = currentLap; }</span>
-<span class="fc" id="L228">    public void setRaceStartTime(long raceStartTime) { this.raceStartTime = raceStartTime; }</span>
-<span class="fc" id="L229">    public void setLapHasPenalty(boolean hasPenalty) { this.lapHasPenalty = hasPenalty; }</span>
+<span class="fc" id="L223">    public void setCurrentState(State state) { this.currentState = state; }</span>
+<span class="fc" id="L224">    public void setRaceMode(boolean raceMode) { this.raceMode = raceMode; }</span>
+<span class="fc" id="L225">    public void setTotalLaps(int totalLaps) { this.totalLaps = totalLaps; }</span>
+<span class="fc" id="L226">    public void setCurrentLap(int currentLap) { this.currentLap = currentLap; }</span>
+<span class="fc" id="L227">    public void setRaceStartTime(long raceStartTime) { this.raceStartTime = raceStartTime; }</span>
+<span class="fc" id="L228">    public void setLapHasPenalty(boolean hasPenalty) { this.lapHasPenalty = hasPenalty; }</span>
 
         //Temporización y tiempos
-<span class="fc" id="L232">    public void setLapStartTime(long time) { this.lapStartTime = time; }</span>
-<span class="fc" id="L233">    public void setBestLapTime(long time) { this.bestLapTime = time; }</span>
-<span class="fc" id="L234">    public void setLapTime(long time) { this.lapTime = time; }   </span>
-<span class="fc" id="L235">    public void setSectorTime(int index, long time) {sectorTimes[index] = time;}</span>
-<span class="fc" id="L236">    public void setBestSectorTime(int index, long time) {bestSectorTimes[index] = time;}</span>
-<span class="fc" id="L237">    public void setCurrentLapPenalty(long penalty) { this.currentLapPenalty = penalty; }</span>
-<span class="fc" id="L238">    public void setCountdownEndTime(long countdownEndTime) { this.countdownEndTime = countdownEndTime; }</span>
-<span class="fc" id="L239">    public void setCountdownSeconds(int countdownSeconds) { this.countdownSeconds = countdownSeconds; }</span>
-<span class="fc" id="L240">    public void setTimeProvider(TimeProvider timeProvider) {this.timeProvider = timeProvider;}</span>
+<span class="fc" id="L231">    public void setLapStartTime(long time) { this.lapStartTime = time; }</span>
+<span class="fc" id="L232">    public void setBestLapTime(long time) { this.bestLapTime = time; }</span>
+<span class="fc" id="L233">    public void setLapTime(long time) { this.lapTime = time; }   </span>
+<span class="fc" id="L234">    public void setSectorTime(int index, long time) {sectorTimes[index] = time;}</span>
+<span class="fc" id="L235">    public void setBestSectorTime(int index, long time) {bestSectorTimes[index] = time;}</span>
+<span class="fc" id="L236">    public void setCurrentLapPenalty(long penalty) { this.currentLapPenalty = penalty; }</span>
+<span class="fc" id="L237">    public void setCountdownEndTime(long countdownEndTime) { this.countdownEndTime = countdownEndTime; }</span>
+<span class="fc" id="L238">    public void setCountdownSeconds(int countdownSeconds) { this.countdownSeconds = countdownSeconds; }</span>
+<span class="fc" id="L239">    public void setTimeProvider(TimeProvider timeProvider) {this.timeProvider = timeProvider;}</span>
 
         //Estado de los checkpoints y sectores
-<span class="fc" id="L243">    public void setNextCheckpointIndex(int index) { this.nextCheckpointIndex = index; }</span>
-<span class="fc" id="L244">    public void setSectorColor(int index, SectorColor color) {sectorColors[index] = color;}</span>
-<span class="fc" id="L245">    public void setSectorRecorded(int index, boolean recorded) {sectorRecorded[index] = recorded;}</span>
+<span class="fc" id="L242">    public void setNextCheckpointIndex(int index) { this.nextCheckpointIndex = index; }</span>
+<span class="fc" id="L243">    public void setSectorColor(int index, SectorColor color) {sectorColors[index] = color;}</span>
+<span class="fc" id="L244">    public void setSectorRecorded(int index, boolean recorded) {sectorRecorded[index] = recorded;}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
