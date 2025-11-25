@@ -4,11 +4,9 @@ import es.uab.tqs.f1_2D.model.AICar;
 import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.model.Map;
 import es.uab.tqs.f1_2D.model.TimeProvider;
-
-import java.awt.image.BufferedImage;
 import java.awt.Point;
 import java.awt.Rectangle;
-
+import java.awt.image.BufferedImage;
 import java.util.*;
 
 public class AIController 
@@ -155,9 +153,9 @@ public class AIController
             {
                 int intermediatePoints = (int)(distance / 75); 
                 for (int j = 1; j < intermediatePoints; j++) {
-                    double t = (double)j / intermediatePoints;
-                    int interX = (int)(current.x + (next.x - current.x) * t);
-                    int interY = (int)(current.y + (next.y - current.y) * t);
+                    double t = (double) j / intermediatePoints;
+                    int interX = (int) (current.x + (next.x - current.x) * t);
+                    int interY = (int) (current.y + (next.y - current.y) * t);
                     racingLine.add(new Point(interX, interY));
                 }
             }

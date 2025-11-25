@@ -2,10 +2,10 @@ package es.uab.tqs.f1_2D.vista;
 
 import es.uab.tqs.f1_2D.model.Map;
 import java.awt.*;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class LapUI extends JPanel
 {
@@ -105,13 +105,24 @@ public class LapUI extends JPanel
         {
             //Obtiene el color del sector 
             Map.SectorColor color = map.getSectorColor(i);
-            int colorIndex = switch(color) 
+            int colorIndex;
+            switch (color) 
             {
-                case NONE -> 0;
-                case GREEN -> 1;
-                case ORANGE -> 2;
-                case PURPLE -> 3;
-            };
+                case NONE:
+                    colorIndex = 0;
+                    break;
+                case GREEN:
+                    colorIndex = 1;
+                    break;
+                case ORANGE:
+                    colorIndex = 2;
+                    break;
+                case PURPLE:
+                    colorIndex = 3;
+                    break;
+                default:
+                    colorIndex = 0;
+            }
             //Obtiene, de la matriz, la imagen correspondiente al sector y color
             BufferedImage img = sectorImages[i][colorIndex];
             //Dibuja la imagen del sector en posición calculada

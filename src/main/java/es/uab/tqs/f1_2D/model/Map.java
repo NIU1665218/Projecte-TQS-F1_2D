@@ -1,7 +1,6 @@
 package es.uab.tqs.f1_2D.model;
 
 import java.awt.Rectangle;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;

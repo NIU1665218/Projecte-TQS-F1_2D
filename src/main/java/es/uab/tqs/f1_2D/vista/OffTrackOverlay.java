@@ -1,10 +1,10 @@
 package es.uab.tqs.f1_2D.vista;
 
-import javax.sound.sampled.*;
-import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
+import javax.sound.sampled.*;
+import javax.swing.*;
 
 public class OffTrackOverlay extends JPanel 
 {

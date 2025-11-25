@@ -26,5 +26,7 @@ jobs:
           ${{ runner.os }}-maven-
     - name: Install dependencies
       run: mvn install -DskipTests
+    - name: Code Quality (Checkstyle)
+      run: mvn checkstyle:check
     - name: Run Tests
       run: mvn test -Djava.awt.headless=true

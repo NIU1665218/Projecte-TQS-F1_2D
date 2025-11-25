@@ -1,9 +1,7 @@
 package es.uab.tqs.f1_2D.controlador;
 
 import es.uab.tqs.f1_2D.model.Car;
-
 import java.awt.image.BufferedImage;
-
 import java.util.Set;
 
 public class CarController 
