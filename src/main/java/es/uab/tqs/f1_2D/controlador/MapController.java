@@ -3,7 +3,6 @@ package es.uab.tqs.f1_2D.controlador;
 import es.uab.tqs.f1_2D.model.AICar;
 import es.uab.tqs.f1_2D.model.Map;
 import es.uab.tqs.f1_2D.model.TimeProvider;
-
 import javax.swing.Timer;
 
 public class MapController 
@@ -245,7 +244,8 @@ public class MapController
         reset();
     }
     
-    //Si se ha pasado por línea de meta y la vuelta se da por finalizada se muestra el resultado o se incrementa vuelta en RACE
+    //Si se ha pasado por línea de meta y la vuelta se da por finalizada 
+    //se muestra el resultado o se incrementa vuelta en RACE
     private void endLap() 
     {
         //Calcular el tiempo base de la vuelta
@@ -383,7 +383,8 @@ public class MapController
         }
     }
     
-    //Si se detecta que se ha finalizado un sector, se cuenta el tiempo y se determina qué color es dependiendo del tiempo
+    //Si se detecta que se ha finalizado un sector, 
+    //se cuenta el tiempo y se determina qué color es dependiendo del tiempo
     public void recordSector(int sectorIndex, long sectorTime) 
     {
         //Comprobar que el sector existe

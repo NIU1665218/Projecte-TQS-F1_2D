@@ -1,8 +1,7 @@
 package es.uab.tqs.f1_2D.model;
 
-import java.awt.image.BufferedImage;
 import java.awt.Point;
-
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -106,7 +105,7 @@ public class AICar extends Car
                     //Si la distancia es menor a 100 pixeles, aplicar slipstream
                     if (distance < 100) 
                     { 
-                            slipstreamBoost = 5.0 * skillLevel; 
+                        slipstreamBoost = 5.0 * skillLevel; 
                     }
                 }
             }

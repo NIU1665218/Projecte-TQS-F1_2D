@@ -2,10 +2,10 @@ package es.uab.tqs.f1_2D.vista;
 
 import es.uab.tqs.f1_2D.model.Map;
 import java.awt.*;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class LapUI extends JPanel
 {

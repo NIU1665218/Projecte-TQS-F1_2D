@@ -1,14 +1,11 @@
 package es.uab.tqs.f1_2D.vista;
 
-import es.uab.tqs.f1_2D.model.AICar;
-import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.controlador.AIController;
 import es.uab.tqs.f1_2D.controlador.CarController;
 import es.uab.tqs.f1_2D.controlador.MapController;
+import es.uab.tqs.f1_2D.model.AICar;
+import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.model.Map;
-
-import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -16,16 +13,14 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.Console;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
-
+import java.util.Set;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class CarDisplay extends JPanel 
 {
@@ -430,17 +425,22 @@ public class CarDisplay extends JPanel
             //Si la posició és la de jugador, afegir el seu resultat
             if (i + 1 == playerPosition) 
             {
-                results.append("→ ").append(playerPosition).append(". PLAYER - ").append(formatTime(trackMap.getBestLapTime())).append(" - L").append(trackMap.getCurrentLap()).append("\n");
+                results.append("→ ").append(playerPosition).append(". PLAYER - ")
+                .append(formatTime(trackMap.getBestLapTime())).append(" - L").append(trackMap.getCurrentLap())
+                .append("\n");
             }
-            //Si la posició del cotxe que tractem és igual o major en la llista a la posició del jugador, afegir una posició
+            //Si la posició del cotxe que tractem és igual o 
+            //major en la llista a la posició del jugador, afegir una posició
             if(i + 1 >= playerPosition)
             {
-                results.append((i + 2)).append(". ").append(aiCar.getTeam()).append(" - ").append(timeStr).append(" - L").append(laps).append("\n");
+                results.append((i + 2)).append(". ").append(aiCar.getTeam()).append(" - ")
+                .append(timeStr).append(" - L").append(laps).append("\n");
             }
             //En cas contrari, agafar l'ordre de la llista
             else
             {
-                results.append((i + 1)).append(". ").append(aiCar.getTeam()).append(" - ").append(timeStr).append(" - L").append(laps).append("\n");
+                results.append((i + 1)).append(". ").append(aiCar.getTeam()).append(" - ")
+                .append(timeStr).append(" - L").append(laps).append("\n");
             }
         }
         
@@ -448,7 +448,9 @@ public class CarDisplay extends JPanel
         if (playerPosition > 10) 
         {
             results.append("...\n");
-            results.append(playerPosition).append(". PLAYER - ").append(formatTime(trackMap.getBestLapTime())).append(" - L").append(trackMap.getCurrentLap()).append("\n");
+            results.append(playerPosition).append(". PLAYER - ")
+            .append(formatTime(trackMap.getBestLapTime())).append(" - L")
+            .append(trackMap.getCurrentLap()).append("\n");
         }
         
         //Ensenyar els resultats complets
@@ -498,7 +500,8 @@ public class CarDisplay extends JPanel
         g.setColor(Color.YELLOW);
         int playerPosition = getPlayerPosition();
         String playerTime = formatTime(trackMap.getLapTime());
-        g.drawString(playerPosition + ". PLAYER - " + playerTime + " - L" + trackMap.getCurrentLap() + "/3", startX, startY + lineHeight);
+        g.drawString(playerPosition + ". PLAYER - " + playerTime + " - L" + 
+            trackMap.getCurrentLap() + "/3", startX, startY + lineHeight);
         
         //AI Cars
         g.setColor(Color.WHITE);
@@ -518,7 +521,8 @@ public class CarDisplay extends JPanel
             int laps = aiCar.getCurrentLap();
             
             int displayPos = i+1;
-            //Si la posició del cotxe que tractem és igual o major en la llista a la posició del jugador, afegir una posició
+            //Si la posició del cotxe que tractem és igual o major en la llista a la posició del jugador, 
+            //afegir una posició
             if(displayPos >= playerPosition) displayPos++;
             String displayText = displayPos + ". " + team + " - " + timeStr + " - L" + laps;
             //Dibuixar la posició del cotxe que estem iterarnt
@@ -556,12 +560,14 @@ public class CarDisplay extends JPanel
             {
                 position++;
             } 
-            //Si el cotxe té les mateixes voltes que el jugador, però té més checkpoints, el jugador va per darrere d'aquest cotxe
+            //Si el cotxe té les mateixes voltes que el jugador, però té més checkpoints, 
+            //el jugador va per darrere d'aquest cotxe
             else if (aiLap == playerLap && aiCheckpoints > playerCheckpoints) 
             {
                 position++;
             }
-            //Si el cotxe té les mateixes voltes i checkpoints que el jugador, però està més aprop del següent checkpoint, el jugador va per darrere d'aquest cotxe
+            //Si el cotxe té les mateixes voltes i checkpoints que el jugador, 
+            //però està més aprop del següent checkpoint, el jugador va per darrere d'aquest cotxe
             else if (aiLap == playerLap && aiCheckpoints == playerCheckpoints && aiDistance < playerDistance) 
             {
                 position++;
@@ -575,8 +581,7 @@ public class CarDisplay extends JPanel
     public double getDistanceToNextCheckpoint(Car car) 
     {
         //Lista de checkpoints i finishLine
-        List<Rectangle> allCheckpoints = Arrays.asList
-        (
+        List<Rectangle> allCheckpoints = Arrays.asList (
             new Rectangle(4548, 940, 40, 230),  
             new Rectangle(5484, 100, 20, 230),   
             new Rectangle(1330, 1216, 350, 50), 
@@ -1006,16 +1011,16 @@ public class CarDisplay extends JPanel
             int buttonsY = panelHeight / 2 + 50; 
             
             //Crear botó de Qualy i assignar startGame de Qualy al prèmer
-            JButton QualyButton = new JButton("QUALY");
-            QualyButton.setBounds(centerX - buttonWidth - 20, buttonsY, buttonWidth, buttonHeight);
-            QualyButton.addActionListener(d -> startGame(GameMode.QUALY));
-            add(QualyButton);
+            JButton qualyButton = new JButton("QUALY");
+            qualyButton.setBounds(centerX - buttonWidth - 20, buttonsY, buttonWidth, buttonHeight);
+            qualyButton.addActionListener(d -> startGame(GameMode.QUALY));
+            add(qualyButton);
             
             //Crear botó de Race i assignar startGame de Race al prèmer
-            JButton RaceButton = new JButton("RACE");
-            RaceButton.setBounds(centerX + buttonWidth + 20, buttonsY, buttonWidth, buttonHeight);
-            RaceButton.addActionListener(f -> startGame(GameMode.RACE));
-            add(RaceButton);
+            JButton raceButton = new JButton("RACE");
+            raceButton.setBounds(centerX + buttonWidth + 20, buttonsY, buttonWidth, buttonHeight);
+            raceButton.addActionListener(f -> startGame(GameMode.RACE));
+            add(raceButton);
         }
         
         //Funció per poder pintar el main menu

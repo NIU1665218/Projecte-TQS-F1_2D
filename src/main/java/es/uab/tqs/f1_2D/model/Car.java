@@ -1,9 +1,8 @@
 package es.uab.tqs.f1_2D.model;
 
-import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-
+import java.awt.image.BufferedImage;
 import java.util.Set;
 
 public class Car
@@ -22,7 +21,9 @@ public class Car
     protected BufferedImage sprite;
     private double slipstreamBoost;
 
-    public Car(double x, double y, double angle, double velocity, double maxVelocity, double backwardsMaxVelocity, double acceleration, double backwardsAcceleration, int mapHeight, int mapWidth) 
+    public Car(double x, double y, double angle, double velocity, double maxVelocity, 
+        double backwardsMaxVelocity, double acceleration, double backwardsAcceleration, 
+        int mapHeight, int mapWidth) 
     {
         //Inicialización de todas las variables
         this.x = x;
