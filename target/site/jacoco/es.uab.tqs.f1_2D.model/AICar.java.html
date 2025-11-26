@@ -1,403 +1,402 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AICar.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.model</a> &gt; <span class="el_source">AICar.java</span></div><h1>AICar.java</h1><pre class="source lang-java linenums">    package es.uab.tqs.f1_2D.model;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AICar.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.model</a> &gt; <span class="el_source">AICar.java</span></div><h1>AICar.java</h1><pre class="source lang-java linenums">package es.uab.tqs.f1_2D.model;
 
-    import java.awt.image.BufferedImage;
-    import java.awt.Point;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-    import java.util.ArrayList;
-    import java.util.Arrays;
-    import java.util.HashSet;
-    import java.util.List;
-    import java.util.Set;
+public class AICar extends Car 
+{
+    private String team;
+    private double skillLevel; 
+    private List&lt;Point&gt; racingLine;
+    private int currentTargetIndex;
+    private double targetSpeed;
+    private Car playerCar;
+    private double slipstreamBoost;
+    private double brakingDistance;
 
-    public class AICar extends Car 
+    private long lapStartTime;
+    private long bestLapTime;
+    private long lapTime;
+    private int currentLap;
+    private TimeProvider timeProvider;
+    
+<span class="fc" id="L28">    private final int numSectors = 3;</span>
+    private long[] sectorTimes;
+    private long[] bestSectorTimes;
+    private Map.SectorColor[] sectorColors;
+    private boolean[] sectorRecorded;
+    
+    private Set&lt;Integer&gt; passedCheckpoints;
+    private int nextCheckpointIndex;
+    
+    public AICar(double x, double y, double angle, double velocity, double maxVelocity, 
+                double backwardsMaxVelocity, double acceleration, double backwardsAcceleration, 
+                int mapHeight, int mapWidth, String team, double skillLevel) 
     {
-        private String team;
-        private double skillLevel; 
-        private List&lt;Point&gt; racingLine;
-        private int currentTargetIndex;
-        private double targetSpeed;
-        private Car playerCar;
-        private double slipstreamBoost;
-        private double brakingDistance;
+        //Llamada a clase base Car para inicializar la mayoria de variables
+<span class="fc" id="L42">        super(x, y, angle, velocity, maxVelocity, backwardsMaxVelocity, acceleration, </span>
+            backwardsAcceleration, mapHeight, mapWidth);
+        
+        //Inicializar el resto de variables
+<span class="fc" id="L46">        this.team = team;</span>
+<span class="fc" id="L47">        this.skillLevel = Math.max(0.1, Math.min(1.0, skillLevel));</span>
+<span class="fc" id="L48">        this.racingLine = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L49">        this.currentTargetIndex = 0;</span>
+<span class="fc" id="L50">        this.slipstreamBoost = 0;</span>
+<span class="fc" id="L51">        this.setTimeProvider(System::currentTimeMillis);</span>
+<span class="fc" id="L52">        this.currentLap = 0;</span>
+<span class="fc" id="L53">        this.bestLapTime = Long.MAX_VALUE;</span>
 
-        private long lapStartTime;
-        private long bestLapTime;
-        private long lapTime;
-        private int currentLap;
-        private TimeProvider timeProvider;
+<span class="fc" id="L55">        this.sectorTimes = new long[numSectors];</span>
+<span class="fc" id="L56">        this.bestSectorTimes = new long[numSectors];</span>
+<span class="fc" id="L57">        this.sectorColors = new Map.SectorColor[numSectors];</span>
+<span class="fc" id="L58">        this.sectorRecorded = new boolean[numSectors];</span>
+<span class="fc" id="L59">        this.passedCheckpoints = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L60">        this.nextCheckpointIndex = 0; </span>
         
-<span class="fc" id="L29">        private final int numSectors = 3;</span>
-        private long[] sectorTimes;
-        private long[] bestSectorTimes;
-        private Map.SectorColor[] sectorColors;
-        private boolean[] sectorRecorded;
+<span class="fc" id="L62">        Arrays.fill(bestSectorTimes, Long.MAX_VALUE);</span>
+<span class="fc" id="L63">        Arrays.fill(sectorColors, Map.SectorColor.NONE);</span>
+<span class="fc" id="L64">        Arrays.fill(sectorRecorded, false);</span>
+<span class="fc" id="L65">        Arrays.fill(sectorTimes, Long.MAX_VALUE);</span>
         
-        private Set&lt;Integer&gt; passedCheckpoints;
-        private int nextCheckpointIndex;
+        //Inicializar variables que dependen de skill level
+<span class="fc" id="L68">        setupAIParameters();</span>
+<span class="fc" id="L69">    }</span>
+    
+    //Inicialización de varaibles dependientes del nivel de los AICars
+    private void setupAIParameters() 
+    {
+<span class="fc" id="L74">        this.brakingDistance = 150 + (100 * (1 - skillLevel)); </span>
+<span class="fc" id="L75">        this.targetSpeed = maxVelocity * (0.8 + (0.2 * skillLevel));</span>
+<span class="fc" id="L76">    }</span>
         
-        public AICar(double x, double y, double angle, double velocity, double maxVelocity, 
-                    double backwardsMaxVelocity, double acceleration, double backwardsAcceleration, 
-                    int mapHeight, int mapWidth, String team, double skillLevel) 
+    //Función principal para actualizar la posición de los coches rivales
+    public void updateAI(BufferedImage collisionMap, List&lt;AICar&gt; otherAICars, int currentLap)
+    {       
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (racingLine.isEmpty()) return;</span>
+        
+<span class="fc" id="L83">        applySlipstream(otherAICars, currentLap);</span>
+<span class="fc" id="L84">        followRacingLine();</span>
+<span class="fc" id="L85">        update(collisionMap);</span>
+<span class="fc" id="L86">    }</span>
+    
+    //Aplicar Slipstream a los coches rivales
+    public void applySlipstream(List&lt;AICar&gt; otherAICars, int currentLap) 
+    {
+<span class="fc" id="L91">        slipstreamBoost = 0;</span>
+        
+        //Solo aplicar a partir de la segunda vuelta 
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (currentLap &gt;= 2) </span>
         {
-            //Llamada a clase base Car para inicializar la mayoria de variables
-<span class="fc" id="L43">            super(x, y, angle, velocity, maxVelocity, backwardsMaxVelocity, acceleration, </span>
-                backwardsAcceleration, mapHeight, mapWidth);
-            
-            //Inicializar el resto de variables
-<span class="fc" id="L47">            this.team = team;</span>
-<span class="fc" id="L48">            this.skillLevel = Math.max(0.1, Math.min(1.0, skillLevel));</span>
-<span class="fc" id="L49">            this.racingLine = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L50">            this.currentTargetIndex = 0;</span>
-<span class="fc" id="L51">            this.slipstreamBoost = 0;</span>
-<span class="fc" id="L52">            this.setTimeProvider(System::currentTimeMillis);</span>
-<span class="fc" id="L53">            this.currentLap = 0;</span>
-<span class="fc" id="L54">            this.bestLapTime = Long.MAX_VALUE;</span>
-
-<span class="fc" id="L56">            this.sectorTimes = new long[numSectors];</span>
-<span class="fc" id="L57">            this.bestSectorTimes = new long[numSectors];</span>
-<span class="fc" id="L58">            this.sectorColors = new Map.SectorColor[numSectors];</span>
-<span class="fc" id="L59">            this.sectorRecorded = new boolean[numSectors];</span>
-<span class="fc" id="L60">            this.passedCheckpoints = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L61">            this.nextCheckpointIndex = 0; </span>
-            
-<span class="fc" id="L63">            Arrays.fill(bestSectorTimes, Long.MAX_VALUE);</span>
-<span class="fc" id="L64">            Arrays.fill(sectorColors, Map.SectorColor.NONE);</span>
-<span class="fc" id="L65">            Arrays.fill(sectorRecorded, false);</span>
-<span class="fc" id="L66">            Arrays.fill(sectorTimes, Long.MAX_VALUE);</span>
-            
-            //Inicializar variables que dependen de skill level
-<span class="fc" id="L69">            setupAIParameters();</span>
-<span class="fc" id="L70">        }</span>
-        
-        //Inicialización de varaibles dependientes del nivel de los AICars
-        private void setupAIParameters() 
-        {
-<span class="fc" id="L75">            this.brakingDistance = 150 + (100 * (1 - skillLevel)); </span>
-<span class="fc" id="L76">            this.targetSpeed = maxVelocity * (0.8 + (0.2 * skillLevel));</span>
-<span class="fc" id="L77">        }</span>
-         
-        //Función principal para actualizar la posición de los coches rivales
-        public void updateAI(BufferedImage collisionMap, List&lt;AICar&gt; otherAICars, int currentLap)
-        {       
-<span class="fc bfc" id="L82" title="All 2 branches covered.">            if (racingLine.isEmpty()) return;</span>
-            
-<span class="fc" id="L84">            applySlipstream(otherAICars, currentLap);</span>
-<span class="fc" id="L85">            followRacingLine();</span>
-<span class="fc" id="L86">            update(collisionMap);</span>
-<span class="fc" id="L87">        }</span>
-        
-        //Aplicar Slipstream a los coches rivales
-        public void applySlipstream(List&lt;AICar&gt; otherAICars, int currentLap) 
-        {
-<span class="fc" id="L92">            slipstreamBoost = 0;</span>
-            
-            //Solo aplicar a partir de la segunda vuelta 
-<span class="fc bfc" id="L95" title="All 2 branches covered.">            if (currentLap &gt;= 2) </span>
+            // Buscar coches cercanos por delante
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            for (AICar otherCar : otherAICars) </span>
             {
-                // Buscar coches cercanos por delante
-<span class="fc bfc" id="L98" title="All 2 branches covered.">                for (AICar otherCar : otherAICars) </span>
+                //Si el coche se encuentra justo detrás
+<span class="fc bfc" id="L100" title="All 2 branches covered.">                if (isBehind(otherCar)) </span>
                 {
-                    //Si el coche se encuentra justo detrás
-<span class="fc bfc" id="L101" title="All 2 branches covered.">                    if (isBehind(otherCar)) </span>
-                    {
-                        //Calcular la distancia hasta el coche
-<span class="fc" id="L104">                        double distance = calculateDistance(otherCar);</span>
+                    //Calcular la distancia hasta el coche
+<span class="fc" id="L103">                    double distance = calculateDistance(otherCar);</span>
 
-                        //Si la distancia es menor a 100 pixeles, aplicar slipstream
-<span class="fc bfc" id="L107" title="All 2 branches covered.">                        if (distance &lt; 100) </span>
-                        { 
-<span class="fc" id="L109">                             slipstreamBoost = 5.0 * skillLevel; </span>
-                        }
-                    }
-<span class="fc" id="L112">                }</span>
-                
-                //Si se encuentra detrás del jugador
-<span class="fc bfc" id="L115" title="All 2 branches covered.">                if (isBehindPlayer()) </span>
-                {
-                    //Calcular la distancia al jugador
-<span class="fc" id="L118">                    double distance = calculateDistanceToPlayer();</span>
-
-                    //Si la distancia es menor a 100 aplicar slipstream
-<span class="fc bfc" id="L121" title="All 2 branches covered.">                    if (distance &lt; 100) </span>
-                    {
-<span class="fc" id="L123">                        slipstreamBoost = Math.max(slipstreamBoost, 5.0 * skillLevel);</span>
+                    //Si la distancia es menor a 100 pixeles, aplicar slipstream
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                    if (distance &lt; 100) </span>
+                    { 
+<span class="fc" id="L108">                        slipstreamBoost = 5.0 * skillLevel; </span>
                     }
                 }
-            }
-<span class="fc" id="L127">        }</span>
-        
-        //Función principal para seguir la Racing Line (no al pie de la letra) para saber por donde ir
-        public void followRacingLine() 
-        {
-            //Resetear indice para el principio de vueltas
-<span class="fc bfc" id="L133" title="All 2 branches covered.">            if (currentTargetIndex &gt;= racingLine.size()) </span>
-            {
-<span class="fc" id="L135">                currentTargetIndex = 0;</span>
-            }
+<span class="fc" id="L111">            }</span>
             
-            //Obtener el siguiente indice que debe seguir el coche
-<span class="fc" id="L139">            Point target = racingLine.get(currentTargetIndex);</span>
-<span class="fc" id="L140">            double targetX = target.x;</span>
-<span class="fc" id="L141">            double targetY = target.y;</span>
-            
-<span class="fc" id="L143">            double dx = targetX - x;</span>
-<span class="fc" id="L144">            double dy = targetY - y;</span>
-
-            //Calcular la distancia hasta el siguiente punto
-<span class="fc" id="L147">            double distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
-
-            //Si el skill level es inferior, mirar más adelante los checkpoints para evitar chocarse
-<span class="fc bfc" id="L150" title="All 2 branches covered.">            if(skillLevel &lt; 0.6)</span>
+            //Si se encuentra detrás del jugador
+<span class="fc bfc" id="L114" title="All 2 branches covered.">            if (isBehindPlayer()) </span>
             {
-                //Si estamos muy cerca del waypoint, pasar al siguiente
-<span class="fc bfc" id="L153" title="All 2 branches covered.">                if (distanceToTarget &lt; 110)  </span>
+                //Calcular la distancia al jugador
+<span class="fc" id="L117">                double distance = calculateDistanceToPlayer();</span>
+
+                //Si la distancia es menor a 100 aplicar slipstream
+<span class="fc bfc" id="L120" title="All 2 branches covered.">                if (distance &lt; 100) </span>
                 {
-<span class="fc" id="L155">                    currentTargetIndex++;</span>
-
-                    //Tener en cuenta que el siguiente puede ser la línea de meta
-<span class="fc bfc" id="L158" title="All 2 branches covered.">                    if(currentTargetIndex == racingLine.size()) currentTargetIndex = 0;</span>
-
-                    //Como se ha cambiado el siguiente punto, cambiar rumbo y calcular distancia
-<span class="fc" id="L161">                    target = racingLine.get(currentTargetIndex);</span>
-<span class="fc" id="L162">                    targetX = target.x;</span>
-<span class="fc" id="L163">                    targetY = target.y;</span>
-                    
-<span class="fc" id="L165">                    dx = targetX - x;</span>
-<span class="fc" id="L166">                    dy = targetY - y;</span>
-<span class="fc" id="L167">                    distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
-                
+<span class="fc" id="L122">                    slipstreamBoost = Math.max(slipstreamBoost, 5.0 * skillLevel);</span>
                 }
             }
-            //Si tienen un skill level más alto, no les hace falta tanta distancia de detección
-            else
-            {
-                //Si estamos muy cerca del waypoint, pasar al siguiente
-<span class="fc bfc" id="L175" title="All 2 branches covered.">                if (distanceToTarget &lt; 90)  </span>
-                {
-<span class="fc" id="L177">                    currentTargetIndex++;</span>
+        }
+<span class="fc" id="L126">    }</span>
+    
+    //Función principal para seguir la Racing Line (no al pie de la letra) para saber por donde ir
+    public void followRacingLine() 
+    {
+        //Resetear indice para el principio de vueltas
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (currentTargetIndex &gt;= racingLine.size()) </span>
+        {
+<span class="fc" id="L134">            currentTargetIndex = 0;</span>
+        }
+        
+        //Obtener el siguiente indice que debe seguir el coche
+<span class="fc" id="L138">        Point target = racingLine.get(currentTargetIndex);</span>
+<span class="fc" id="L139">        double targetX = target.x;</span>
+<span class="fc" id="L140">        double targetY = target.y;</span>
+        
+<span class="fc" id="L142">        double dx = targetX - x;</span>
+<span class="fc" id="L143">        double dy = targetY - y;</span>
 
-                    //Tener en cuenta que el siguiente puede ser la línea de meta
-<span class="fc bfc" id="L180" title="All 2 branches covered.">                    if(currentTargetIndex == racingLine.size()) currentTargetIndex = 0;</span>
-                    
-                    //Como se ha cambiado el siguiente punto, cambiar rumbo y calcular distancia
-<span class="fc" id="L183">                    target = racingLine.get(currentTargetIndex);</span>
-<span class="fc" id="L184">                    targetX = target.x;</span>
-<span class="fc" id="L185">                    targetY = target.y;</span>
-                    
-<span class="fc" id="L187">                    dx = targetX - x;</span>
-<span class="fc" id="L188">                    dy = targetY - y;</span>
-<span class="fc" id="L189">                    distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
+        //Calcular la distancia hasta el siguiente punto
+<span class="fc" id="L146">        double distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
+
+        //Si el skill level es inferior, mirar más adelante los checkpoints para evitar chocarse
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if(skillLevel &lt; 0.6)</span>
+        {
+            //Si estamos muy cerca del waypoint, pasar al siguiente
+<span class="fc bfc" id="L152" title="All 2 branches covered.">            if (distanceToTarget &lt; 110)  </span>
+            {
+<span class="fc" id="L154">                currentTargetIndex++;</span>
+
+                //Tener en cuenta que el siguiente puede ser la línea de meta
+<span class="fc bfc" id="L157" title="All 2 branches covered.">                if(currentTargetIndex == racingLine.size()) currentTargetIndex = 0;</span>
+
+                //Como se ha cambiado el siguiente punto, cambiar rumbo y calcular distancia
+<span class="fc" id="L160">                target = racingLine.get(currentTargetIndex);</span>
+<span class="fc" id="L161">                targetX = target.x;</span>
+<span class="fc" id="L162">                targetY = target.y;</span>
                 
-                }
+<span class="fc" id="L164">                dx = targetX - x;</span>
+<span class="fc" id="L165">                dy = targetY - y;</span>
+<span class="fc" id="L166">                distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
+            
             }
-            
-            //Calcular ángulo hacia el siguiente objetivo
-<span class="fc" id="L195">            double targetAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
-            
-            //Suavizar el giro en función del skill level (más giro o menos giro)
-<span class="fc" id="L198">            double angleDiff = normalizeAngle(targetAngle - angle);</span>
-<span class="fc" id="L199">            double turnAmount = Math.min(5.0 * skillLevel, Math.abs(angleDiff)); </span>
-            
-            //Decidir dirección de giro
-<span class="fc bfc" id="L202" title="All 2 branches covered.">            if (angleDiff &gt; 0) </span>
+        }
+        //Si tienen un skill level más alto, no les hace falta tanta distancia de detección
+        else
+        {
+            //Si estamos muy cerca del waypoint, pasar al siguiente
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (distanceToTarget &lt; 90)  </span>
             {
-<span class="fc" id="L204">                angle += turnAmount;</span>
-            } 
-            else 
-            {
-<span class="fc" id="L208">                angle -= turnAmount;</span>
-            }
-            
-            //Control de velocidad 
-<span class="fc" id="L212">            double speedMultiplier = 1.0;</span>
-            
-            //Reducir velocidad en curvas pronunciadas
-<span class="fc bfc" id="L215" title="All 2 branches covered.">            if (Math.abs(angleDiff) &gt; 90) </span>
-            {
-<span class="fc" id="L217">                speedMultiplier = 0.4;</span>
-            } 
-<span class="fc bfc" id="L219" title="All 2 branches covered.">            else if (Math.abs(angleDiff) &gt; 45) </span>
-            {
-<span class="fc" id="L221">                speedMultiplier = 0.6;</span>
-            } 
-<span class="fc bfc" id="L223" title="All 2 branches covered.">            else if (Math.abs(angleDiff) &gt; 20) </span>
-            {
-<span class="fc" id="L225">                speedMultiplier = 0.8;</span>
-            }
-            
-            //Reducir velocidad al acercarse al waypoint
-<span class="fc bfc" id="L229" title="All 2 branches covered.">            if (distanceToTarget &lt; brakingDistance)</span>
-            {
-<span class="fc" id="L231">                double brakeMultiplier = Math.max(0.3, distanceToTarget / brakingDistance);</span>
-<span class="fc" id="L232">                speedMultiplier *= brakeMultiplier;</span>
-            }
-            
-<span class="fc" id="L235">            double currentTargetSpeed = (targetSpeed + slipstreamBoost) * speedMultiplier;</span>
-            
-            //Determinar si el coche debe frenar o acelerar
-<span class="fc" id="L238">            double speedDifference = currentTargetSpeed - velocity;</span>
-            
-            //Deicidir si el coche debe frenar o acelerar según su situación
-<span class="fc bfc" id="L241" title="All 2 branches covered.">            if (speedDifference &gt; 0) </span>
-            {
+<span class="fc" id="L176">                currentTargetIndex++;</span>
+
+                //Tener en cuenta que el siguiente puede ser la línea de meta
+<span class="fc bfc" id="L179" title="All 2 branches covered.">                if(currentTargetIndex == racingLine.size()) currentTargetIndex = 0;</span>
                 
-<span class="fc" id="L244">                velocity += acceleration * skillLevel * Math.min(1.0, speedDifference / 5.0);</span>
-            } 
-            else 
-            {
+                //Como se ha cambiado el siguiente punto, cambiar rumbo y calcular distancia
+<span class="fc" id="L182">                target = racingLine.get(currentTargetIndex);</span>
+<span class="fc" id="L183">                targetX = target.x;</span>
+<span class="fc" id="L184">                targetY = target.y;</span>
                 
-<span class="fc" id="L249">                velocity += backwardsAcceleration * skillLevel * Math.max(-1.0, speedDifference / 5.0);</span>
-            }
+<span class="fc" id="L186">                dx = targetX - x;</span>
+<span class="fc" id="L187">                dy = targetY - y;</span>
+<span class="fc" id="L188">                distanceToTarget = Math.sqrt(dx * dx + dy * dy);</span>
             
-            // Limitar velocidad máxima y mínima
-<span class="fc" id="L253">            velocity = Math.max(backwardsMaxVelocity, Math.min(getEffectiveMaxVelocity(), velocity));</span>
-<span class="fc" id="L254">        }</span>
-                
-        //Calcular distancia hasta otro coche
-        public double calculateDistance(AICar otherCar) 
-        {
-<span class="fc" id="L259">            double dx = otherCar.getX() - x;</span>
-<span class="fc" id="L260">            double dy = otherCar.getY() - y;</span>
-<span class="fc" id="L261">            return Math.sqrt(dx * dx + dy * dy);</span>
-        }
-        
-        //Calcular distancia hasta el coche del jugador
-        private double calculateDistanceToPlayer() 
-        {
-<span class="fc" id="L267">            double dx = playerCar.getX() - x;</span>
-<span class="fc" id="L268">            double dy = playerCar.getY() - y;</span>
-<span class="fc" id="L269">            return Math.sqrt(dx * dx + dy * dy);</span>
-        }
-        
-        //Determinar si un coche se encuentra detrás o no
-        private boolean isBehind(AICar otherCar) 
-        {
-<span class="fc bfc" id="L275" title="All 2 branches covered.">            if(otherCar == this) return false;</span>
-<span class="fc" id="L276">            double dx = otherCar.getX() - x;</span>
-<span class="fc" id="L277">            double dy = otherCar.getY() - y;</span>
-<span class="fc" id="L278">            double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
-<span class="fc" id="L279">            double angleDiff = normalizeAngle(relativeAngle - angle);</span>
-<span class="fc bfc" id="L280" title="All 2 branches covered.">            return Math.abs(angleDiff) &lt; 60; </span>
-        }
-        
-        //Determinar si un coche se encuentra detrás del cotxes del jugador
-        private boolean isBehindPlayer() 
-        {
-<span class="fc bfc" id="L286" title="All 2 branches covered.">            if (playerCar == null) return false;</span>
-<span class="fc" id="L287">            double dx = playerCar.getX() - x;</span>
-<span class="fc" id="L288">            double dy = playerCar.getY() - y;</span>
-<span class="fc" id="L289">            double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
-<span class="fc" id="L290">            double angleDiff = normalizeAngle(relativeAngle - angle);</span>
-<span class="fc bfc" id="L291" title="All 2 branches covered.">            return Math.abs(angleDiff) &lt; 60;</span>
-        }
-        
-        //Normalizar los cálculos de los ángulos para controlar el valor entre 0-360
-        public double normalizeAngle(double angle) 
-        {
-<span class="fc bfc" id="L297" title="All 2 branches covered.">            while (angle &gt; 180) angle -= 360;</span>
-<span class="fc bfc" id="L298" title="All 2 branches covered.">            while (angle &lt; -180) angle += 360;</span>
-<span class="fc" id="L299">            return angle;</span>
-        }
-
-        //Resetear todos los valores necesarios para poder empezar una nueva vuelta
-        public void startNewLap() 
-        {
-<span class="fc" id="L305">            this.lapStartTime = timeProvider.now();</span>
-<span class="fc" id="L306">            Arrays.fill(sectorTimes, Long.MAX_VALUE);</span>
-<span class="fc" id="L307">            Arrays.fill(sectorRecorded, false);</span>
-<span class="fc" id="L308">            Arrays.fill(sectorColors, Map.SectorColor.NONE);</span>
-<span class="fc" id="L309">            passedCheckpoints.clear();</span>
-<span class="fc" id="L310">            nextCheckpointIndex = 0;</span>
-<span class="fc" id="L311">            currentLap++;</span>
-<span class="fc" id="L312">        }</span>
-        
-        //Guardar el tiempo de sector realizado por un coche AI
-        public void recordSector(int sectorIndex, long sectorTime) 
-        {
-            //Verificiar que el sector existe
-<span class="fc bfc" id="L318" title="All 4 branches covered.">            if (sectorIndex &lt; 0 || sectorIndex &gt;= numSectors) return;</span>
-            
-            //Asignar el valor
-<span class="fc" id="L321">            sectorTimes[sectorIndex] = sectorTime;</span>
-<span class="fc" id="L322">            sectorRecorded[sectorIndex] = true;</span>
-            
-            // Verificar si es el mejor sector personal y determinar verde en caso correcto, naranja incorrecto
-<span class="fc bfc" id="L325" title="All 2 branches covered.">            if (sectorTime &lt; bestSectorTimes[sectorIndex]) </span>
-            {
-<span class="fc" id="L327">                bestSectorTimes[sectorIndex] = sectorTime;</span>
-<span class="fc" id="L328">                sectorColors[sectorIndex] = Map.SectorColor.GREEN;</span>
-            } 
-            else 
-            {
-<span class="fc" id="L332">                sectorColors[sectorIndex] = Map.SectorColor.ORANGE;</span>
             }
-<span class="fc" id="L334">        }</span>
-        
-        //Calcular el tiempo de vuelta al completar una
-        public void completeLap() 
-        {
-<span class="fc" id="L339">            long lapEndTime = timeProvider.now();</span>
-<span class="fc" id="L340">            long lastCompletedLapTime = lapEndTime - lapStartTime;</span>
-            
-            // Actualizar mejor tiempo de vuelta
-<span class="fc bfc" id="L343" title="All 2 branches covered.">            if (lastCompletedLapTime &lt; bestLapTime) </span>
-            {
-<span class="fc" id="L345">                bestLapTime = lastCompletedLapTime;</span>
-            }
-<span class="fc" id="L347">        }</span>
-
-        //Hacer el update del Lap Time en caso necesario al pasar por un checkpoint o en update general
-        public void updateLapTime() 
-        {
-<span class="fc bfc" id="L352" title="All 2 branches covered.">            if (lapStartTime &gt; 0) </span>
-            {
-<span class="fc" id="L354">                this.lapTime = timeProvider.now() - lapStartTime;</span>
-            }
-<span class="fc" id="L356">        }</span>
-        
-        //Verificar que haya pasado por todos los checkpoints
-        public boolean passedAllCheckpoints() 
-        {
-<span class="fc bfc" id="L361" title="All 2 branches covered.">            return passedCheckpoints.size() &gt;= 4; // Asumiendo 4 checkpoints + línea de meta</span>
         }
         
-        // Getters
-            //Temporizador y tiempo
-<span class="fc" id="L366">        public long getLapTime() { return lapTime; }</span>
-<span class="fc bfc" id="L367" title="All 2 branches covered.">        public long getBestLapTime() { return bestLapTime == Long.MAX_VALUE ? 0 : bestLapTime; }</span>
-<span class="fc" id="L368">        public long getLapStartTime() { return lapStartTime; }</span>
-<span class="fc" id="L369">        public long[] getSectorTimes() { return sectorTimes; }</span>
-
-            //Checkpoints
-<span class="fc" id="L372">        public Map.SectorColor[] getSectorColors() { return sectorColors; }</span>
-<span class="fc" id="L373">        public Set&lt;Integer&gt; getPassedCheckpoints() { return passedCheckpoints; }</span>
-<span class="fc" id="L374">        public int getNextCheckpointIndex() { return nextCheckpointIndex; }</span>
-
-            //Carrera o coches
-<span class="fc" id="L377">        public int getCurrentLap() { return currentLap; }</span>
-<span class="fc" id="L378">        public String getTeam() { return this.team; }</span>
-<span class="fc" id="L379">        public double getSkillLevel() { return this.skillLevel; }</span>
-<span class="fc" id="L380">        public double getSlipstreamBoost() { return this.slipstreamBoost; }</span>
-<span class="fc" id="L381">        public List&lt;Point&gt; getRacingLine() {return this.racingLine;}</span>
-<span class="fc" id="L382">        public Integer getCurrentTargetIndex() {return currentTargetIndex;}</span>
+        //Calcular ángulo hacia el siguiente objetivo
+<span class="fc" id="L194">        double targetAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
         
-        //Setters
-<span class="fc" id="L385">        public void setNextCheckpointIndex(int index) { this.nextCheckpointIndex = index; }</span>
-<span class="fc" id="L386">        public void setTimeProvider(TimeProvider timeProvider) {this.timeProvider = timeProvider;}</span>
-<span class="fc" id="L387">        public void setCurrentLap(int lap) {this.currentLap = lap;}</span>
-<span class="fc" id="L388">        public void setSectorTime(int index, long time) {sectorTimes[index] = time;}</span>
-<span class="fc" id="L389">        public void setPlayerCar(Car playerCar) {this.playerCar = playerCar;}</span>
-<span class="fc" id="L390">        public void setCurrentTargetIndex(int index) {this.currentTargetIndex = index;}</span>
-<span class="fc" id="L391">        public void setCheckpointPassed(int checkPoint) {this.passedCheckpoints.add(checkPoint);}</span>
-        public void setSkillLevel(double skillLevel) 
-        { 
-<span class="fc" id="L394">            this.skillLevel = skillLevel; </span>
-<span class="fc" id="L395">            setupAIParameters();</span>
-<span class="fc" id="L396">        }</span>
-        public void setRacingLine(List&lt;Point&gt; racingLine) 
+        //Suavizar el giro en función del skill level (más giro o menos giro)
+<span class="fc" id="L197">        double angleDiff = normalizeAngle(targetAngle - angle);</span>
+<span class="fc" id="L198">        double turnAmount = Math.min(5.0 * skillLevel, Math.abs(angleDiff)); </span>
+        
+        //Decidir dirección de giro
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (angleDiff &gt; 0) </span>
         {
-<span class="fc" id="L399">            this.racingLine = new ArrayList&lt;&gt;(racingLine);</span>
-<span class="fc" id="L400">            this.currentTargetIndex = 0;</span>
-<span class="fc" id="L401">        }</span>
-    } 
+<span class="fc" id="L203">            angle += turnAmount;</span>
+        } 
+        else 
+        {
+<span class="fc" id="L207">            angle -= turnAmount;</span>
+        }
+        
+        //Control de velocidad 
+<span class="fc" id="L211">        double speedMultiplier = 1.0;</span>
+        
+        //Reducir velocidad en curvas pronunciadas
+<span class="fc bfc" id="L214" title="All 2 branches covered.">        if (Math.abs(angleDiff) &gt; 90) </span>
+        {
+<span class="fc" id="L216">            speedMultiplier = 0.4;</span>
+        } 
+<span class="fc bfc" id="L218" title="All 2 branches covered.">        else if (Math.abs(angleDiff) &gt; 45) </span>
+        {
+<span class="fc" id="L220">            speedMultiplier = 0.6;</span>
+        } 
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        else if (Math.abs(angleDiff) &gt; 20) </span>
+        {
+<span class="fc" id="L224">            speedMultiplier = 0.8;</span>
+        }
+        
+        //Reducir velocidad al acercarse al waypoint
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        if (distanceToTarget &lt; brakingDistance)</span>
+        {
+<span class="fc" id="L230">            double brakeMultiplier = Math.max(0.3, distanceToTarget / brakingDistance);</span>
+<span class="fc" id="L231">            speedMultiplier *= brakeMultiplier;</span>
+        }
+        
+<span class="fc" id="L234">        double currentTargetSpeed = (targetSpeed + slipstreamBoost) * speedMultiplier;</span>
+        
+        //Determinar si el coche debe frenar o acelerar
+<span class="fc" id="L237">        double speedDifference = currentTargetSpeed - velocity;</span>
+        
+        //Deicidir si el coche debe frenar o acelerar según su situación
+<span class="fc bfc" id="L240" title="All 2 branches covered.">        if (speedDifference &gt; 0) </span>
+        {
+            
+<span class="fc" id="L243">            velocity += acceleration * skillLevel * Math.min(1.0, speedDifference / 5.0);</span>
+        } 
+        else 
+        {
+            
+<span class="fc" id="L248">            velocity += backwardsAcceleration * skillLevel * Math.max(-1.0, speedDifference / 5.0);</span>
+        }
+        
+        // Limitar velocidad máxima y mínima
+<span class="fc" id="L252">        velocity = Math.max(backwardsMaxVelocity, Math.min(getEffectiveMaxVelocity(), velocity));</span>
+<span class="fc" id="L253">    }</span>
+            
+    //Calcular distancia hasta otro coche
+    public double calculateDistance(AICar otherCar) 
+    {
+<span class="fc" id="L258">        double dx = otherCar.getX() - x;</span>
+<span class="fc" id="L259">        double dy = otherCar.getY() - y;</span>
+<span class="fc" id="L260">        return Math.sqrt(dx * dx + dy * dy);</span>
+    }
+    
+    //Calcular distancia hasta el coche del jugador
+    private double calculateDistanceToPlayer() 
+    {
+<span class="fc" id="L266">        double dx = playerCar.getX() - x;</span>
+<span class="fc" id="L267">        double dy = playerCar.getY() - y;</span>
+<span class="fc" id="L268">        return Math.sqrt(dx * dx + dy * dy);</span>
+    }
+    
+    //Determinar si un coche se encuentra detrás o no
+    private boolean isBehind(AICar otherCar) 
+    {
+<span class="fc bfc" id="L274" title="All 2 branches covered.">        if(otherCar == this) return false;</span>
+<span class="fc" id="L275">        double dx = otherCar.getX() - x;</span>
+<span class="fc" id="L276">        double dy = otherCar.getY() - y;</span>
+<span class="fc" id="L277">        double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
+<span class="fc" id="L278">        double angleDiff = normalizeAngle(relativeAngle - angle);</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">        return Math.abs(angleDiff) &lt; 60; </span>
+    }
+    
+    //Determinar si un coche se encuentra detrás del cotxes del jugador
+    private boolean isBehindPlayer() 
+    {
+<span class="fc bfc" id="L285" title="All 2 branches covered.">        if (playerCar == null) return false;</span>
+<span class="fc" id="L286">        double dx = playerCar.getX() - x;</span>
+<span class="fc" id="L287">        double dy = playerCar.getY() - y;</span>
+<span class="fc" id="L288">        double relativeAngle = Math.toDegrees(Math.atan2(dy, dx));</span>
+<span class="fc" id="L289">        double angleDiff = normalizeAngle(relativeAngle - angle);</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">        return Math.abs(angleDiff) &lt; 60;</span>
+    }
+    
+    //Normalizar los cálculos de los ángulos para controlar el valor entre 0-360
+    public double normalizeAngle(double angle) 
+    {
+<span class="fc bfc" id="L296" title="All 2 branches covered.">        while (angle &gt; 180) angle -= 360;</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">        while (angle &lt; -180) angle += 360;</span>
+<span class="fc" id="L298">        return angle;</span>
+    }
+
+    //Resetear todos los valores necesarios para poder empezar una nueva vuelta
+    public void startNewLap() 
+    {
+<span class="fc" id="L304">        this.lapStartTime = timeProvider.now();</span>
+<span class="fc" id="L305">        Arrays.fill(sectorTimes, Long.MAX_VALUE);</span>
+<span class="fc" id="L306">        Arrays.fill(sectorRecorded, false);</span>
+<span class="fc" id="L307">        Arrays.fill(sectorColors, Map.SectorColor.NONE);</span>
+<span class="fc" id="L308">        passedCheckpoints.clear();</span>
+<span class="fc" id="L309">        nextCheckpointIndex = 0;</span>
+<span class="fc" id="L310">        currentLap++;</span>
+<span class="fc" id="L311">    }</span>
+    
+    //Guardar el tiempo de sector realizado por un coche AI
+    public void recordSector(int sectorIndex, long sectorTime) 
+    {
+        //Verificiar que el sector existe
+<span class="fc bfc" id="L317" title="All 4 branches covered.">        if (sectorIndex &lt; 0 || sectorIndex &gt;= numSectors) return;</span>
+        
+        //Asignar el valor
+<span class="fc" id="L320">        sectorTimes[sectorIndex] = sectorTime;</span>
+<span class="fc" id="L321">        sectorRecorded[sectorIndex] = true;</span>
+        
+        // Verificar si es el mejor sector personal y determinar verde en caso correcto, naranja incorrecto
+<span class="fc bfc" id="L324" title="All 2 branches covered.">        if (sectorTime &lt; bestSectorTimes[sectorIndex]) </span>
+        {
+<span class="fc" id="L326">            bestSectorTimes[sectorIndex] = sectorTime;</span>
+<span class="fc" id="L327">            sectorColors[sectorIndex] = Map.SectorColor.GREEN;</span>
+        } 
+        else 
+        {
+<span class="fc" id="L331">            sectorColors[sectorIndex] = Map.SectorColor.ORANGE;</span>
+        }
+<span class="fc" id="L333">    }</span>
+    
+    //Calcular el tiempo de vuelta al completar una
+    public void completeLap() 
+    {
+<span class="fc" id="L338">        long lapEndTime = timeProvider.now();</span>
+<span class="fc" id="L339">        long lastCompletedLapTime = lapEndTime - lapStartTime;</span>
+        
+        // Actualizar mejor tiempo de vuelta
+<span class="fc bfc" id="L342" title="All 2 branches covered.">        if (lastCompletedLapTime &lt; bestLapTime) </span>
+        {
+<span class="fc" id="L344">            bestLapTime = lastCompletedLapTime;</span>
+        }
+<span class="fc" id="L346">    }</span>
+
+    //Hacer el update del Lap Time en caso necesario al pasar por un checkpoint o en update general
+    public void updateLapTime() 
+    {
+<span class="fc bfc" id="L351" title="All 2 branches covered.">        if (lapStartTime &gt; 0) </span>
+        {
+<span class="fc" id="L353">            this.lapTime = timeProvider.now() - lapStartTime;</span>
+        }
+<span class="fc" id="L355">    }</span>
+    
+    //Verificar que haya pasado por todos los checkpoints
+    public boolean passedAllCheckpoints() 
+    {
+<span class="fc bfc" id="L360" title="All 2 branches covered.">        return passedCheckpoints.size() &gt;= 4; // Asumiendo 4 checkpoints + línea de meta</span>
+    }
+    
+    // Getters
+        //Temporizador y tiempo
+<span class="fc" id="L365">    public long getLapTime() { return lapTime; }</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">    public long getBestLapTime() { return bestLapTime == Long.MAX_VALUE ? 0 : bestLapTime; }</span>
+<span class="fc" id="L367">    public long getLapStartTime() { return lapStartTime; }</span>
+<span class="fc" id="L368">    public long[] getSectorTimes() { return sectorTimes; }</span>
+
+        //Checkpoints
+<span class="fc" id="L371">    public Map.SectorColor[] getSectorColors() { return sectorColors; }</span>
+<span class="fc" id="L372">    public Set&lt;Integer&gt; getPassedCheckpoints() { return passedCheckpoints; }</span>
+<span class="fc" id="L373">    public int getNextCheckpointIndex() { return nextCheckpointIndex; }</span>
+
+        //Carrera o coches
+<span class="fc" id="L376">    public int getCurrentLap() { return currentLap; }</span>
+<span class="fc" id="L377">    public String getTeam() { return this.team; }</span>
+<span class="fc" id="L378">    public double getSkillLevel() { return this.skillLevel; }</span>
+<span class="fc" id="L379">    public double getSlipstreamBoost() { return this.slipstreamBoost; }</span>
+<span class="fc" id="L380">    public List&lt;Point&gt; getRacingLine() {return this.racingLine;}</span>
+<span class="fc" id="L381">    public Integer getCurrentTargetIndex() {return currentTargetIndex;}</span>
+    
+    //Setters
+<span class="fc" id="L384">    public void setNextCheckpointIndex(int index) { this.nextCheckpointIndex = index; }</span>
+<span class="fc" id="L385">    public void setTimeProvider(TimeProvider timeProvider) {this.timeProvider = timeProvider;}</span>
+<span class="fc" id="L386">    public void setCurrentLap(int lap) {this.currentLap = lap;}</span>
+<span class="fc" id="L387">    public void setSectorTime(int index, long time) {sectorTimes[index] = time;}</span>
+<span class="fc" id="L388">    public void setPlayerCar(Car playerCar) {this.playerCar = playerCar;}</span>
+<span class="fc" id="L389">    public void setCurrentTargetIndex(int index) {this.currentTargetIndex = index;}</span>
+<span class="fc" id="L390">    public void setCheckpointPassed(int checkPoint) {this.passedCheckpoints.add(checkPoint);}</span>
+    public void setSkillLevel(double skillLevel) 
+    { 
+<span class="fc" id="L393">        this.skillLevel = skillLevel; </span>
+<span class="fc" id="L394">        setupAIParameters();</span>
+<span class="fc" id="L395">    }</span>
+    public void setRacingLine(List&lt;Point&gt; racingLine) 
+    {
+<span class="fc" id="L398">        this.racingLine = new ArrayList&lt;&gt;(racingLine);</span>
+<span class="fc" id="L399">        this.currentTargetIndex = 0;</span>
+<span class="fc" id="L400">    }</span>
+} 
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

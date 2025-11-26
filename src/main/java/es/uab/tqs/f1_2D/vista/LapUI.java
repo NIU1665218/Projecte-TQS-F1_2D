@@ -105,7 +105,7 @@ public class LapUI extends JPanel
         {
             //Obtiene el color del sector 
             Map.SectorColor color = map.getSectorColor(i);
-            int colorIndex;
+            int colorIndex = 0;
             switch (color) 
             {
                 case NONE:
@@ -120,8 +120,6 @@ public class LapUI extends JPanel
                 case PURPLE:
                     colorIndex = 3;
                     break;
-                default:
-                    colorIndex = 0;
             }
             //Obtiene, de la matriz, la imagen correspondiente al sector y color
             BufferedImage img = sectorImages[i][colorIndex];

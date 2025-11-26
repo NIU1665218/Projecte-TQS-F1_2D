@@ -412,6 +412,8 @@ public class MapController
         long min = Long.MAX_VALUE;
         if(model.isRaceMode())
         {
+            //Si estamos en carrera, comprobar quien tiene el mejor tiempo de ese sector
+            //si se trata del jugador, poner el sector en morado
             for(AICar aicar : aiController.getAICars())
             {
                 Long aiTime = aicar.getSectorTimes()[sectorIndex];

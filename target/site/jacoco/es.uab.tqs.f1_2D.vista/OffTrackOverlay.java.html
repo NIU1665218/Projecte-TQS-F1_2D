@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OffTrackOverlay.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.vista</a> &gt; <span class="el_source">OffTrackOverlay.java</span></div><h1>OffTrackOverlay.java</h1><pre class="source lang-java linenums">package es.uab.tqs.f1_2D.vista;
 
-import javax.sound.sampled.*;
-import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
+import javax.sound.sampled.*;
+import javax.swing.*;
 
 public class OffTrackOverlay extends JPanel 
 {
@@ -16,8 +16,8 @@ public class OffTrackOverlay extends JPanel
     private boolean visible;
 
     //Constructor
-    public OffTrackOverlay(String imageResourcePath, String soundResourcePath) 
-<span class="fc" id="L20">    {</span>
+<span class="fc" id="L19">    public OffTrackOverlay(String imageResourcePath, String soundResourcePath) </span>
+    {
         //Inicializar el panel de forma que no sea visible y sea transparente
 <span class="fc" id="L22">        setOpaque(false);</span>
 <span class="fc" id="L23">        this.visible = false;</span>
@@ -33,17 +33,17 @@ public class OffTrackOverlay extends JPanel
 <span class="fc" id="L33">        URL imageUrl = null;</span>
         try {
 <span class="fc" id="L35">            imageUrl = getClass().getResource(path);</span>
-        }
+<span class="fc" id="L36">        }</span>
 <span class="fc" id="L37">        catch (NullPointerException | IllegalArgumentException e) { </span>
             //Si hay excepción se queda en null
-<span class="fc" id="L39">        }</span>
+        }
 
 
         //Si se encuentra la imagen se crea el icon, en caso contrario lo deja en null
 <span class="fc bfc" id="L43" title="All 2 branches covered.">        if (imageUrl != null) </span>
         {
 <span class="fc" id="L45">            imageIcon = new ImageIcon(imageUrl);</span>
-        }
+<span class="fc" id="L46">        }</span>
         else
         {
 <span class="fc" id="L49">            imageIcon = null;</span>
@@ -69,8 +69,8 @@ public class OffTrackOverlay extends JPanel
 <span class="fc" id="L69">                clip.open(audioStream);</span>
 <span class="fc" id="L70">            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {</span>
 <span class="fc" id="L71">                clip = null; //Si hay error, lo dejamos en null</span>
-<span class="fc" id="L72">            }</span>
-        }
+            }
+<span class="fc" id="L73">        }</span>
         else
         {
 <span class="fc" id="L76">            clip = null; //si no encuentra el audio, lo dejamos en null</span>

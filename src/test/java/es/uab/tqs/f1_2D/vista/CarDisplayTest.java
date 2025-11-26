@@ -30,7 +30,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.sound.sampled.Clip;
-
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 @ExtendWith(MockitoExtension.class)
@@ -301,7 +301,7 @@ class CarDisplayTest {
 
 
     @Test
-    void testKeyListenerAddsAndRemovesKeys() throws Exception
+    void testKeyListenerAndActionListener() throws Exception
     {
         //Configuración del mock
         Map mockTempMap = mock(Map.class);
@@ -363,6 +363,14 @@ class CarDisplayTest {
             new KeyEvent(display, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_W, 'W')
         );
         assertFalse(display.getKeysPressed().contains(KeyEvent.VK_W));
+
+        JButton qualyButton = display.getMainMenu().getQualyButton();
+        qualyButton.doClick();
+        assertEquals(GameMode.QUALY, display.getCurrentGameMode());
+
+        JButton raceButton = display.getMainMenu().getRaceButton();
+        raceButton.doClick();
+        assertEquals(GameMode.RACE, display.getCurrentGameMode());
 
     }
 
@@ -444,6 +452,25 @@ class CarDisplayTest {
         }
     }
 
+    /*
+    @Test
+    void testSoloHeadless() 
+    {
+        String old = System.getProperty("java.awt.headless");
+        try {
+            System.setProperty("java.awt.headless", "true"); 
+            //assertThrows(HeadlessException.class, () -> CarDisplay.main(new String[]{}));
+            assertThrows(HeadlessException.class,
+            () -> Toolkit.getDefaultToolkit().getScreenSize()
+        );
+        } finally {
+            // restaurar estado
+            if (old != null) System.setProperty("java.awt.headless", old);
+            else System.clearProperty("java.awt.headless");
+        }
+    }
+    */
+    @Test
     //Métodos de ayuda para poder hacer una especie de caballo de troya
     private void setPrivateField(Object obj, String fieldName, Object value) 
     {

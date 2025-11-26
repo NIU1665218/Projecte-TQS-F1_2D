@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CarDisplay.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">f1_2D</a> &gt; <a href="index.source.html" class="el_package">es.uab.tqs.f1_2D.vista</a> &gt; <span class="el_source">CarDisplay.java</span></div><h1>CarDisplay.java</h1><pre class="source lang-java linenums">package es.uab.tqs.f1_2D.vista;
 
-import es.uab.tqs.f1_2D.model.AICar;
-import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.controlador.AIController;
 import es.uab.tqs.f1_2D.controlador.CarController;
 import es.uab.tqs.f1_2D.controlador.MapController;
+import es.uab.tqs.f1_2D.model.AICar;
+import es.uab.tqs.f1_2D.model.Car;
 import es.uab.tqs.f1_2D.model.Map;
-
-import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -16,16 +13,14 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
-
+import java.util.Set;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class CarDisplay extends JPanel 
 {
@@ -41,89 +36,97 @@ public class CarDisplay extends JPanel
     //Variables a controlar durant els updates i inicialització del joc
     private BufferedImage largerMap; 
     private BufferedImage collisionMap;
-<span class="fc" id="L44">    private Set&lt;Integer&gt; keysPressed = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L45">    Rectangle finish = new Rectangle(280, 1200, 320, 40);</span>
-<span class="fc" id="L46">    List&lt;Rectangle&gt; checkpoints = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L39">    private Set&lt;Integer&gt; keysPressed = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L40">    Rectangle finish = new Rectangle(280, 1200, 320, 40);</span>
+<span class="fc" id="L41">    List&lt;Rectangle&gt; checkpoints = new ArrayList&lt;&gt;();</span>
 
     //Variables de control d'estil
-<span class="fc" id="L49">    private boolean inMainMenu = true;</span>
+<span class="fc" id="L44">    private boolean inMainMenu = true;</span>
     private MainMenu mainMenu;
-<span class="fc" id="L51">    private GameMode currentGameMode = GameMode.QUALY;</span>
-<span class="fc" id="L52">    private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();</span>
+<span class="fc" id="L46">    private GameMode currentGameMode = GameMode.QUALY;</span>
+    private Dimension screenSize;
 
     //Diferents modes de Joc
-<span class="fc" id="L55">    public enum GameMode </span>
+<span class="fc" id="L50">    public enum GameMode </span>
     {
-<span class="fc" id="L57">        QUALY,</span>
-<span class="fc" id="L58">        RACE</span>
+<span class="fc" id="L52">        QUALY,</span>
+<span class="fc" id="L53">        RACE</span>
     }
 
     // Constructor
-    public CarDisplay(CarController controller, BufferedImage map, BufferedImage collisionMap1) 
-<span class="fc" id="L63">    {</span>
+<span class="fc" id="L57">    public CarDisplay(CarController controller, BufferedImage map, BufferedImage collisionMap1) </span>
+    {
+        try 
+        {
+<span class="fc" id="L61">            this.screenSize = Toolkit.getDefaultToolkit().getScreenSize();</span>
+<span class="fc" id="L62">        }</span>
+<span class="nc" id="L63">        catch(Exception e)</span>
+        {
+<span class="nc" id="L65">            this.screenSize = new Dimension(1920, 1080);</span>
+        }
         //Inicialitzar controlador
-<span class="fc" id="L65">        this.controller = controller;</span>
+<span class="fc" id="L68">        this.controller = controller;</span>
         
         // Si no hay mapas, usar valores mínimos seguros i inicialitzar-los al display
-<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (map == null) </span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (map == null) </span>
         {
-<span class="fc" id="L70">            map = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);</span>
+<span class="fc" id="L73">            map = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);</span>
         }
-<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (collisionMap1 == null) </span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (collisionMap1 == null) </span>
         {
-<span class="fc" id="L74">            collisionMap1 = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);</span>
+<span class="fc" id="L77">            collisionMap1 = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);</span>
         }
         //Inicialitzar mapes
-<span class="fc" id="L77">        this.largerMap = map;</span>
-<span class="fc" id="L78">        this.collisionMap = collisionMap1;</span>
+<span class="fc" id="L80">        this.largerMap = map;</span>
+<span class="fc" id="L81">        this.collisionMap = collisionMap1;</span>
 
         // Configurar el mapa de la pista
-<span class="fc" id="L81">        checkpoints.add(new Rectangle(4548, 900, 40, 270)); </span>
-<span class="fc" id="L82">        checkpoints.add(new Rectangle(5484, 100, 40, 230));</span>
-<span class="fc" id="L83">        checkpoints.add(new Rectangle(1330, 1216, 350, 50));</span>
-<span class="fc" id="L84">        checkpoints.add(new Rectangle(400, 2344, 350, 50));</span>
+<span class="fc" id="L84">        checkpoints.add(new Rectangle(4548, 900, 40, 270)); </span>
+<span class="fc" id="L85">        checkpoints.add(new Rectangle(5484, 100, 40, 230));</span>
+<span class="fc" id="L86">        checkpoints.add(new Rectangle(1330, 1216, 350, 50));</span>
+<span class="fc" id="L87">        checkpoints.add(new Rectangle(400, 2344, 350, 50));</span>
 
         //Inicialitzar mapa amb els checkpoints i finish line
-<span class="fc" id="L87">        trackMap = new Map(map.getWidth(), map.getHeight(), finish, checkpoints);</span>
+<span class="fc" id="L90">        trackMap = new Map(map.getWidth(), map.getHeight(), finish, checkpoints);</span>
         //Inicialitzar mapController
-<span class="fc" id="L89">        trackMapController = new MapController(trackMap);</span>
+<span class="fc" id="L92">        trackMapController = new MapController(trackMap);</span>
         //Inicialitzar el cronòmetre
-<span class="fc" id="L91">        trackMapController.setTimeProvider(System::currentTimeMillis);</span>
+<span class="fc" id="L94">        trackMapController.setTimeProvider(System::currentTimeMillis);</span>
 
         // Configurar interfaces de usuario
-<span class="fc" id="L94">        lapUI = new LapUI(trackMap);</span>
+<span class="fc" id="L97">        lapUI = new LapUI(trackMap);</span>
 
         //Creació d'un nou overlay per offtrack position
-<span class="fc" id="L97">        offTrackOverlay = new OffTrackOverlay(&quot;/img/lapdeleted.png&quot;, &quot;/sound/Popup.wav&quot;);</span>
+<span class="fc" id="L100">        offTrackOverlay = new OffTrackOverlay(&quot;/img/lapdeleted.png&quot;, &quot;/sound/Popup.wav&quot;);</span>
 
         //Desactiva el layout automàtic per poder manipular-lo amb setbounds
-<span class="fc" id="L100">        setLayout(null);</span>
-<span class="fc" id="L101">        offTrackOverlay.setBounds(0, 0, 1024, 860);</span>
+<span class="fc" id="L103">        setLayout(null);</span>
+<span class="fc" id="L104">        offTrackOverlay.setBounds(0, 0, 1024, 860);</span>
 
         //Creació d'un nou overlay per invalidlap position
-<span class="fc" id="L104">        invalidLapOverlay = new OffTrackOverlay(&quot;/img/invalidlap.png&quot;, &quot;/sound/boxbox.wav&quot;);</span>
+<span class="fc" id="L107">        invalidLapOverlay = new OffTrackOverlay(&quot;/img/invalidlap.png&quot;, &quot;/sound/boxbox.wav&quot;);</span>
 
         //Definició posició i tamany d'invalid lap overlay
-<span class="fc" id="L107">        invalidLapOverlay.setBounds(0, 0, 1024, 860);</span>
+<span class="fc" id="L110">        invalidLapOverlay.setBounds(0, 0, 1024, 860);</span>
 
         //Definició posició i tamany del UI del cronòmetre i sectors
-<span class="fc" id="L110">        lapUI.setBounds((int)screenSize.getWidth() - 360, (int)screenSize.getHeight() - 200, 340, 150);</span>
+<span class="fc" id="L113">        lapUI.setBounds((int)screenSize.getWidth() - 360, (int)screenSize.getHeight() - 200, 340, 150);</span>
 
         //Incloure els tres components al contenedor principal i possar-los a sobre amb ZOrder
-<span class="fc" id="L113">        add(lapUI);</span>
-<span class="fc" id="L114">        add(offTrackOverlay);</span>
-<span class="fc" id="L115">        setComponentZOrder(offTrackOverlay, 0);</span>
-<span class="fc" id="L116">        add(invalidLapOverlay);</span>
-<span class="fc" id="L117">        setComponentZOrder(invalidLapOverlay, 0);</span>
+<span class="fc" id="L116">        add(lapUI);</span>
+<span class="fc" id="L117">        add(offTrackOverlay);</span>
+<span class="fc" id="L118">        setComponentZOrder(offTrackOverlay, 0);</span>
+<span class="fc" id="L119">        add(invalidLapOverlay);</span>
+<span class="fc" id="L120">        setComponentZOrder(invalidLapOverlay, 0);</span>
 
         //Inicialització del Main Menu 
-<span class="fc" id="L120">        setupMainMenu();</span>
+<span class="fc" id="L123">        setupMainMenu();</span>
 
         //Indicar que pot rebre events del teclat
-<span class="fc" id="L123">        setFocusable(true);</span>
+<span class="fc" id="L126">        setFocusable(true);</span>
 
         // Cargar el sprite del coche i dels IACars
-<span class="fc" id="L126">        loadCarSprite(controller.getCar(), &quot;/img/ferrari_car.png&quot;);</span>
+<span class="fc" id="L129">        loadCarSprite(controller.getCar(), &quot;/img/ferrari_car.png&quot;);</span>
         /* 
         Timer initializationTimer = new Timer(100, e -&gt; {
             loadAICarSprites();
@@ -132,474 +135,488 @@ public class CarDisplay extends JPanel
         initializationTimer.setRepeats(false);
         initializationTimer.start();
         */
-<span class="fc" id="L135">        loadAICarSprites();</span>
+<span class="fc" id="L138">        loadAICarSprites();</span>
         // Configurar listeners de teclat
-<span class="fc" id="L137">        addKeyListener(new KeyAdapter() </span>
-<span class="fc" id="L138">        {</span>
+<span class="fc" id="L140">        addKeyListener(new KeyAdapter() </span>
+        {
             //Quan l'event agafa una nova tecla
             @Override
             public void keyPressed(KeyEvent e) 
             {
                 //Només agafar tecles si no es troba en el MainMenu
-<span class="fc bfc" id="L144" title="All 2 branches covered.">                if(!inMainMenu) </span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">                if(!inMainMenu) </span>
                 {
                     //Si la tecla es l'Esc, anar al main menu
-<span class="fc bfc" id="L147" title="All 2 branches covered.">                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) </span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) </span>
                     {
-<span class="fc" id="L149">                        showMainMenu();</span>
-                    }
+<span class="fc" id="L152">                        showMainMenu();</span>
+<span class="fc" id="L153">                    }</span>
                     //En cas contrari afegir-la a la llista per tratar-la posteriorment
-<span class="fc bfc" id="L152" title="All 2 branches covered.">                    else if(!trackMap.isCountdownActive())</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">                    else if(!trackMap.isCountdownActive())</span>
                     {
-<span class="fc" id="L154">                        keysPressed.add(e.getKeyCode());</span>
+<span class="fc" id="L157">                        keysPressed.add(e.getKeyCode());</span>
                     }
                 }
-<span class="fc" id="L157">            }</span>
+<span class="fc" id="L160">            }</span>
 
             //Quan l'event troba que la tecla es deixa de prèmer
             @Override
             public void keyReleased(KeyEvent e) 
             {
                 //Només tratar l'acció quan es troba en joc
-<span class="fc bfc" id="L164" title="All 2 branches covered.">                if (!inMainMenu) </span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">                if (!inMainMenu) </span>
                 {
-<span class="fc bfc" id="L166" title="All 2 branches covered.">                    if(!trackMap.isCountdownActive())</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">                    if(!trackMap.isCountdownActive())</span>
                     {
-<span class="fc" id="L168">                        keysPressed.remove(e.getKeyCode());</span>
+<span class="fc" id="L171">                        keysPressed.remove(e.getKeyCode());</span>
                     }
                 }
-<span class="fc" id="L171">            }</span>
+<span class="fc" id="L174">            }</span>
         });
 
         // Ajustar overlays al redimensionar
-<span class="fc" id="L175">        addComponentListener(new ComponentAdapter() </span>
-<span class="fc" id="L176">        {</span>
+<span class="fc" id="L178">        addComponentListener(new ComponentAdapter() </span>
+        {
             @Override
             public void componentResized(ComponentEvent e) 
             {
-<span class="fc" id="L180">                offTrackOverlay.setBounds(0, 0, getWidth(), getHeight());</span>
-<span class="fc" id="L181">                invalidLapOverlay.setBounds(0, 0, getWidth(), getHeight());</span>
-<span class="fc" id="L182">                mainMenu.setBounds(0, 0, getWidth(), getHeight());</span>
-<span class="fc" id="L183">            }</span>
+<span class="fc" id="L183">                offTrackOverlay.setBounds(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L184">                invalidLapOverlay.setBounds(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L185">                mainMenu.setBounds(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L186">            }</span>
         });
 
         // Timer per actualitzar el joc i repintar
-<span class="fc" id="L187">        new Timer(16, e -&gt; { </span>
+<span class="fc" id="L190">        new Timer(16, e -&gt; { </span>
             //Si no es troba al MainMenu processar les tecles i fer l'update corresponent
-<span class="fc bfc" id="L189" title="All 2 branches covered.">            if(!inMainMenu)</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">            if(!inMainMenu)</span>
             {
-<span class="fc" id="L191">                controller.processInput(keysPressed, collisionMap); </span>
-<span class="fc" id="L192">                updateRace();</span>
+<span class="fc" id="L194">                controller.processInput(keysPressed, collisionMap); </span>
+<span class="fc" id="L195">                updateRace();</span>
             }
-<span class="fc" id="L194">            repaint();</span>
-<span class="fc" id="L195">        }).start();</span>
-<span class="fc" id="L196">    }</span>
+<span class="fc" id="L197">            repaint();</span>
+<span class="fc" id="L198">        }).start();</span>
+<span class="fc" id="L199">    }</span>
 
     // Configurar el menú principal
     private void setupMainMenu() 
     {
-<span class="fc" id="L201">        mainMenu = new MainMenu();</span>
+<span class="fc" id="L204">        mainMenu = new MainMenu();</span>
         //Configurar la mdia i el tamany del mainMenu i afegirlo al component visual a Z 0
-<span class="fc" id="L203">        mainMenu.setBounds(0, 0, getWidth(), getHeight());</span>
-<span class="fc" id="L204">        add(mainMenu);</span>
-<span class="fc" id="L205">        setComponentZOrder(mainMenu, 0);</span>
+<span class="fc" id="L206">        mainMenu.setBounds(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L207">        add(mainMenu);</span>
+<span class="fc" id="L208">        setComponentZOrder(mainMenu, 0);</span>
         //Mostrar main menu
-<span class="fc" id="L207">        showMainMenu();</span>
-<span class="fc" id="L208">    }</span>
+<span class="fc" id="L210">        showMainMenu();</span>
+<span class="fc" id="L211">    }</span>
 
     // Mostrar el menú principal
     public void showMainMenu() 
     {
-<span class="fc" id="L213">        inMainMenu = true;</span>
-<span class="fc" id="L214">        mainMenu.setVisible(true);</span>
-<span class="fc" id="L215">        keysPressed.clear();       </span>
-<span class="fc" id="L216">    }</span>
+<span class="fc" id="L216">        inMainMenu = true;</span>
+<span class="fc" id="L217">        mainMenu.setVisible(true);</span>
+<span class="fc" id="L218">        keysPressed.clear();       </span>
+<span class="fc" id="L219">    }</span>
 
     // Ocultar el menú principal y empezar el juego
     public void startGame(GameMode mode) 
     {
         //Resetejar cada cop que es vol jugar
-<span class="fc" id="L222">        currentGameMode = mode;</span>
-<span class="fc" id="L223">        resetGame();</span>
-<span class="fc" id="L224">        inMainMenu = false;</span>
-<span class="fc" id="L225">        mainMenu.setVisible(false);</span>
+<span class="fc" id="L225">        currentGameMode = mode;</span>
+<span class="fc" id="L226">        resetGame();</span>
+<span class="fc" id="L227">        inMainMenu = false;</span>
+<span class="fc" id="L228">        mainMenu.setVisible(false);</span>
         
         // Configurar el modo de juego
-<span class="fc bfc" id="L228" title="All 2 branches covered.">        if (mode == GameMode.RACE) </span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">        if (mode == GameMode.RACE) </span>
         {
             // Configurar para modo carrera (número de vueltas, etc.)
-<span class="fc" id="L231">            Car car = controller.getCar();</span>
-<span class="fc" id="L232">            car.setX(350);</span>
-<span class="fc" id="L233">            car.setY(1250);</span>
-<span class="fc" id="L234">            car.setAngle(280);</span>
-<span class="fc" id="L235">            car.setVelocity(0);</span>
-<span class="fc" id="L236">            trackMapController.startRaceMode();</span>
-<span class="fc" id="L237">            trackMap.setTotalLaps(3); </span>
+<span class="fc" id="L234">            Car car = controller.getCar();</span>
+<span class="fc" id="L235">            car.setX(350);</span>
+<span class="fc" id="L236">            car.setY(1250);</span>
+<span class="fc" id="L237">            car.setAngle(280);</span>
+<span class="fc" id="L238">            car.setVelocity(0);</span>
+<span class="fc" id="L239">            trackMapController.startRaceMode();</span>
+<span class="fc" id="L240">            trackMap.setTotalLaps(3); </span>
             //Inicialitzar el controlador pels cotxes IA
-<span class="fc" id="L239">            this.aiController = new AIController(trackMap, controller.getCar());   </span>
-<span class="fc" id="L240">            trackMapController.setAIController(aiController);  </span>
-<span class="fc" id="L241">            loadAICarSprites();     </span>
-<span class="fc" id="L242">        }</span>
+<span class="fc" id="L242">            this.aiController = new AIController(trackMap, controller.getCar());   </span>
+<span class="fc" id="L243">            trackMapController.setAIController(aiController);  </span>
+<span class="fc" id="L244">            loadAICarSprites();     </span>
+<span class="fc" id="L245">        }</span>
         else
         {
             // Resetear la posición del coche
-<span class="fc" id="L246">            Car car = controller.getCar();</span>
-<span class="fc" id="L247">            car.setX(880);</span>
-<span class="fc" id="L248">            car.setY(1780);</span>
-<span class="fc" id="L249">            car.setAngle(267);</span>
-<span class="fc" id="L250">            car.setVelocity(0);</span>
-<span class="fc" id="L251">            trackMapController.startQualyMode();</span>
-<span class="fc" id="L252">            this.aiController = null;</span>
+<span class="fc" id="L249">            Car car = controller.getCar();</span>
+<span class="fc" id="L250">            car.setX(880);</span>
+<span class="fc" id="L251">            car.setY(1780);</span>
+<span class="fc" id="L252">            car.setAngle(267);</span>
+<span class="fc" id="L253">            car.setVelocity(0);</span>
+<span class="fc" id="L254">            trackMapController.startQualyMode();</span>
+<span class="fc" id="L255">            this.aiController = null;</span>
         }
         
         //Demana al component actual que pugui rebre accions des del teclat
-<span class="fc" id="L256">        requestFocusInWindow();</span>
-<span class="fc" id="L257">    }</span>
+<span class="fc" id="L259">        requestFocusInWindow();</span>
+<span class="fc" id="L260">    }</span>
 
     private void resetGame()
     {
         //Resetejar totes les clases i carregar de nou els cotxes IA i repintar
-<span class="fc" id="L262">        trackMapController.reset();</span>
-<span class="fc" id="L263">        trackMap.reset();</span>
-<span class="fc bfc" id="L264" title="All 2 branches covered.">        if(aiController != null) aiController.reset();</span>
-<span class="fc" id="L265">        offTrackOverlay.hideOverlay();</span>
-<span class="fc" id="L266">        invalidLapOverlay.hideOverlay();</span>
-<span class="fc bfc" id="L267" title="All 2 branches covered.">        if(currentGameMode == GameMode.RACE) loadAICarSprites();</span>
-<span class="fc" id="L268">        repaint();</span>
-<span class="fc" id="L269">    }</span>
+<span class="fc" id="L265">        trackMapController.reset();</span>
+<span class="fc" id="L266">        trackMap.reset();</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">        if(aiController != null) aiController.reset();</span>
+<span class="fc" id="L268">        offTrackOverlay.hideOverlay();</span>
+<span class="fc" id="L269">        invalidLapOverlay.hideOverlay();</span>
+<span class="fc bfc" id="L270" title="All 2 branches covered.">        if(currentGameMode == GameMode.RACE) loadAICarSprites();</span>
+<span class="fc" id="L271">        repaint();</span>
+<span class="fc" id="L272">    }</span>
     
     // Actualiza el estado de la carrera y los overlays
     public void updateRace() 
     {
         //Si es troba al main menu no hi ha res a actualitzar
-<span class="fc bfc" id="L275" title="All 2 branches covered.">        if (inMainMenu) return;</span>
+<span class="fc bfc" id="L278" title="All 2 branches covered.">        if (inMainMenu) return;</span>
 
         //Si no es troba dins la pantalla de countdown i la carrera no ha finalitzat
-<span class="pc bpc" id="L278" title="2 of 4 branches missed.">        if (!trackMap.isCountdownActive() &amp;&amp; trackMap.getState() != Map.State.RACE_FINISHED)</span>
+<span class="pc bpc" id="L281" title="1 of 4 branches missed.">        if (!trackMap.isCountdownActive() &amp;&amp; trackMap.getState() != Map.State.RACE_FINISHED)</span>
         {
-<span class="fc" id="L280">            Car car = controller.getCar();</span>
+<span class="fc" id="L283">            Car car = controller.getCar();</span>
 
             // Aplicar slipstream al jugador
-<span class="fc bfc" id="L283" title="All 2 branches covered.">            if(currentGameMode == GameMode.RACE)</span>
+<span class="fc bfc" id="L286" title="All 2 branches covered.">            if(currentGameMode == GameMode.RACE)</span>
             {
-<span class="fc" id="L285">                boolean playerInSlipstream = checkPlayerSlipstream();</span>
-<span class="fc" id="L286">                car.applySlipstream(playerInSlipstream, trackMap.getCurrentLap());</span>
+<span class="fc" id="L288">                boolean playerInSlipstream = checkPlayerSlipstream();</span>
+<span class="fc" id="L289">                car.applySlipstream(playerInSlipstream, trackMap.getCurrentLap());</span>
             }
 
             // Actualizar posición del coche en el mapa
-<span class="fc" id="L290">            boolean offTrack = car.trackLimits(collisionMap);</span>
-<span class="fc" id="L291">            trackMapController.updatePosition(car.getX(), car.getY(), offTrack);</span>
+<span class="fc" id="L293">            boolean offTrack = car.trackLimits(collisionMap);</span>
+<span class="fc" id="L294">            trackMapController.updatePosition(car.getX(), car.getY(), offTrack);</span>
 
             //Actualitzar l'estat de tots els cotxes rivals
-<span class="fc bfc" id="L294" title="All 2 branches covered.">            if(currentGameMode == GameMode.RACE)</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">            if(currentGameMode == GameMode.RACE)</span>
             {
-<span class="fc" id="L296">                aiController.updateAllAI(collisionMap);</span>
+<span class="fc" id="L299">                aiController.updateAllAI(collisionMap);</span>
             }
         }
 
         //Si la carrera ha finalitzat, veure els resultats
-<span class="fc bfc" id="L301" title="All 4 branches covered.">        if (currentGameMode == GameMode.RACE &amp;&amp; isRaceFinished()) </span>
+<span class="fc bfc" id="L304" title="All 4 branches covered.">        if (currentGameMode == GameMode.RACE &amp;&amp; isRaceFinished()) </span>
         {
-<span class="fc" id="L303">            showRaceResults();</span>
-<span class="fc" id="L304">            return;</span>
+<span class="fc" id="L306">            showRaceResults();</span>
+<span class="fc" id="L307">            return;</span>
         }
 
         //Si el jugador es troba offtrack, ensenyar l'overlay corresponent
-<span class="pc bpc" id="L308" title="1 of 2 branches missed.">        if (trackMap.getState() == Map.State.OFF_TRACK) </span>
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">        if (trackMap.getState() == Map.State.OFF_TRACK) </span>
         {
             // Mostrar overlay de fora de pista
-<span class="nc" id="L311">            offTrackOverlay.showOverlay();</span>
-<span class="nc" id="L312">            invalidLapOverlay.hideOverlay();</span>
-        } 
+<span class="nc" id="L314">            offTrackOverlay.showOverlay();</span>
+<span class="nc" id="L315">            invalidLapOverlay.hideOverlay();</span>
+<span class="nc" id="L316">        } </span>
         //Si el jugador es troba invalid lap, ensenyar l'overlay corresponent
-<span class="pc bpc" id="L315" title="1 of 2 branches missed.">        else if (trackMap.getState() == Map.State.INVALID_LAP)</span>
+<span class="pc bpc" id="L318" title="1 of 2 branches missed.">        else if (trackMap.getState() == Map.State.INVALID_LAP)</span>
         {
             // Mostrar overlay de vuelta invàlida
-<span class="nc" id="L318">            invalidLapOverlay.showOverlay();</span>
-<span class="nc" id="L319">            offTrackOverlay.hideOverlay();</span>
-        }
+<span class="nc" id="L321">            invalidLapOverlay.showOverlay();</span>
+<span class="nc" id="L322">            offTrackOverlay.hideOverlay();</span>
+<span class="nc" id="L323">        }</span>
         //Si no es cap de les anteriors situacions, ocultar els overlays
         else 
         {
             // Ocultar ambdos overlays
-<span class="fc" id="L325">            offTrackOverlay.hideOverlay();</span>
-<span class="fc" id="L326">            invalidLapOverlay.hideOverlay();</span>
+<span class="fc" id="L328">            offTrackOverlay.hideOverlay();</span>
+<span class="fc" id="L329">            invalidLapOverlay.hideOverlay();</span>
         }
-<span class="fc" id="L328">    }</span>
+<span class="fc" id="L331">    }</span>
 
     //Verificar si la carrera s'ha acabat
     public boolean isRaceFinished() 
     {
         // Verificar si el jugador ha completado la carrera
-<span class="fc bfc" id="L334" title="All 2 branches covered.">        if(trackMap.isRaceComplete()) </span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">        if(trackMap.isRaceComplete()) </span>
         {
-<span class="fc" id="L336">            return true;</span>
+<span class="fc" id="L339">            return true;</span>
         }
         
-<span class="pc bpc" id="L339" title="1 of 2 branches missed.">        if(aiController != null)</span>
+<span class="pc bpc" id="L342" title="1 of 2 branches missed.">        if(aiController != null)</span>
         {
             // Verificar si algún AI ha completado la carrera
-<span class="fc bfc" id="L342" title="All 2 branches covered.">            for (AICar aiCar : aiController.getAICars()) </span>
+<span class="fc bfc" id="L345" title="All 2 branches covered.">            for (AICar aiCar : aiController.getAICars()) </span>
             {
-<span class="fc bfc" id="L344" title="All 2 branches covered.">                if (aiCar.getCurrentLap() &gt; trackMap.getTotalLaps()) </span>
+<span class="fc bfc" id="L347" title="All 2 branches covered.">                if (aiCar.getCurrentLap() &gt; trackMap.getTotalLaps()) </span>
                 {
-<span class="fc" id="L346">                    return true;</span>
+<span class="fc" id="L349">                    return true;</span>
                 }
-<span class="fc" id="L348">            }</span>
+            }
+<span class="fc" id="L352">        }</span>
+        else
+        {
+<span class="nc" id="L355">            System.out.println(&quot;fghwioeb&quot;);</span>
         }
         //Si ningú compleix els requisits, la carrera segueix
-<span class="fc" id="L351">        return false;</span>
+<span class="fc" id="L358">        return false;</span>
     }
 
     //Comprobar si el cotxe del jugador es troba just darrere d'un altre per donar un impuls
     public boolean checkPlayerSlipstream() 
     {
-<span class="fc" id="L357">        Car playerCar = controller.getCar();</span>
+<span class="fc" id="L364">        Car playerCar = controller.getCar();</span>
         
         //Comprobar la distancia a cada cotxe rival
-<span class="fc bfc" id="L360" title="All 2 branches covered.">        for (AICar aiCar : aiController.getAICars()) </span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">        for (AICar aiCar : aiController.getAICars()) </span>
         {
-<span class="fc" id="L362">            double distance = Math.sqrt(</span>
-<span class="fc" id="L363">                Math.pow(aiCar.getX() - playerCar.getX(), 2) + </span>
-<span class="fc" id="L364">                Math.pow(aiCar.getY() - playerCar.getY(), 2)</span>
+<span class="fc" id="L369">            double distance = Math.sqrt(</span>
+<span class="fc" id="L370">                Math.pow(aiCar.getX() - playerCar.getX(), 2) + </span>
+<span class="fc" id="L371">                Math.pow(aiCar.getY() - playerCar.getY(), 2)</span>
             );
             
             //Si es troba a una distància de menys de 100 píxels, calcular l'angle a que es troba
-<span class="fc bfc" id="L368" title="All 2 branches covered.">            if (distance &lt; 100) </span>
+<span class="fc bfc" id="L375" title="All 2 branches covered.">            if (distance &lt; 100) </span>
             { 
                 
-<span class="fc" id="L371">                double dx = aiCar.getX() - playerCar.getX();</span>
-<span class="fc" id="L372">                double dy = aiCar.getY() - playerCar.getY();</span>
-<span class="fc" id="L373">                double angleToAICar = Math.toDegrees(Math.atan2(dy, dx));</span>
-<span class="fc" id="L374">                double angleDiff = Math.abs(normalizeAngle(angleToAICar - playerCar.getAngle()));</span>
+<span class="fc" id="L378">                double dx = aiCar.getX() - playerCar.getX();</span>
+<span class="fc" id="L379">                double dy = aiCar.getY() - playerCar.getY();</span>
+<span class="fc" id="L380">                double angleToAICar = Math.toDegrees(Math.atan2(dy, dx));</span>
+<span class="fc" id="L381">                double angleDiff = Math.abs(normalizeAngle(angleToAICar - playerCar.getAngle()));</span>
                 
                 //Si l'angle és menor als 30 graus, considerem que es troba darrere
-<span class="pc bpc" id="L377" title="1 of 2 branches missed.">                if (angleDiff &lt; 30) </span>
+<span class="pc bpc" id="L384" title="1 of 2 branches missed.">                if (angleDiff &lt; 30) </span>
                 { 
-<span class="fc" id="L379">                    return true;</span>
+<span class="fc" id="L386">                    return true;</span>
                 }
             }
-<span class="fc" id="L382">        }</span>
+        }
 
         //Si cap situació es compleix, no aplicar slipstram
-<span class="fc" id="L385">        return false;</span>
+<span class="fc" id="L392">        return false;</span>
     }
     
     //Funció d'utilitat per normalitzar un angle entre 0 i 360
     public double normalizeAngle(double angle) 
     {
-<span class="pc bpc" id="L391" title="1 of 2 branches missed.">        while (angle &gt; 180) angle -= 360;</span>
-<span class="pc bpc" id="L392" title="1 of 2 branches missed.">        while (angle &lt; -180) angle += 360;</span>
-<span class="fc" id="L393">        return angle;</span>
+<span class="pc bpc" id="L398" title="1 of 2 branches missed.">        while (angle &gt; 180) angle -= 360;</span>
+<span class="pc bpc" id="L399" title="1 of 2 branches missed.">        while (angle &lt; -180) angle += 360;</span>
+<span class="fc" id="L400">        return angle;</span>
     }
 
     //Si algú ha finalitzat la carrera, ensenyar els resultats
     public void showRaceResults() 
     {
         // Obtener la clasificación final
-<span class="fc" id="L400">        List&lt;AICar&gt; positions = aiController.getPositions();</span>
-<span class="fc" id="L401">        int playerPosition = getPlayerPosition();</span>
+<span class="fc" id="L407">        List&lt;AICar&gt; positions = aiController.getPositions();</span>
+<span class="fc" id="L408">        int playerPosition = getPlayerPosition();</span>
         
         //Preparar els títols
-<span class="fc" id="L404">        StringBuilder results = new StringBuilder();</span>
-<span class="fc" id="L405">        results.append(&quot;¡Carrera completada!\n\n&quot;);</span>
-<span class="fc" id="L406">        results.append(&quot;Clasificación final:\n\n&quot;);</span>
+<span class="fc" id="L411">        StringBuilder results = new StringBuilder();</span>
+<span class="fc" id="L412">        results.append(&quot;¡Carrera completada!\n\n&quot;);</span>
+<span class="fc" id="L413">        results.append(&quot;Clasificación final:\n\n&quot;);</span>
         
         // Mostrar les 10 primeres posicions
-<span class="pc bpc" id="L409" title="1 of 2 branches missed.">        for (int i = 0; i &lt; Math.min(positions.size(), 10); i++) </span>
+<span class="pc bpc" id="L416" title="1 of 2 branches missed.">        for (int i = 0; i &lt; Math.min(positions.size(), 10); i++) </span>
         {
             //Agafar el cotxe a tractar
-<span class="nc" id="L412">            AICar aiCar = positions.get(i);</span>
+<span class="nc" id="L419">            AICar aiCar = positions.get(i);</span>
             //Canviar el temps de milisegons a minuts/segons/milisegons
-<span class="nc" id="L414">            String timeStr = formatTime(aiCar.getBestLapTime());</span>
+<span class="nc" id="L421">            String timeStr = formatTime(aiCar.getBestLapTime());</span>
             //Calcular el número de voltes del cotxe a tractar
-<span class="nc" id="L416">            int laps = aiCar.getCurrentLap();</span>
+<span class="nc" id="L423">            int laps = aiCar.getCurrentLap();</span>
             
             //Si la posició és la de jugador, afegir el seu resultat
-<span class="nc bnc" id="L419" title="All 2 branches missed.">            if (i + 1 == playerPosition) </span>
+<span class="nc bnc" id="L426" title="All 2 branches missed.">            if (i + 1 == playerPosition) </span>
             {
-<span class="nc" id="L421">                results.append(&quot;→ &quot;).append(playerPosition).append(&quot;. PLAYER - &quot;).append(formatTime(trackMap.getBestLapTime())).append(&quot; - L&quot;).append(trackMap.getCurrentLap()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L428">                results.append(&quot;→ &quot;).append(playerPosition).append(&quot;. PLAYER - &quot;)</span>
+<span class="nc" id="L429">                .append(formatTime(trackMap.getBestLapTime())).append(&quot; - L&quot;).append(trackMap.getCurrentLap())</span>
+<span class="nc" id="L430">                .append(&quot;\n&quot;);</span>
             }
-            //Si la posició del cotxe que tractem és igual o major en la llista a la posició del jugador, afegir una posició
-<span class="nc bnc" id="L424" title="All 2 branches missed.">            if(i + 1 &gt;= playerPosition)</span>
+            //Si la posició del cotxe que tractem és igual o 
+            //major en la llista a la posició del jugador, afegir una posició
+<span class="nc bnc" id="L434" title="All 2 branches missed.">            if(i + 1 &gt;= playerPosition)</span>
             {
-<span class="nc" id="L426">                results.append((i + 2)).append(&quot;. &quot;).append(aiCar.getTeam()).append(&quot; - &quot;).append(timeStr).append(&quot; - L&quot;).append(laps).append(&quot;\n&quot;);</span>
-            }
+<span class="nc" id="L436">                results.append((i + 2)).append(&quot;. &quot;).append(aiCar.getTeam()).append(&quot; - &quot;)</span>
+<span class="nc" id="L437">                .append(timeStr).append(&quot; - L&quot;).append(laps).append(&quot;\n&quot;);</span>
+<span class="nc" id="L438">            }</span>
             //En cas contrari, agafar l'ordre de la llista
             else
             {
-<span class="nc" id="L431">                results.append((i + 1)).append(&quot;. &quot;).append(aiCar.getTeam()).append(&quot; - &quot;).append(timeStr).append(&quot; - L&quot;).append(laps).append(&quot;\n&quot;);</span>
+<span class="nc" id="L442">                results.append((i + 1)).append(&quot;. &quot;).append(aiCar.getTeam()).append(&quot; - &quot;)</span>
+<span class="nc" id="L443">                .append(timeStr).append(&quot; - L&quot;).append(laps).append(&quot;\n&quot;);</span>
             }
         }
         
         // Si el jugador no está en las primeras 10 posiciones, añadirlo al final
-<span class="pc bpc" id="L436" title="1 of 2 branches missed.">        if (playerPosition &gt; 10) </span>
+<span class="pc bpc" id="L448" title="1 of 2 branches missed.">        if (playerPosition &gt; 10) </span>
         {
-<span class="nc" id="L438">            results.append(&quot;...\n&quot;);</span>
-<span class="nc" id="L439">            results.append(playerPosition).append(&quot;. PLAYER - &quot;).append(formatTime(trackMap.getBestLapTime())).append(&quot; - L&quot;).append(trackMap.getCurrentLap()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L450">            results.append(&quot;...\n&quot;);</span>
+<span class="nc" id="L451">            results.append(playerPosition).append(&quot;. PLAYER - &quot;)</span>
+<span class="nc" id="L452">            .append(formatTime(trackMap.getBestLapTime())).append(&quot; - L&quot;)</span>
+<span class="nc" id="L453">            .append(trackMap.getCurrentLap()).append(&quot;\n&quot;);</span>
         }
         
         //Ensenyar els resultats complets
-<span class="fc" id="L443">        JOptionPane.showMessageDialog(this, results.toString(), </span>
-            &quot;Resultados de Carrera&quot;, JOptionPane.INFORMATION_MESSAGE);
+<span class="fc" id="L457">        JOptionPane.showMessageDialog(this, results.toString(), </span>
+<span class="fc" id="L458">            &quot;Resultados de Carrera&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
         
         // Volver al menú principal
-<span class="fc" id="L447">        showMainMenu();</span>
-<span class="fc" id="L448">    }</span>
+<span class="fc" id="L461">        showMainMenu();</span>
+<span class="fc" id="L462">    }</span>
 
     //Pasar de milisegons al format MM:SS.mmm (minuts, segons, milisegons)
     public String formatTime(long time) 
     {
-<span class="nc" id="L453">        long minutes = (time / 60000) % 60;</span>
-<span class="nc" id="L454">        long seconds = (time / 1000) % 60;</span>
-<span class="nc" id="L455">        long milliseconds = (time % 1000);</span>
-<span class="nc" id="L456">        return String.format(&quot;%02d:%02d.%03d&quot;, minutes, seconds, milliseconds);</span>
+<span class="nc" id="L467">        long minutes = (time / 60000) % 60;</span>
+<span class="nc" id="L468">        long seconds = (time / 1000) % 60;</span>
+<span class="nc" id="L469">        long milliseconds = (time % 1000);</span>
+<span class="nc" id="L470">        return String.format(&quot;%02d:%02d.%03d&quot;, minutes, seconds, milliseconds);</span>
     }
 
     //En carrera, funció que s'encarrega de pintar les posicions on toca
     public void drawPositions(Graphics g) 
     {
         //Agafar la llista de posicions en carrera
-<span class="nc" id="L463">        List&lt;AICar&gt; positions = aiController.getPositions();</span>
+<span class="nc" id="L477">        List&lt;AICar&gt; positions = aiController.getPositions();</span>
 
         //Si no existeix, no avançem 
-<span class="nc bnc" id="L466" title="All 4 branches missed.">        if (positions == null || positions.isEmpty()) return;</span>
+<span class="nc bnc" id="L480" title="All 4 branches missed.">        if (positions == null || positions.isEmpty()) return;</span>
         
         //Definició del layout semitransparent
-<span class="nc" id="L469">        g.setColor(new Color(0, 0, 0, 180)); </span>
-<span class="nc" id="L470">        g.fillRect(10, 120, 300, 550);</span>
+<span class="nc" id="L483">        g.setColor(new Color(0, 0, 0, 180)); </span>
+<span class="nc" id="L484">        g.fillRect(10, 120, 300, 550);</span>
         
-<span class="nc" id="L472">        g.setColor(Color.WHITE);</span>
-<span class="nc" id="L473">        g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 18));</span>
+<span class="nc" id="L486">        g.setColor(Color.WHITE);</span>
+<span class="nc" id="L487">        g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 18));</span>
         
-<span class="nc" id="L475">        int startX = 20;</span>
-<span class="nc" id="L476">        int startY = 140;</span>
-<span class="nc" id="L477">        int lineHeight = 25;</span>
+<span class="nc" id="L489">        int startX = 20;</span>
+<span class="nc" id="L490">        int startY = 140;</span>
+<span class="nc" id="L491">        int lineHeight = 25;</span>
         
         //Títol
-<span class="nc" id="L480">        g.drawString(&quot;CLASSIFICATION&quot;, startX, startY);</span>
+<span class="nc" id="L494">        g.drawString(&quot;CLASSIFICATION&quot;, startX, startY);</span>
         
         //Línea separadora
-<span class="nc" id="L483">        g.drawLine(startX, startY + 5, startX + 200, startY + 5);</span>
+<span class="nc" id="L497">        g.drawLine(startX, startY + 5, startX + 200, startY + 5);</span>
         
         //Jugador
-<span class="nc" id="L486">        g.setColor(Color.YELLOW);</span>
-<span class="nc" id="L487">        int playerPosition = getPlayerPosition();</span>
-<span class="nc" id="L488">        String playerTime = formatTime(trackMap.getLapTime());</span>
-<span class="nc" id="L489">        g.drawString(playerPosition + &quot;. PLAYER - &quot; + playerTime + &quot; - L&quot; + trackMap.getCurrentLap() + &quot;/3&quot;, startX, startY + lineHeight);</span>
+<span class="nc" id="L500">        g.setColor(Color.YELLOW);</span>
+<span class="nc" id="L501">        int playerPosition = getPlayerPosition();</span>
+<span class="nc" id="L502">        String playerTime = formatTime(trackMap.getLapTime());</span>
+<span class="nc" id="L503">        g.drawString(playerPosition + &quot;. PLAYER - &quot; + playerTime + &quot; - L&quot; + </span>
+<span class="nc" id="L504">            trackMap.getCurrentLap() + &quot;/3&quot;, startX, startY + lineHeight);</span>
         
         //AI Cars
-<span class="nc" id="L492">        g.setColor(Color.WHITE);</span>
-<span class="nc" id="L493">        g.setFont(new Font(&quot;Arial&quot;, Font.PLAIN, 14));</span>
+<span class="nc" id="L507">        g.setColor(Color.WHITE);</span>
+<span class="nc" id="L508">        g.setFont(new Font(&quot;Arial&quot;, Font.PLAIN, 14));</span>
         
         //Iterar sobre la resta de cotxes
-<span class="nc bnc" id="L496" title="All 2 branches missed.">        for (int i = 0; i &lt; positions.size(); i++) </span>
+<span class="nc bnc" id="L511" title="All 2 branches missed.">        for (int i = 0; i &lt; positions.size(); i++) </span>
         {
             //Agafar de la llista el cotxe a iterar
-<span class="nc" id="L499">            AICar aiCar = positions.get(i);</span>
-<span class="nc bnc" id="L500" title="All 2 branches missed.">            if (aiCar == null) continue;</span>
+<span class="nc" id="L514">            AICar aiCar = positions.get(i);</span>
+<span class="nc bnc" id="L515" title="All 2 branches missed.">            if (aiCar == null) continue;</span>
             
             //Agafar les seves dades
-<span class="nc" id="L503">            String team = aiCar.getTeam();</span>
-<span class="nc" id="L504">            long lapTime = aiCar.getLapTime();</span>
-<span class="nc" id="L505">            String timeStr = formatTime(lapTime);</span>
-<span class="nc" id="L506">            int laps = aiCar.getCurrentLap();</span>
+<span class="nc" id="L518">            String team = aiCar.getTeam();</span>
+<span class="nc" id="L519">            long lapTime = aiCar.getLapTime();</span>
+<span class="nc" id="L520">            String timeStr = formatTime(lapTime);</span>
+<span class="nc" id="L521">            int laps = aiCar.getCurrentLap();</span>
             
-<span class="nc" id="L508">            int displayPos = i+1;</span>
-            //Si la posició del cotxe que tractem és igual o major en la llista a la posició del jugador, afegir una posició
-<span class="nc bnc" id="L510" title="All 2 branches missed.">            if(displayPos &gt;= playerPosition) displayPos++;</span>
-<span class="nc" id="L511">            String displayText = displayPos + &quot;. &quot; + team + &quot; - &quot; + timeStr + &quot; - L&quot; + laps;</span>
+<span class="nc" id="L523">            int displayPos = i+1;</span>
+            //Si la posició del cotxe que tractem és igual o major en la llista a la posició del jugador, 
+            //afegir una posició
+<span class="nc bnc" id="L526" title="All 2 branches missed.">            if(displayPos &gt;= playerPosition) displayPos++;</span>
+<span class="nc" id="L527">            String displayText = displayPos + &quot;. &quot; + team + &quot; - &quot; + timeStr + &quot; - L&quot; + laps;</span>
             //Dibuixar la posició del cotxe que estem iterarnt
-<span class="nc" id="L513">            g.drawString(displayText, startX, startY + (i + 2) * lineHeight);</span>
+<span class="nc" id="L529">            g.drawString(displayText, startX, startY + (i + 2) * lineHeight);</span>
         }
-<span class="nc" id="L515">    }</span>
+<span class="nc" id="L531">    }</span>
     
     //Funció complementaria per determinar la posició del jugador
     public int getPlayerPosition() 
     {
         //Almacenar les posicions actuals a una llista per iterar-la
-<span class="fc" id="L521">        List&lt;AICar&gt; positions = aiController.getPositions();</span>
-<span class="pc bpc" id="L522" title="1 of 2 branches missed.">        if (positions == null) return 1;</span>
+<span class="fc" id="L537">        List&lt;AICar&gt; positions = aiController.getPositions();</span>
+<span class="pc bpc" id="L538" title="1 of 2 branches missed.">        if (positions == null) return 1;</span>
         
         //Consultar situació del jugador
-<span class="fc" id="L525">        int playerLap = trackMap.getCurrentLap();</span>
-<span class="fc" id="L526">        int playerCheckpoints = trackMap.getPassedCheckpoints().size();</span>
-<span class="fc" id="L527">        double playerDistance = getDistanceToNextCheckpoint(controller.getCar());</span>
+<span class="fc" id="L541">        int playerLap = trackMap.getCurrentLap();</span>
+<span class="fc" id="L542">        int playerCheckpoints = trackMap.getPassedCheckpoints().size();</span>
+<span class="fc" id="L543">        double playerDistance = getDistanceToNextCheckpoint(controller.getCar());</span>
         
         //Mínima posició
-<span class="fc" id="L530">        int position = 1;</span>
+<span class="fc" id="L546">        int position = 1;</span>
         
         //Iterar sobre els diferents cotxes
-<span class="pc bpc" id="L533" title="1 of 2 branches missed.">        for (AICar aiCar : positions) </span>
+<span class="pc bpc" id="L549" title="1 of 2 branches missed.">        for (AICar aiCar : positions) </span>
         {
-<span class="nc bnc" id="L535" title="All 2 branches missed.">            if (aiCar == null) continue;</span>
+<span class="nc bnc" id="L551" title="All 2 branches missed.">            if (aiCar == null) continue;</span>
             
             //Consultar situació del cotxe iterat
-<span class="nc" id="L538">            int aiLap = aiCar.getCurrentLap();</span>
-<span class="nc" id="L539">            int aiCheckpoints = aiCar.getPassedCheckpoints().size();</span>
-<span class="nc" id="L540">            double aiDistance = getDistanceToNextCheckpoint(aiCar);</span>
+<span class="nc" id="L554">            int aiLap = aiCar.getCurrentLap();</span>
+<span class="nc" id="L555">            int aiCheckpoints = aiCar.getPassedCheckpoints().size();</span>
+<span class="nc" id="L556">            double aiDistance = getDistanceToNextCheckpoint(aiCar);</span>
             
             //Si el cotxe té més voltes que el jugador, el jugador va per darrere d'aquest cotxe
-<span class="nc bnc" id="L543" title="All 2 branches missed.">            if (aiLap &gt; playerLap) </span>
+<span class="nc bnc" id="L559" title="All 2 branches missed.">            if (aiLap &gt; playerLap) </span>
             {
-<span class="nc" id="L545">                position++;</span>
-            } 
-            //Si el cotxe té les mateixes voltes que el jugador, però té més checkpoints, el jugador va per darrere d'aquest cotxe
-<span class="nc bnc" id="L548" title="All 4 branches missed.">            else if (aiLap == playerLap &amp;&amp; aiCheckpoints &gt; playerCheckpoints) </span>
+<span class="nc" id="L561">                position++;</span>
+<span class="nc" id="L562">            } </span>
+            //Si el cotxe té les mateixes voltes que el jugador, però té més checkpoints, 
+            //el jugador va per darrere d'aquest cotxe
+<span class="nc bnc" id="L565" title="All 4 branches missed.">            else if (aiLap == playerLap &amp;&amp; aiCheckpoints &gt; playerCheckpoints) </span>
             {
-<span class="nc" id="L550">                position++;</span>
+<span class="nc" id="L567">                position++;</span>
+<span class="nc" id="L568">            }</span>
+            //Si el cotxe té les mateixes voltes i checkpoints que el jugador, 
+            //però està més aprop del següent checkpoint, el jugador va per darrere d'aquest cotxe
+<span class="nc bnc" id="L571" title="All 6 branches missed.">            else if (aiLap == playerLap &amp;&amp; aiCheckpoints == playerCheckpoints &amp;&amp; aiDistance &lt; playerDistance) </span>
+            {
+<span class="nc" id="L573">                position++;</span>
             }
-            //Si el cotxe té les mateixes voltes i checkpoints que el jugador, però està més aprop del següent checkpoint, el jugador va per darrere d'aquest cotxe
-<span class="nc bnc" id="L553" title="All 6 branches missed.">            else if (aiLap == playerLap &amp;&amp; aiCheckpoints == playerCheckpoints &amp;&amp; aiDistance &lt; playerDistance) </span>
-            {
-<span class="nc" id="L555">                position++;</span>
-            }
-<span class="nc" id="L557">        }</span>
+        }
         
-<span class="fc" id="L559">        return position;</span>
+<span class="fc" id="L577">        return position;</span>
     }
 
     //Funció complementaria per calcular la distància al següent checkpoint
     public double getDistanceToNextCheckpoint(Car car) 
     {
         //Lista de checkpoints i finishLine
-<span class="fc" id="L566">        List&lt;Rectangle&gt; allCheckpoints = Arrays.asList</span>
-<span class="fc" id="L567">        (</span>
-            new Rectangle(4548, 940, 40, 230),  
-            new Rectangle(5484, 100, 20, 230),   
-            new Rectangle(1330, 1216, 350, 50), 
-            new Rectangle(400, 2344,350, 50),  
-            new Rectangle(280, 1200, 320, 40)
+<span class="fc" id="L584">        List&lt;Rectangle&gt; allCheckpoints = Arrays.asList (</span>
+<span class="fc" id="L585">            new Rectangle(4548, 940, 40, 230),  </span>
+<span class="fc" id="L586">            new Rectangle(5484, 100, 20, 230),   </span>
+<span class="fc" id="L587">            new Rectangle(1330, 1216, 350, 50), </span>
+<span class="fc" id="L588">            new Rectangle(400, 2344,350, 50),  </span>
+<span class="fc" id="L589">            new Rectangle(280, 1200, 320, 40)</span>
         );
         
         int nextCheckpointIndex;
 
         //Depenent de la instància que sigui Car, utlitzar la funció corresponent
-<span class="pc bpc" id="L578" title="1 of 2 branches missed.">        if (car instanceof AICar) </span>
+<span class="pc bpc" id="L595" title="1 of 2 branches missed.">        if (car instanceof AICar) </span>
         {
-<span class="nc" id="L580">            nextCheckpointIndex = ((AICar) car).getNextCheckpointIndex();</span>
-        } 
+<span class="nc" id="L597">            nextCheckpointIndex = ((AICar) car).getNextCheckpointIndex();</span>
+<span class="nc" id="L598">        } </span>
         else 
         {
-<span class="fc" id="L584">            nextCheckpointIndex = trackMap.getNextCheckpointIndex();</span>
+<span class="fc" id="L601">            nextCheckpointIndex = trackMap.getNextCheckpointIndex();</span>
         }
         
         //Si tots els checkpoints han sigut passats, utilitzar la finish line
-<span class="pc bpc" id="L588" title="1 of 2 branches missed.">        if (nextCheckpointIndex &gt;= allCheckpoints.size()) </span>
+<span class="pc bpc" id="L605" title="1 of 2 branches missed.">        if (nextCheckpointIndex &gt;= allCheckpoints.size()) </span>
         {
-<span class="nc" id="L590">            nextCheckpointIndex = allCheckpoints.size() - 1;</span>
+<span class="nc" id="L607">            nextCheckpointIndex = allCheckpoints.size() - 1;</span>
         }
         
         //Calcular la distància des del centre del cotxe fins el centre del següent checkpoint
-<span class="fc" id="L594">        Rectangle nextCheckpoint = allCheckpoints.get(nextCheckpointIndex);</span>
+<span class="fc" id="L611">        Rectangle nextCheckpoint = allCheckpoints.get(nextCheckpointIndex);</span>
         
-<span class="fc" id="L596">        double carCenterX = car.getX() + 40;</span>
-<span class="fc" id="L597">        double carCenterY = car.getY() + 40;</span>
-<span class="fc" id="L598">        double checkpointCenterX = nextCheckpoint.getX() + nextCheckpoint.getWidth() / 2.0;</span>
-<span class="fc" id="L599">        double checkpointCenterY = nextCheckpoint.getY() + nextCheckpoint.getHeight() / 2.0;</span>
+<span class="fc" id="L613">        double carCenterX = car.getX() + 40;</span>
+<span class="fc" id="L614">        double carCenterY = car.getY() + 40;</span>
+<span class="fc" id="L615">        double checkpointCenterX = nextCheckpoint.getX() + nextCheckpoint.getWidth() / 2.0;</span>
+<span class="fc" id="L616">        double checkpointCenterY = nextCheckpoint.getY() + nextCheckpoint.getHeight() / 2.0;</span>
         
-<span class="fc" id="L601">        return Math.sqrt(Math.pow(checkpointCenterX - carCenterX, 2) + </span>
-<span class="fc" id="L602">                        Math.pow(checkpointCenterY - carCenterY, 2));</span>
+<span class="fc" id="L618">        return Math.sqrt(Math.pow(checkpointCenterX - carCenterX, 2) + </span>
+<span class="fc" id="L619">                        Math.pow(checkpointCenterY - carCenterY, 2));</span>
     }
 
 
@@ -608,64 +625,64 @@ public class CarDisplay extends JPanel
     protected void paintComponent(Graphics g) 
     {
         //Cridar a la classe base per asegurar funcionament 
-<span class="fc" id="L611">        super.paintComponent(g);</span>
+<span class="fc" id="L628">        super.paintComponent(g);</span>
 
         //Si es troba en el menú principal, dibuixar-lo
-<span class="pc bpc" id="L614" title="1 of 2 branches missed.">        if (inMainMenu) </span>
+<span class="pc bpc" id="L631" title="1 of 2 branches missed.">        if (inMainMenu) </span>
         {
             // Dibujar fondo del menú principal
-<span class="fc" id="L617">            g.setColor(Color.BLACK);</span>
-<span class="fc" id="L618">            g.fillRect(0, 0, getWidth(), getHeight());</span>
-<span class="fc" id="L619">            return;</span>
+<span class="fc" id="L634">            g.setColor(Color.BLACK);</span>
+<span class="fc" id="L635">            g.fillRect(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L636">            return;</span>
         }
 
         // Mostrar compte enrerre si està activa
-<span class="nc bnc" id="L623" title="All 2 branches missed.">        if (trackMap.isCountdownActive()) </span>
+<span class="nc bnc" id="L640" title="All 2 branches missed.">        if (trackMap.isCountdownActive()) </span>
         {
-<span class="nc" id="L625">            drawCountdown(g);</span>
-<span class="nc" id="L626">            return;</span>
+<span class="nc" id="L642">            drawCountdown(g);</span>
+<span class="nc" id="L643">            return;</span>
         }
 
-<span class="nc" id="L629">        Car car = controller.getCar();</span>
-<span class="nc" id="L630">        Graphics2D g2d = (Graphics2D) g;</span>
+<span class="nc" id="L646">        Car car = controller.getCar();</span>
+<span class="nc" id="L647">        Graphics2D g2d = (Graphics2D) g;</span>
 
         // Calcular la posició de la càmara centrada al cotxe
-<span class="nc" id="L633">        int panelWidth = getWidth();</span>
-<span class="nc" id="L634">        int panelHeight = getHeight();</span>
-<span class="nc" id="L635">        double cameraX = car.getX() - panelWidth / 2.0;</span>
-<span class="nc" id="L636">        double cameraY = car.getY() - panelHeight / 2.0;</span>
+<span class="nc" id="L650">        int panelWidth = getWidth();</span>
+<span class="nc" id="L651">        int panelHeight = getHeight();</span>
+<span class="nc" id="L652">        double cameraX = car.getX() - panelWidth / 2.0;</span>
+<span class="nc" id="L653">        double cameraY = car.getY() - panelHeight / 2.0;</span>
 
-<span class="nc" id="L638">        cameraX = Math.max(0, Math.min(cameraX, largerMap.getWidth() - panelWidth));</span>
-<span class="nc" id="L639">        cameraY = Math.max(0, Math.min(cameraY, largerMap.getHeight() - panelHeight));</span>
+<span class="nc" id="L655">        cameraX = Math.max(0, Math.min(cameraX, largerMap.getWidth() - panelWidth));</span>
+<span class="nc" id="L656">        cameraY = Math.max(0, Math.min(cameraY, largerMap.getHeight() - panelHeight));</span>
 
        // Dibuixar la porció visible del mapa
-<span class="nc" id="L642">        g2d.drawImage(largerMap,</span>
-                0, 0, panelWidth, panelHeight,
-                (int) cameraX, (int) cameraY,
-                (int) cameraX + panelWidth, (int) cameraY + panelHeight,
-                null);
+<span class="nc" id="L659">        g2d.drawImage(largerMap,</span>
+<span class="nc" id="L660">                0, 0, panelWidth, panelHeight,</span>
+<span class="nc" id="L661">                (int) cameraX, (int) cameraY,</span>
+<span class="nc" id="L662">                (int) cameraX + panelWidth, (int) cameraY + panelHeight,</span>
+<span class="nc" id="L663">                null);</span>
 
         //Si no es troba ni en el menú ni en el countdown, i és mode carrera, dibuixar posicions
-<span class="nc bnc" id="L649" title="All 4 branches missed.">        if (!inMainMenu &amp;&amp; !trackMap.isCountdownActive())</span>
+<span class="nc bnc" id="L666" title="All 4 branches missed.">        if (!inMainMenu &amp;&amp; !trackMap.isCountdownActive())</span>
         {
-<span class="nc bnc" id="L651" title="All 2 branches missed.">            if(trackMap.isRaceMode()) drawPositions(g);</span>
+<span class="nc bnc" id="L668" title="All 2 branches missed.">            if(trackMap.isRaceMode()) drawPositions(g);</span>
         }
 
         //Calcular on dibuixar el cotxe del jugador en funció de la càmera
-<span class="nc" id="L655">        double drawX = car.getX() - cameraX;</span>
-<span class="nc" id="L656">        double drawY = car.getY() - cameraY;</span>
+<span class="nc" id="L672">        double drawX = car.getX() - cameraX;</span>
+<span class="nc" id="L673">        double drawY = car.getY() - cameraY;</span>
 
         // Dibuixar el cotxe amb rotació
-<span class="nc bnc" id="L659" title="All 2 branches missed.">        if (car.getSprite() != null) </span>
+<span class="nc bnc" id="L676" title="All 2 branches missed.">        if (car.getSprite() != null) </span>
         {
             //Transformar la imatge/sprite del cotxe per tal de rotar-la en funció de l'angle
-<span class="nc" id="L662">            AffineTransform transform = new AffineTransform();</span>
-<span class="nc" id="L663">            transform.translate(drawX, drawY);</span>
-<span class="nc" id="L664">            transform.rotate(Math.toRadians(car.getAngle()),</span>
-<span class="nc" id="L665">                    car.getSprite().getWidth() / 2.0,</span>
-<span class="nc" id="L666">                    car.getSprite().getHeight() / 2.0);</span>
+<span class="nc" id="L679">            AffineTransform transform = new AffineTransform();</span>
+<span class="nc" id="L680">            transform.translate(drawX, drawY);</span>
+<span class="nc" id="L681">            transform.rotate(Math.toRadians(car.getAngle()),</span>
+<span class="nc" id="L682">                    car.getSprite().getWidth() / 2.0,</span>
+<span class="nc" id="L683">                    car.getSprite().getHeight() / 2.0);</span>
             //Dibuixar el cotxe
-<span class="nc" id="L668">            g2d.drawImage(car.getSprite(), transform, null);</span>
+<span class="nc" id="L685">            g2d.drawImage(car.getSprite(), transform, null);</span>
 
             /* DEBUGGING PURPOSES
             // Dibujar hitbox del coche
@@ -676,12 +693,12 @@ public class CarDisplay extends JPanel
             g2d.draw(hitbox);
             */
 
-<span class="nc" id="L679">        } </span>
+<span class="nc" id="L696">        } </span>
         else 
         {
             // Dibuixar un punt vermell si el cotxe no té sprite
-<span class="nc" id="L683">            g2d.setColor(Color.RED);</span>
-<span class="nc" id="L684">            g2d.fillRect((int) drawX, (int) drawY, 20, 10);</span>
+<span class="nc" id="L700">            g2d.setColor(Color.RED);</span>
+<span class="nc" id="L701">            g2d.fillRect((int) drawX, (int) drawY, 20, 10);</span>
         }
 
         /*
@@ -712,177 +729,176 @@ public class CarDisplay extends JPanel
         }
         */
     
-<span class="nc bnc" id="L715" title="All 2 branches missed.">        if(trackMap.isRaceMode())</span>
+<span class="nc bnc" id="L732" title="All 2 branches missed.">        if(trackMap.isRaceMode())</span>
         {
             //Dibujar  tots els cotxes IA
-<span class="nc" id="L718">            Graphics2D g2d2 = (Graphics2D) g;</span>
-<span class="nc bnc" id="L719" title="All 2 branches missed.">            for (AICar aiCar : aiController.getAICars()) </span>
+<span class="nc" id="L735">            Graphics2D g2d2 = (Graphics2D) g;</span>
+<span class="nc bnc" id="L736" title="All 2 branches missed.">            for (AICar aiCar : aiController.getAICars()) </span>
             {
                 //Calcular posició del cotxe
-<span class="nc" id="L722">                double drawX2 = aiCar.getX() - cameraX;</span>
-<span class="nc" id="L723">                double drawY2 = aiCar.getY() - cameraY;</span>
-<span class="nc bnc" id="L724" title="All 2 branches missed.">                if (aiCar.getSprite() != null) </span>
+<span class="nc" id="L739">                double drawX2 = aiCar.getX() - cameraX;</span>
+<span class="nc" id="L740">                double drawY2 = aiCar.getY() - cameraY;</span>
+<span class="nc bnc" id="L741" title="All 2 branches missed.">                if (aiCar.getSprite() != null) </span>
                 {
                     //Si té sprite, calcular la rotació
-<span class="nc" id="L727">                    AffineTransform transform = new AffineTransform();</span>
-<span class="nc" id="L728">                    transform.translate(drawX2, drawY2);</span>
-<span class="nc" id="L729">                    transform.rotate(Math.toRadians(aiCar.getAngle()),</span>
-<span class="nc" id="L730">                            aiCar.getSprite().getWidth() / 2.0,</span>
-<span class="nc" id="L731">                            aiCar.getSprite().getHeight() / 2.0);</span>
+<span class="nc" id="L744">                    AffineTransform transform = new AffineTransform();</span>
+<span class="nc" id="L745">                    transform.translate(drawX2, drawY2);</span>
+<span class="nc" id="L746">                    transform.rotate(Math.toRadians(aiCar.getAngle()),</span>
+<span class="nc" id="L747">                            aiCar.getSprite().getWidth() / 2.0,</span>
+<span class="nc" id="L748">                            aiCar.getSprite().getHeight() / 2.0);</span>
                     //Dibuixar el cotxe
-<span class="nc" id="L733">                    g2d2.drawImage(aiCar.getSprite(), transform, null);</span>
+<span class="nc" id="L750">                    g2d2.drawImage(aiCar.getSprite(), transform, null);</span>
                 }
-<span class="nc" id="L735">            }</span>
-
-            
+            }
+            /*
             //DEBUGGING PURPOSES
             //RACING LINE DRAWING
-<span class="nc" id="L740">            List&lt;Point&gt; racingLine = aiController.getRacingLine();</span>
+            List&lt;Point&gt; racingLine = aiController.getRacingLine();
     
-<span class="nc bnc" id="L742" title="All 2 branches missed.">            if (racingLine.isEmpty()) </span>
+            if (racingLine.isEmpty()) 
             {
-<span class="nc" id="L744">                return;</span>
+                return;
             }
 
             // Configurar el color y el trazo para la línea
-<span class="nc" id="L748">            g2d.setColor(new Color(255, 0, 0, 150)); </span>
-<span class="nc" id="L749">            g2d.setStroke(new BasicStroke(3)); </span>
+            g2d.setColor(new Color(255, 0, 0, 150)); 
+            g2d.setStroke(new BasicStroke(3)); 
 
             // Dibujar la línea que conecta los waypoints
-<span class="nc" id="L752">            Point prev = racingLine.get(0);</span>
-<span class="nc bnc" id="L753" title="All 2 branches missed.">            for (int i = 1; i &lt; racingLine.size(); i++) </span>
+            Point prev = racingLine.get(0);
+            for (int i = 1; i &lt; racingLine.size(); i++) 
             {
-<span class="nc" id="L755">                Point current = racingLine.get(i);</span>
-<span class="nc" id="L756">                int x1 = (int) (prev.x - cameraX);</span>
-<span class="nc" id="L757">                int y1 = (int) (prev.y - cameraY);</span>
-<span class="nc" id="L758">                int x2 = (int) (current.x - cameraX);</span>
-<span class="nc" id="L759">                int y2 = (int) (current.y - cameraY);</span>
-<span class="nc" id="L760">                g2d.drawLine(x1, y1, x2, y2);</span>
-<span class="nc" id="L761">                prev = current;</span>
+                Point current = racingLine.get(i);
+                int x1 = (int) (prev.x - cameraX);
+                int y1 = (int) (prev.y - cameraY);
+                int x2 = (int) (current.x - cameraX);
+                int y2 = (int) (current.y - cameraY);
+                g2d.drawLine(x1, y1, x2, y2);
+                prev = current;
             }
 
             // Dibujar los waypoints como círculos
-<span class="nc" id="L765">            g2d.setColor(new Color(0, 255, 0, 200)); </span>
-<span class="nc bnc" id="L766" title="All 2 branches missed.">            for (Point point : racingLine) </span>
+            g2d.setColor(new Color(0, 255, 0, 200)); 
+            for (Point point : racingLine) 
             {
-<span class="nc" id="L768">                int x = (int) (point.x - cameraX);</span>
-<span class="nc" id="L769">                int y = (int) (point.y - cameraY);</span>
-<span class="nc" id="L770">                g2d.fillOval(x - 5, y - 5, 10, 10); </span>
-<span class="nc" id="L771">            }</span>
-            
+                int x = (int) (point.x - cameraX);
+                int y = (int) (point.y - cameraY);
+                g2d.fillOval(x - 5, y - 5, 10, 10); 
+            }
+            */
         }
 
-<span class="nc" id="L775">    }</span>
+<span class="nc" id="L791">    }</span>
 
     //Funció per dibuixar la countdown abans de la carrera
     public void drawCountdown(Graphics g) 
     {
-<span class="nc" id="L780">        Graphics2D g2d = (Graphics2D) g;</span>
+<span class="nc" id="L796">        Graphics2D g2d = (Graphics2D) g;</span>
         
         // Nomès dibuixar el mapa si estem en mode carrera
-<span class="nc bnc" id="L783" title="All 2 branches missed.">        if (currentGameMode == GameMode.RACE) </span>
+<span class="nc bnc" id="L799" title="All 2 branches missed.">        if (currentGameMode == GameMode.RACE) </span>
         {
-<span class="nc" id="L785">            Car car = controller.getCar();</span>
-<span class="nc" id="L786">            int panelWidth = getWidth();</span>
-<span class="nc" id="L787">            int panelHeight = getHeight();</span>
+<span class="nc" id="L801">            Car car = controller.getCar();</span>
+<span class="nc" id="L802">            int panelWidth = getWidth();</span>
+<span class="nc" id="L803">            int panelHeight = getHeight();</span>
             
             // Calcular la posició de la càmara centrada en el cotxe 
-<span class="nc" id="L790">            double cameraX = car.getX() - panelWidth / 2.0;</span>
-<span class="nc" id="L791">            double cameraY = car.getY() - panelHeight / 2.0;</span>
+<span class="nc" id="L806">            double cameraX = car.getX() - panelWidth / 2.0;</span>
+<span class="nc" id="L807">            double cameraY = car.getY() - panelHeight / 2.0;</span>
 
-<span class="nc" id="L793">            cameraX = Math.max(0, Math.min(cameraX, largerMap.getWidth() - panelWidth));</span>
-<span class="nc" id="L794">            cameraY = Math.max(0, Math.min(cameraY, largerMap.getHeight() - panelHeight));</span>
+<span class="nc" id="L809">            cameraX = Math.max(0, Math.min(cameraX, largerMap.getWidth() - panelWidth));</span>
+<span class="nc" id="L810">            cameraY = Math.max(0, Math.min(cameraY, largerMap.getHeight() - panelHeight));</span>
 
             // Dibujar la porció visible del mapa
-<span class="nc" id="L797">            g2d.drawImage(largerMap,</span>
-                    0, 0, panelWidth, panelHeight,
-                    (int) cameraX, (int) cameraY,
-                    (int) cameraX + panelWidth, (int) cameraY + panelHeight,
-                    null);
-<span class="nc" id="L802">        } </span>
+<span class="nc" id="L813">            g2d.drawImage(largerMap,</span>
+<span class="nc" id="L814">                    0, 0, panelWidth, panelHeight,</span>
+<span class="nc" id="L815">                    (int) cameraX, (int) cameraY,</span>
+<span class="nc" id="L816">                    (int) cameraX + panelWidth, (int) cameraY + panelHeight,</span>
+<span class="nc" id="L817">                    null);</span>
+<span class="nc" id="L818">        } </span>
         else 
         {
             //Per QUALY, fons negre
-<span class="nc" id="L806">            g.setColor(Color.BLACK);</span>
-<span class="nc" id="L807">            g.fillRect(0, 0, getWidth(), getHeight());</span>
+<span class="nc" id="L822">            g.setColor(Color.BLACK);</span>
+<span class="nc" id="L823">            g.fillRect(0, 0, getWidth(), getHeight());</span>
         }
         
         //Dibuixar overlay semitransparent
-<span class="nc" id="L811">        g.setColor(new Color(0, 0, 0, 150)); </span>
-<span class="nc" id="L812">        g.fillRect(0, 0, getWidth(), getHeight());</span>
+<span class="nc" id="L827">        g.setColor(new Color(0, 0, 0, 150)); </span>
+<span class="nc" id="L828">        g.fillRect(0, 0, getWidth(), getHeight());</span>
         
         //calcular el número que s'ha d'imprimir per pantalla al countdown
-<span class="nc" id="L815">        int countdown = trackMap.getRemainingCountdown();</span>
-<span class="nc" id="L816">        g.setColor(Color.WHITE);</span>
-<span class="nc" id="L817">        g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 120));</span>
+<span class="nc" id="L831">        int countdown = trackMap.getRemainingCountdown();</span>
+<span class="nc" id="L832">        g.setColor(Color.WHITE);</span>
+<span class="nc" id="L833">        g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 120));</span>
         
-<span class="nc bnc" id="L819" title="All 2 branches missed.">        String countdownText = countdown &gt; 0 ? String.valueOf(countdown) : &quot;GO!&quot;;</span>
-<span class="nc" id="L820">        FontMetrics fm = g.getFontMetrics();</span>
-<span class="nc" id="L821">        int x = (getWidth() - fm.stringWidth(countdownText)) / 2;</span>
-<span class="nc" id="L822">        int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();</span>
+<span class="nc bnc" id="L835" title="All 2 branches missed.">        String countdownText = countdown &gt; 0 ? String.valueOf(countdown) : &quot;GO!&quot;;</span>
+<span class="nc" id="L836">        FontMetrics fm = g.getFontMetrics();</span>
+<span class="nc" id="L837">        int x = (getWidth() - fm.stringWidth(countdownText)) / 2;</span>
+<span class="nc" id="L838">        int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();</span>
 
         //Dibuixar a cada instant el que queda de countdown
-<span class="nc" id="L825">        g.drawString(countdownText, x, y);</span>
+<span class="nc" id="L841">        g.drawString(countdownText, x, y);</span>
         
         // Mostrar informació de la carrera
-<span class="nc bnc" id="L828" title="All 2 branches missed.">        if (currentGameMode == GameMode.RACE) </span>
+<span class="nc bnc" id="L844" title="All 2 branches missed.">        if (currentGameMode == GameMode.RACE) </span>
         {
-<span class="nc" id="L830">            g.setFont(new Font(&quot;Arial&quot;, Font.PLAIN, 24));</span>
-<span class="nc" id="L831">            String info = &quot;Carrera - &quot; + trackMap.getTotalLaps() + &quot; vueltas&quot;;</span>
-<span class="nc" id="L832">            FontMetrics infoFm = g.getFontMetrics();</span>
-<span class="nc" id="L833">            int infoX = (getWidth() - infoFm.stringWidth(info)) / 2;</span>
-<span class="nc" id="L834">            int infoY = y + 80;</span>
-<span class="nc" id="L835">            g.drawString(info, infoX, infoY);</span>
+<span class="nc" id="L846">            g.setFont(new Font(&quot;Arial&quot;, Font.PLAIN, 24));</span>
+<span class="nc" id="L847">            String info = &quot;Carrera - &quot; + trackMap.getTotalLaps() + &quot; vueltas&quot;;</span>
+<span class="nc" id="L848">            FontMetrics infoFm = g.getFontMetrics();</span>
+<span class="nc" id="L849">            int infoX = (getWidth() - infoFm.stringWidth(info)) / 2;</span>
+<span class="nc" id="L850">            int infoY = y + 80;</span>
+<span class="nc" id="L851">            g.drawString(info, infoX, infoY);</span>
         }
-<span class="nc" id="L837">    }</span>
+<span class="nc" id="L853">    }</span>
 
     //Funció per carregar els Sprites dels cotxes rivals
     public void loadAICarSprites() 
     {
-<span class="fc bfc" id="L842" title="All 2 branches covered.">        if(aiController == null) return;</span>
+<span class="fc bfc" id="L858" title="All 2 branches covered.">        if(aiController == null) return;</span>
         //Possibles noms dels cotxes rivals
-<span class="fc" id="L844">        String[] teamNames = </span>
-        {
-            &quot;mercedes&quot;, &quot;redbull&quot;, &quot;mclaren&quot;,
-            &quot;alpine&quot;, &quot;racingbulls&quot;, &quot;astonmartin&quot;, &quot;williams&quot;, 
-            &quot;sauber&quot;, &quot;haas&quot;
+<span class="fc" id="L860">        String[] teamNames = </span>
+<span class="fc" id="L861">        {</span>
+<span class="fc" id="L862">            &quot;mercedes&quot;, &quot;redbull&quot;, &quot;mclaren&quot;,</span>
+<span class="fc" id="L863">            &quot;alpine&quot;, &quot;racingbulls&quot;, &quot;astonmartin&quot;, &quot;williams&quot;, </span>
+<span class="fc" id="L864">            &quot;sauber&quot;, &quot;haas&quot;</span>
         };
 
         //Direccions a les imatges de cada sprite
-<span class="fc" id="L852">        String[] teamColors = </span>
-        {
-            &quot;/img/mercedes_car.png&quot;, &quot;/img/redbull_car.png&quot;,
-            &quot;/img/mclaren_car.png&quot;, &quot;/img/alpine_car.png&quot;, &quot;/img/racingbulls_car.png&quot;,
-            &quot;/img/astonmartin_car.png&quot;, &quot;/img/williams_car.png&quot;, &quot;/img/sauber_car.png&quot;,
-            &quot;/img/haas_car.png&quot;
+<span class="fc" id="L868">        String[] teamColors = </span>
+<span class="fc" id="L869">        {</span>
+<span class="fc" id="L870">            &quot;/img/mercedes_car.png&quot;, &quot;/img/redbull_car.png&quot;,</span>
+<span class="fc" id="L871">            &quot;/img/mclaren_car.png&quot;, &quot;/img/alpine_car.png&quot;, &quot;/img/racingbulls_car.png&quot;,</span>
+<span class="fc" id="L872">            &quot;/img/astonmartin_car.png&quot;, &quot;/img/williams_car.png&quot;, &quot;/img/sauber_car.png&quot;,</span>
+<span class="fc" id="L873">            &quot;/img/haas_car.png&quot;</span>
         };
 
         //Per cada cotxe, assignar-li el seu Sprite corresponent al nom de l'equip
-<span class="fc bfc" id="L861" title="All 2 branches covered.">        for (AICar aiCar : aiController.getAICars()) </span>
+<span class="fc bfc" id="L877" title="All 2 branches covered.">        for (AICar aiCar : aiController.getAICars()) </span>
         {
-<span class="fc" id="L863">            String team = aiCar.getTeam().toLowerCase().replace(&quot; &quot;, &quot;&quot;);</span>
-<span class="fc" id="L864">            int teamIndex = -1;</span>
+<span class="fc" id="L879">            String team = aiCar.getTeam().toLowerCase().replace(&quot; &quot;, &quot;&quot;);</span>
+<span class="fc" id="L880">            int teamIndex = -1;</span>
             
             //Buscar l'equip dins de l'array
-<span class="pc bpc" id="L867" title="1 of 2 branches missed.">            for (int i = 0; i &lt; teamNames.length; i++) </span>
+<span class="pc bpc" id="L883" title="1 of 2 branches missed.">            for (int i = 0; i &lt; teamNames.length; i++) </span>
             {
-<span class="fc bfc" id="L869" title="All 2 branches covered.">                if (teamNames[i].equals(team)) </span>
+<span class="fc bfc" id="L885" title="All 2 branches covered.">                if (teamNames[i].equals(team)) </span>
                 {
-<span class="fc" id="L871">                    teamIndex = i;</span>
-<span class="fc" id="L872">                    break;</span>
+<span class="fc" id="L887">                    teamIndex = i;</span>
+<span class="fc" id="L888">                    break;</span>
                 }
             }
             
             // Si no es troba, utilitzar index per defecte
-<span class="pc bpc" id="L877" title="1 of 2 branches missed.">            if (teamIndex == -1) </span>
+<span class="pc bpc" id="L893" title="1 of 2 branches missed.">            if (teamIndex == -1) </span>
             {
-<span class="nc" id="L879">                teamIndex = 0;</span>
+<span class="nc" id="L895">                teamIndex = 0;</span>
             }
             
             //Carregar la direcció en la funció principal de load
-<span class="fc" id="L883">            loadCarSprite(aiCar, teamColors[teamIndex]);</span>
-<span class="fc" id="L884">        }</span>
-<span class="fc" id="L885">    }</span>
+<span class="fc" id="L899">            loadCarSprite(aiCar, teamColors[teamIndex]);</span>
+        }
+<span class="fc" id="L901">    }</span>
 
     // Carga i assigna el sprite del cotxe al controlador
     public void loadCarSprite(Car car, String path) 
@@ -890,35 +906,35 @@ public class CarDisplay extends JPanel
         BufferedImage carImage;
 
         try {
-<span class="fc bfc" id="L893" title="All 2 branches covered.">            if (path == null) </span>
+<span class="fc bfc" id="L909" title="All 2 branches covered.">            if (path == null) </span>
             {
-<span class="fc" id="L895">                throw new IllegalArgumentException(&quot;Ruta del sprite no puede ser null&quot;);</span>
+<span class="fc" id="L911">                throw new IllegalArgumentException(&quot;Ruta del sprite no puede ser null&quot;);</span>
             }
 
             //Intentar llegir la imatge passada per parametre 
-<span class="fc" id="L899">            carImage = ImageIO.read(getClass().getResource(path));</span>
+<span class="fc" id="L915">            carImage = ImageIO.read(getClass().getResource(path));</span>
 
             // Redimensionar la imatge del cotxe
-<span class="fc" id="L902">            int newWidth = 80;</span>
-<span class="fc" id="L903">            int newHeight = 80;</span>
-<span class="fc" id="L904">            Image scaledImage = carImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);</span>
+<span class="fc" id="L918">            int newWidth = 80;</span>
+<span class="fc" id="L919">            int newHeight = 80;</span>
+<span class="fc" id="L920">            Image scaledImage = carImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);</span>
 
-<span class="fc" id="L906">            BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);</span>
+<span class="fc" id="L922">            BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);</span>
             //Crear el gràfic per poder pintar-lo
-<span class="fc" id="L908">            Graphics2D g2d = resized.createGraphics();</span>
-<span class="fc" id="L909">            g2d.drawImage(scaledImage, 0, 0, null);</span>
+<span class="fc" id="L924">            Graphics2D g2d = resized.createGraphics();</span>
+<span class="fc" id="L925">            g2d.drawImage(scaledImage, 0, 0, null);</span>
             //Alliberar recursos per poder inicialitzar el següent
-<span class="fc" id="L911">            g2d.dispose();</span>
+<span class="fc" id="L927">            g2d.dispose();</span>
 
             //Asignar l'sprite al cotxe corresponent
-<span class="fc" id="L914">            car.setSprite(resized);</span>
+<span class="fc" id="L930">            car.setSprite(resized);</span>
 
-<span class="fc" id="L916">        } catch (IOException | IllegalArgumentException e) {</span>
+<span class="fc" id="L932">        } catch (IOException | IllegalArgumentException e) {</span>
             //Si hi ha algún problema en carregar algún sprite, possar una imatge default
-<span class="fc" id="L918">            BufferedImage defaultImage = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);</span>
-<span class="fc" id="L919">            car.setSprite(defaultImage);</span>
-<span class="fc" id="L920">        }</span>
-<span class="fc" id="L921">    }</span>
+<span class="fc" id="L934">            BufferedImage defaultImage = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);</span>
+<span class="fc" id="L935">            car.setSprite(defaultImage);</span>
+        }
+<span class="fc" id="L937">    }</span>
 
     // Carga una imatge pel track i s'escala per cubrir tota l'àrea
     public static BufferedImage loadImage(String path, double scaleFactor) 
@@ -926,123 +942,129 @@ public class CarDisplay extends JPanel
         BufferedImage original;
         try
         {
-<span class="fc bfc" id="L929" title="All 2 branches covered.">            if (path == null) throw new IllegalArgumentException(&quot;Path no puede ser null&quot;);</span>
+<span class="fc bfc" id="L945" title="All 2 branches covered.">            if (path == null) throw new IllegalArgumentException(&quot;Path no puede ser null&quot;);</span>
             //Intentar llegir la imatge del track
-<span class="fc" id="L931">            original = ImageIO.read(CarDisplay.class.getResource(path));</span>
-        }
-<span class="fc" id="L933">        catch (IOException | IllegalArgumentException e)</span>
+<span class="fc" id="L947">            original = ImageIO.read(CarDisplay.class.getResource(path));</span>
+<span class="fc" id="L948">        }</span>
+<span class="fc" id="L949">        catch (IOException | IllegalArgumentException e)</span>
         {
             //Si no es pot llegir, possar una default
-<span class="fc" id="L936">            original = new BufferedImage(2000, 2000, BufferedImage.TYPE_INT_RGB);</span>
-<span class="fc" id="L937">        }</span>
+<span class="fc" id="L952">            original = new BufferedImage(2000, 2000, BufferedImage.TYPE_INT_RGB);</span>
+        }
 
         // Escalar la imatge
-<span class="fc" id="L940">        int bigWidth = (int)(original.getWidth() * scaleFactor);</span>
-<span class="fc" id="L941">        int bigHeight = (int)(original.getHeight() * scaleFactor);</span>
+<span class="fc" id="L956">        int bigWidth = (int)(original.getWidth() * scaleFactor);</span>
+<span class="fc" id="L957">        int bigHeight = (int)(original.getHeight() * scaleFactor);</span>
 
-<span class="fc" id="L943">        BufferedImage scaled = new BufferedImage(bigWidth, bigHeight, BufferedImage.TYPE_INT_RGB);</span>
+<span class="fc" id="L959">        BufferedImage scaled = new BufferedImage(bigWidth, bigHeight, BufferedImage.TYPE_INT_RGB);</span>
         //Crear el gràfic per poder dibuixar-lo
-<span class="fc" id="L945">        Graphics2D g = scaled.createGraphics();</span>
-<span class="fc" id="L946">        g.drawImage(original, 0, 0, bigWidth, bigHeight, null);</span>
+<span class="fc" id="L961">        Graphics2D g = scaled.createGraphics();</span>
+<span class="fc" id="L962">        g.drawImage(original, 0, 0, bigWidth, bigHeight, null);</span>
         //Alliberar recursos
-<span class="fc" id="L948">        g.dispose();</span>
-<span class="fc" id="L949">        return scaled;</span>
+<span class="fc" id="L964">        g.dispose();</span>
+<span class="fc" id="L965">        return scaled;</span>
     }
 
     //Crea la finestra del joc amb el CarDisplay
     public static JFrame createGame(CarController controller, BufferedImage largeMap, BufferedImage collisionMap) 
     {
         //Definir un JFrame per afegir tots els components anteriors
-<span class="fc" id="L956">        JFrame frame = new JFrame(&quot;F1 2D&quot;);</span>
-<span class="fc" id="L957">        CarDisplay display = new CarDisplay(controller, largeMap, collisionMap);</span>
-<span class="fc" id="L958">        frame.add(display);</span>
+<span class="fc" id="L972">        JFrame frame = new JFrame(&quot;F1 2D&quot;);</span>
+<span class="fc" id="L973">        CarDisplay display = new CarDisplay(controller, largeMap, collisionMap);</span>
+<span class="fc" id="L974">        frame.add(display);</span>
         //S'obre en pestanya gran
-<span class="fc" id="L960">        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);</span>
+<span class="fc" id="L976">        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);</span>
         //Quan es tanca, finalitza l'execució
-<span class="fc" id="L962">        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
-<span class="fc" id="L963">        return frame;</span>
+<span class="fc" id="L978">        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="fc" id="L979">        return frame;</span>
     }
 
     // Getter/Setter para test
-<span class="fc" id="L967">    public Set&lt;Integer&gt; getKeysPressed() { return keysPressed; }</span>
-<span class="fc" id="L968">    public Map getTrackMap() { return trackMap; }</span>
-<span class="fc" id="L969">    public OffTrackOverlay getOffTrackOverlay() { return offTrackOverlay; }</span>
-<span class="fc" id="L970">    public OffTrackOverlay getInvalidLapOverlay() { return invalidLapOverlay; }</span>
-<span class="fc" id="L971">    public boolean isInMainMenu() { return inMainMenu; }</span>
-<span class="fc" id="L972">    public GameMode getCurrentGameMode() { return currentGameMode; }</span>
-<span class="fc" id="L973">    public void setIsMainMenu(boolean active) {this.inMainMenu = active;} </span>
-<span class="nc" id="L974">    public AIController getAIController() { return aiController; }</span>
+<span class="fc" id="L983">    public Set&lt;Integer&gt; getKeysPressed() { return keysPressed; }</span>
+<span class="fc" id="L984">    public Map getTrackMap() { return trackMap; }</span>
+<span class="fc" id="L985">    public OffTrackOverlay getOffTrackOverlay() { return offTrackOverlay; }</span>
+<span class="fc" id="L986">    public OffTrackOverlay getInvalidLapOverlay() { return invalidLapOverlay; }</span>
+<span class="fc" id="L987">    public boolean isInMainMenu() { return inMainMenu; }</span>
+<span class="fc" id="L988">    public GameMode getCurrentGameMode() { return currentGameMode; }</span>
+<span class="fc" id="L989">    public void setIsMainMenu(boolean active) {this.inMainMenu = active;} </span>
+<span class="fc" id="L990">    public MainMenu getMainMenu() {return mainMenu;}</span>
+    
 
     // Classe interna necessaria pel menú principal
-    private class MainMenu extends JPanel 
+    class MainMenu extends JPanel 
     {
         //Variables pels botons
-<span class="fc" id="L980">        private int buttonWidth = 200;</span>
-<span class="fc" id="L981">        private int buttonHeight = 60;</span>
+<span class="fc" id="L997">        private int buttonWidth = 200;</span>
+<span class="fc" id="L998">        private int buttonHeight = 60;</span>
+
+        //Botons
+<span class="fc" id="L1001">        JButton qualyButton = new JButton(&quot;QUALY&quot;);</span>
+<span class="fc" id="L1002">        JButton raceButton = new JButton(&quot;RACE&quot;);</span>
 
         //Inicialitzar el menú principal
-        public MainMenu() 
-<span class="fc" id="L985">        {</span>
+<span class="fc" id="L1005">        public MainMenu() </span>
+<span class="fc" id="L1006">        {</span>
             //Definir layout a null per poder controlar a gust
-<span class="fc" id="L987">            setLayout(null);</span>
+<span class="fc" id="L1008">            setLayout(null);</span>
             
             // Calcular posició centrada pels botons
-<span class="fc" id="L990">            int panelWidth = (int)screenSize.getWidth();</span>
-<span class="fc" id="L991">            int panelHeight = (int)screenSize.getHeight(); </span>
+<span class="fc" id="L1011">            int panelWidth = (int)screenSize.getWidth();</span>
+<span class="fc" id="L1012">            int panelHeight = (int)screenSize.getHeight(); </span>
             
-<span class="fc" id="L993">            int centerX = panelWidth / 2 - buttonWidth / 2;</span>
-<span class="fc" id="L994">            int buttonsY = panelHeight / 2 + 50; </span>
+<span class="fc" id="L1014">            int centerX = panelWidth / 2 - buttonWidth / 2;</span>
+<span class="fc" id="L1015">            int buttonsY = panelHeight / 2 + 50; </span>
             
             //Crear botó de Qualy i assignar startGame de Qualy al prèmer
-<span class="fc" id="L997">            JButton QualyButton = new JButton(&quot;QUALY&quot;);</span>
-<span class="fc" id="L998">            QualyButton.setBounds(centerX - buttonWidth - 20, buttonsY, buttonWidth, buttonHeight);</span>
-<span class="pc" id="L999">            QualyButton.addActionListener(d -&gt; startGame(GameMode.QUALY));</span>
-<span class="fc" id="L1000">            add(QualyButton);</span>
+<span class="fc" id="L1018">            qualyButton.setBounds(centerX - buttonWidth - 20, buttonsY, buttonWidth, buttonHeight);</span>
+<span class="fc" id="L1019">            qualyButton.addActionListener(d -&gt; startGame(GameMode.QUALY));</span>
+<span class="fc" id="L1020">            add(qualyButton);</span>
             
             //Crear botó de Race i assignar startGame de Race al prèmer
-<span class="fc" id="L1003">            JButton RaceButton = new JButton(&quot;RACE&quot;);</span>
-<span class="fc" id="L1004">            RaceButton.setBounds(centerX + buttonWidth + 20, buttonsY, buttonWidth, buttonHeight);</span>
-<span class="pc" id="L1005">            RaceButton.addActionListener(f -&gt; startGame(GameMode.RACE));</span>
-<span class="fc" id="L1006">            add(RaceButton);</span>
-<span class="fc" id="L1007">        }</span>
+<span class="fc" id="L1023">            raceButton.setBounds(centerX + buttonWidth + 20, buttonsY, buttonWidth, buttonHeight);</span>
+<span class="fc" id="L1024">            raceButton.addActionListener(f -&gt; startGame(GameMode.RACE));</span>
+<span class="fc" id="L1025">            add(raceButton);</span>
+<span class="fc" id="L1026">        }</span>
         
         //Funció per poder pintar el main menu
         @Override
         protected void paintComponent(Graphics g)
         {
             //Cridar a la funció base per comporbar el funcionament
-<span class="fc" id="L1014">            super.paintComponent(g);</span>
+<span class="fc" id="L1033">            super.paintComponent(g);</span>
         
-<span class="fc" id="L1016">            g.setColor(new Color(30, 30, 60));</span>
-<span class="fc" id="L1017">            g.fillRect(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L1035">            g.setColor(new Color(30, 30, 60));</span>
+<span class="fc" id="L1036">            g.fillRect(0, 0, getWidth(), getHeight());</span>
             
             // Títol per defecte
-<span class="fc" id="L1020">            g.setColor(Color.WHITE);</span>
-<span class="fc" id="L1021">            g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 36));</span>
-<span class="fc" id="L1022">            String title = &quot;F1 2D&quot;;</span>
-<span class="fc" id="L1023">            int titleWidth = g.getFontMetrics().stringWidth(title);</span>
-<span class="fc" id="L1024">            g.drawString(title, (getWidth() - titleWidth) / 2, getHeight() / 3);</span>
-<span class="fc" id="L1025">        }</span>
+<span class="fc" id="L1039">            g.setColor(Color.WHITE);</span>
+<span class="fc" id="L1040">            g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 36));</span>
+<span class="fc" id="L1041">            String title = &quot;F1 2D&quot;;</span>
+<span class="fc" id="L1042">            int titleWidth = g.getFontMetrics().stringWidth(title);</span>
+<span class="fc" id="L1043">            g.drawString(title, (getWidth() - titleWidth) / 2, getHeight() / 3);</span>
+<span class="fc" id="L1044">        }</span>
+
+<span class="fc" id="L1046">        public JButton getRaceButton() {return raceButton;}</span>
+<span class="fc" id="L1047">        public JButton getQualyButton() {return qualyButton;}</span>
     }
     
     //Main per executar el joc
     public static void main(String[] args) 
     {
-<span class="fc" id="L1031">        double scaleFactor = 4.0;</span>
-<span class="fc" id="L1032">        BufferedImage largeMap = null;</span>
-<span class="fc" id="L1033">        BufferedImage collisionMap = null;</span>
+<span class="fc" id="L1053">        double scaleFactor = 4.0;</span>
+<span class="fc" id="L1054">        BufferedImage largeMap = null;</span>
+<span class="fc" id="L1055">        BufferedImage collisionMap = null;</span>
 
-<span class="fc" id="L1035">        largeMap = loadImage(&quot;/track/monaco.jpg&quot;, scaleFactor);</span>
-<span class="fc" id="L1036">        collisionMap = loadImage(&quot;/track/monacoCollision.jpg&quot;, scaleFactor);</span>
+<span class="fc" id="L1057">        largeMap = loadImage(&quot;/track/monaco.jpg&quot;, scaleFactor);</span>
+<span class="fc" id="L1058">        collisionMap = loadImage(&quot;/track/monacoCollision.jpg&quot;, scaleFactor);</span>
 
         // Crear el cotxe i el controlador
-<span class="fc" id="L1039">        Car car = new Car(880, 1780, 267, 0, 30, -5, 0.2, 0.5, largeMap.getHeight() - 150, largeMap.getWidth() - 200);</span>
-<span class="fc" id="L1040">        CarController controller = new CarController(car);</span>
+<span class="fc" id="L1061">        Car car = new Car(880, 1780, 267, 0, 30, -5, 0.2, 0.5, largeMap.getHeight() - 150, largeMap.getWidth() - 200);</span>
+<span class="fc" id="L1062">        CarController controller = new CarController(car);</span>
 
         // Crear i mostrar la finestra del joc
-<span class="fc" id="L1043">        JFrame frame = createGame(controller, largeMap, collisionMap);</span>
-<span class="fc" id="L1044">        frame.setVisible(true);</span>
-<span class="fc" id="L1045">    }</span>
+<span class="fc" id="L1065">        JFrame frame = createGame(controller, largeMap, collisionMap);</span>
+<span class="fc" id="L1066">        frame.setVisible(true);</span>
+<span class="fc" id="L1067">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

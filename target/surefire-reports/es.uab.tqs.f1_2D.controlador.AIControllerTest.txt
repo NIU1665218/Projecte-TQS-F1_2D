@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: es.uab.tqs.f1_2D.controlador.AIControllerTest
 -------------------------------------------------------------------------------
-Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.542 s -- in es.uab.tqs.f1_2D.controlador.AIControllerTest
+Tests run: 22, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.497 s -- in es.uab.tqs.f1_2D.controlador.AIControllerTest
