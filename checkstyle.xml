@@ -38,7 +38,7 @@
             <property name="groups" value="es,java,javax,org,com"/>
         </module>
 
-        <!-- Espais i format (WhitespaceAfter, WhiteSpace around) -->
+        <!-- Espais i format -->
         <module name="NoLineWrap"/>
 
         <!-- Altres normes habituals -->

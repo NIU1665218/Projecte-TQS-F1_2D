@@ -750,7 +750,6 @@ public class CarDisplay extends JPanel
                     g2d2.drawImage(aiCar.getSprite(), transform, null);
                 }
             }
-
             /*
             //DEBUGGING PURPOSES
             //RACING LINE DRAWING

@@ -15,8 +15,8 @@ public class MapController
 <span class="fc" id="L15">    private boolean isSkipEnabled = false; //variable para testing timer</span>
     private AIController aiController;
     
-    public MapController(Map model) 
-<span class="fc" id="L19">    {</span>
+<span class="fc" id="L18">    public MapController(Map model) </span>
+    {
 <span class="fc" id="L20">        this.model = model;</span>
 <span class="fc" id="L21">    }</span>
     
@@ -101,7 +101,7 @@ public class MapController
 <span class="fc bfc" id="L101" title="All 2 branches covered.">        if (currentState == Map.State.IDLE) </span>
         {
 <span class="fc" id="L103">            startLap();</span>
-        } 
+<span class="fc" id="L104">        } </span>
         else 
         {
            //Si está corriendo mira si es el último checkpoint y cuenta el último sector
@@ -122,7 +122,7 @@ public class MapController
 <span class="fc bfc" id="L122" title="All 2 branches covered.">            if (model.passedAllCheckpoints()) </span>
             {
 <span class="fc" id="L124">                endLap();</span>
-            } else 
+<span class="fc" id="L125">            } else </span>
             {
 <span class="fc" id="L127">                startLap();</span>
             }
@@ -157,8 +157,8 @@ public class MapController
 <span class="fc" id="L157">                        long prevSum = model.sum(model.getSectorTimes(), sectorIndex);</span>
 <span class="fc" id="L158">                        long sectorTime = totalSinceStart - prevSum;</span>
 <span class="fc" id="L159">                        recordSector(sectorIndex, sectorTime);</span>
-<span class="fc" id="L160">                    }</span>
-                } 
+                    }
+<span class="fc" id="L161">                } </span>
                 else 
                 {
 <span class="fc" id="L164">                    handleInvalidLap();</span>
@@ -195,12 +195,12 @@ public class MapController
 <span class="fc" id="L195">                });</span>
 <span class="fc" id="L196">                offTrackTimer.setRepeats(false);</span>
 <span class="fc" id="L197">                offTrackTimer.start();</span>
-            } 
+<span class="fc" id="L198">            } </span>
             else 
             {
 <span class="fc" id="L201">                model.setCurrentState(Map.State.RUNNING);</span>
             }
-        } 
+<span class="fc" id="L203">        } </span>
         else 
         {
 <span class="fc" id="L206">            model.setCurrentState(Map.State.OFF_TRACK);</span>
@@ -227,7 +227,7 @@ public class MapController
 <span class="fc bfc" id="L227" title="All 2 branches covered.">        if(isSkipEnabled)</span>
         {
 <span class="fc" id="L229">            model.startRace();</span>
-        }
+<span class="fc" id="L230">        }</span>
         else 
         {
             // Timer para actualizar la cuenta atrás
@@ -287,7 +287,7 @@ public class MapController
 <span class="fc" id="L287">                });</span>
 <span class="fc" id="L288">                resultTimer.setRepeats(false);</span>
 <span class="fc" id="L289">                resultTimer.start();</span>
-            }
+<span class="fc" id="L290">            }</span>
             else
             {
                 //Empezar siguiente vuelta sin enseñar los resultados, solo para testing
@@ -323,12 +323,12 @@ public class MapController
 <span class="fc" id="L323">                });</span>
 <span class="fc" id="L324">                offTrackTimer.setRepeats(false);</span>
 <span class="fc" id="L325">                offTrackTimer.start();</span>
-            } 
+<span class="fc" id="L326">            } </span>
             else 
             {
 <span class="fc" id="L329">                model.setCurrentState(Map.State.RUNNING);</span>
             }
-        } 
+<span class="fc" id="L331">        } </span>
         else 
         {
             //En QUALY: se invalida el tiempo de la vuelta
@@ -402,7 +402,7 @@ public class MapController
         {
 <span class="fc" id="L403">            model.setBestSectorTime(sectorIndex, sectorTime);</span>
 <span class="fc" id="L404">            model.setSectorColor(sectorIndex, Map.SectorColor.GREEN);</span>
-        } 
+<span class="fc" id="L405">        } </span>
         else 
         {
 <span class="fc" id="L408">            model.setSectorColor(sectorIndex, Map.SectorColor.ORANGE);</span>
@@ -412,37 +412,39 @@ public class MapController
 <span class="fc" id="L412">        long min = Long.MAX_VALUE;</span>
 <span class="fc bfc" id="L413" title="All 2 branches covered.">        if(model.isRaceMode())</span>
         {
-<span class="fc bfc" id="L415" title="All 2 branches covered.">            for(AICar aicar : aiController.getAICars())</span>
+            //Si estamos en carrera, comprobar quien tiene el mejor tiempo de ese sector
+            //si se trata del jugador, poner el sector en morado
+<span class="fc bfc" id="L417" title="All 2 branches covered.">            for(AICar aicar : aiController.getAICars())</span>
             {
-<span class="fc" id="L417">                Long aiTime = aicar.getSectorTimes()[sectorIndex];</span>
-<span class="fc bfc" id="L418" title="All 2 branches covered.">                if(aiTime &lt; min)</span>
+<span class="fc" id="L419">                Long aiTime = aicar.getSectorTimes()[sectorIndex];</span>
+<span class="fc bfc" id="L420" title="All 2 branches covered.">                if(aiTime &lt; min)</span>
                 {
-<span class="fc" id="L420">                    min = aiTime;</span>
+<span class="fc" id="L422">                    min = aiTime;</span>
                 }
-<span class="fc" id="L422">            }</span>
+            }
 
-<span class="fc bfc" id="L424" title="All 2 branches covered.">            if(min &gt; sectorTime)</span>
+<span class="fc bfc" id="L426" title="All 2 branches covered.">            if(min &gt; sectorTime)</span>
             {
-<span class="fc" id="L426">                model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);</span>
+<span class="fc" id="L428">                model.setSectorColor(sectorIndex, Map.SectorColor.PURPLE);</span>
             }
         }
-<span class="fc" id="L429">    }</span>
+<span class="fc" id="L431">    }</span>
     
     //Función para pruebas mock
     public void setTimeProvider(TimeProvider timeProvider)
     {
-<span class="fc" id="L434">        this.timeProvider = timeProvider;</span>
-<span class="fc" id="L435">        this.model.setTimeProvider(timeProvider);</span>
-<span class="fc" id="L436">    }</span>
+<span class="fc" id="L436">        this.timeProvider = timeProvider;</span>
+<span class="fc" id="L437">        this.model.setTimeProvider(timeProvider);</span>
+<span class="fc" id="L438">    }</span>
 
     //Getters
-<span class="fc" id="L439">    public Map getModel() { return model;} </span>
-<span class="fc" id="L440">    public Timer getOffTrackTimer() { return offTrackTimer; }</span>
-<span class="fc" id="L441">    public Timer getCountdownTimer() { return countdownTimer; }</span>
+<span class="fc" id="L441">    public Map getModel() { return model;} </span>
+<span class="fc" id="L442">    public Timer getOffTrackTimer() { return offTrackTimer; }</span>
+<span class="fc" id="L443">    public Timer getCountdownTimer() { return countdownTimer; }</span>
 
     //Setters
-<span class="fc" id="L444">    public void setMap(Map map) {this.model = map;}</span>
-<span class="fc" id="L445">    public void setSkip(boolean isSkip) { this.isSkipEnabled = isSkip;}</span>
-<span class="fc" id="L446">    public void setAIController(AIController aiController) { this.aiController = aiController;}</span>
+<span class="fc" id="L446">    public void setMap(Map map) {this.model = map;}</span>
+<span class="fc" id="L447">    public void setSkip(boolean isSkip) { this.isSkipEnabled = isSkip;}</span>
+<span class="fc" id="L448">    public void setAIController(AIController aiController) { this.aiController = aiController;}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
