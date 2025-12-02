@@ -124,6 +124,7 @@ class MapControllerTest
         trackController.updatePosition(110, 110, false);
         trackController.updatePosition(120, 120, true);
         assertEquals(Map.State.OFF_TRACK, track.getState());
+        
         assertEquals(0, track.getLapTime());
         assertTrue(track.getPassedCheckpoints().isEmpty());
     }
