@@ -5,7 +5,7 @@ f1_2D,es.uab.tqs.f1_2D.model,Car,0,568,0,78,0,115,0,57,0,18
 f1_2D,es.uab.tqs.f1_2D.model,Map.State,0,45,0,0,0,1,0,1,0,1
 f1_2D,es.uab.tqs.f1_2D.model,Map,0,519,0,30,0,127,0,71,0,56
 f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.GameMode,0,24,0,0,0,3,0,1,0,1
-f1_2D,es.uab.tqs.f1_2D.vista,OffTrackOverlay,0,161,0,14,0,53,0,20,0,13
+f1_2D,es.uab.tqs.f1_2D.vista,OffTrackOverlay,4,165,1,15,1,54,1,20,0,13
 f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.MainMenu,0,167,0,0,0,29,0,6,0,6
 f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay,800,1140,66,60,154,245,44,49,3,27
 f1_2D,es.uab.tqs.f1_2D.vista,CarDisplay.new KeyAdapter() {...},0,50,0,10,0,12,0,8,0,3

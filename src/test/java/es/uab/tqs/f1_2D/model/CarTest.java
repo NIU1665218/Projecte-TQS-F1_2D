@@ -884,15 +884,5 @@ class CarTest
         car.update(mapImageMock);
         assertTrue(car.invisibleWalls(mapImageMock));
         assertTrue(5.0 == car.getX() && 5.0 == car.getY());
-    }
-
-    /* 
-      =============================================================================
-        Decision/Condition Coverage
-      =============================================================================
-    */
-
-    
-
-
+    } 
 }
