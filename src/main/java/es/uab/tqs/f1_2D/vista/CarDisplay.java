@@ -988,6 +988,7 @@ public class CarDisplay extends JPanel
     public GameMode getCurrentGameMode() { return currentGameMode; }
     public void setIsMainMenu(boolean active) {this.inMainMenu = active;} 
     public MainMenu getMainMenu() {return mainMenu;}
+    public void setAIController(AIController aiController) {this.aiController = aiController;}
     
 
     // Classe interna necessaria pel menú principal

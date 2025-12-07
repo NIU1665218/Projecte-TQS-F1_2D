@@ -284,6 +284,28 @@ class CarDisplayTest {
     }
 
     @Test
+    public void testLoadSprites()
+    {
+        AICar mockAI = mock(AICar.class);
+
+        when(mockAI.getTeam()).thenReturn("FerrariInventado");
+        when(mockController.getCar()).thenReturn(mockCar);
+        List<AICar> aicarlist = List.of(mockAI);
+        when(mockAiController.getAICars()).thenReturn(aicarlist);
+        
+        //Creación del resto de componentes necesarios para la creación del display
+        BufferedImage map = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
+        CarDisplay display = new CarDisplay(mockController, map, map);
+        display.setAIController(mockAiController);
+        display.setBounds(0, 0, 500, 500);
+
+        assertDoesNotThrow(() -> display.loadAICarSprites());
+
+        
+        
+    }
+
+    @Test
     void testPaintComponentWithSprite() 
     {
         //Configuración del mock
