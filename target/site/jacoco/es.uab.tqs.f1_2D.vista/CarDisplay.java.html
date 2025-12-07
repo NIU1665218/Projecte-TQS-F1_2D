@@ -880,7 +880,7 @@ public class CarDisplay extends JPanel
 <span class="fc" id="L880">            int teamIndex = -1;</span>
             
             //Buscar l'equip dins de l'array
-<span class="pc bpc" id="L883" title="1 of 2 branches missed.">            for (int i = 0; i &lt; teamNames.length; i++) </span>
+<span class="fc bfc" id="L883" title="All 2 branches covered.">            for (int i = 0; i &lt; teamNames.length; i++) </span>
             {
 <span class="fc bfc" id="L885" title="All 2 branches covered.">                if (teamNames[i].equals(team)) </span>
                 {
@@ -890,9 +890,9 @@ public class CarDisplay extends JPanel
             }
             
             // Si no es troba, utilitzar index per defecte
-<span class="pc bpc" id="L893" title="1 of 2 branches missed.">            if (teamIndex == -1) </span>
+<span class="fc bfc" id="L893" title="All 2 branches covered.">            if (teamIndex == -1) </span>
             {
-<span class="nc" id="L895">                teamIndex = 0;</span>
+<span class="fc" id="L895">                teamIndex = 0;</span>
             }
             
             //Carregar la direcció en la funció principal de load
@@ -988,83 +988,84 @@ public class CarDisplay extends JPanel
 <span class="fc" id="L988">    public GameMode getCurrentGameMode() { return currentGameMode; }</span>
 <span class="fc" id="L989">    public void setIsMainMenu(boolean active) {this.inMainMenu = active;} </span>
 <span class="fc" id="L990">    public MainMenu getMainMenu() {return mainMenu;}</span>
+<span class="fc" id="L991">    public void setAIController(AIController aiController) {this.aiController = aiController;}</span>
     
 
     // Classe interna necessaria pel menú principal
     class MainMenu extends JPanel 
     {
         //Variables pels botons
-<span class="fc" id="L997">        private int buttonWidth = 200;</span>
-<span class="fc" id="L998">        private int buttonHeight = 60;</span>
+<span class="fc" id="L998">        private int buttonWidth = 200;</span>
+<span class="fc" id="L999">        private int buttonHeight = 60;</span>
 
         //Botons
-<span class="fc" id="L1001">        JButton qualyButton = new JButton(&quot;QUALY&quot;);</span>
-<span class="fc" id="L1002">        JButton raceButton = new JButton(&quot;RACE&quot;);</span>
+<span class="fc" id="L1002">        JButton qualyButton = new JButton(&quot;QUALY&quot;);</span>
+<span class="fc" id="L1003">        JButton raceButton = new JButton(&quot;RACE&quot;);</span>
 
         //Inicialitzar el menú principal
-<span class="fc" id="L1005">        public MainMenu() </span>
-<span class="fc" id="L1006">        {</span>
+<span class="fc" id="L1006">        public MainMenu() </span>
+<span class="fc" id="L1007">        {</span>
             //Definir layout a null per poder controlar a gust
-<span class="fc" id="L1008">            setLayout(null);</span>
+<span class="fc" id="L1009">            setLayout(null);</span>
             
             // Calcular posició centrada pels botons
-<span class="fc" id="L1011">            int panelWidth = (int)screenSize.getWidth();</span>
-<span class="fc" id="L1012">            int panelHeight = (int)screenSize.getHeight(); </span>
+<span class="fc" id="L1012">            int panelWidth = (int)screenSize.getWidth();</span>
+<span class="fc" id="L1013">            int panelHeight = (int)screenSize.getHeight(); </span>
             
-<span class="fc" id="L1014">            int centerX = panelWidth / 2 - buttonWidth / 2;</span>
-<span class="fc" id="L1015">            int buttonsY = panelHeight / 2 + 50; </span>
+<span class="fc" id="L1015">            int centerX = panelWidth / 2 - buttonWidth / 2;</span>
+<span class="fc" id="L1016">            int buttonsY = panelHeight / 2 + 50; </span>
             
             //Crear botó de Qualy i assignar startGame de Qualy al prèmer
-<span class="fc" id="L1018">            qualyButton.setBounds(centerX - buttonWidth - 20, buttonsY, buttonWidth, buttonHeight);</span>
-<span class="fc" id="L1019">            qualyButton.addActionListener(d -&gt; startGame(GameMode.QUALY));</span>
-<span class="fc" id="L1020">            add(qualyButton);</span>
+<span class="fc" id="L1019">            qualyButton.setBounds(centerX - buttonWidth - 20, buttonsY, buttonWidth, buttonHeight);</span>
+<span class="fc" id="L1020">            qualyButton.addActionListener(d -&gt; startGame(GameMode.QUALY));</span>
+<span class="fc" id="L1021">            add(qualyButton);</span>
             
             //Crear botó de Race i assignar startGame de Race al prèmer
-<span class="fc" id="L1023">            raceButton.setBounds(centerX + buttonWidth + 20, buttonsY, buttonWidth, buttonHeight);</span>
-<span class="fc" id="L1024">            raceButton.addActionListener(f -&gt; startGame(GameMode.RACE));</span>
-<span class="fc" id="L1025">            add(raceButton);</span>
-<span class="fc" id="L1026">        }</span>
+<span class="fc" id="L1024">            raceButton.setBounds(centerX + buttonWidth + 20, buttonsY, buttonWidth, buttonHeight);</span>
+<span class="fc" id="L1025">            raceButton.addActionListener(f -&gt; startGame(GameMode.RACE));</span>
+<span class="fc" id="L1026">            add(raceButton);</span>
+<span class="fc" id="L1027">        }</span>
         
         //Funció per poder pintar el main menu
         @Override
         protected void paintComponent(Graphics g)
         {
             //Cridar a la funció base per comporbar el funcionament
-<span class="fc" id="L1033">            super.paintComponent(g);</span>
+<span class="fc" id="L1034">            super.paintComponent(g);</span>
         
-<span class="fc" id="L1035">            g.setColor(new Color(30, 30, 60));</span>
-<span class="fc" id="L1036">            g.fillRect(0, 0, getWidth(), getHeight());</span>
+<span class="fc" id="L1036">            g.setColor(new Color(30, 30, 60));</span>
+<span class="fc" id="L1037">            g.fillRect(0, 0, getWidth(), getHeight());</span>
             
             // Títol per defecte
-<span class="fc" id="L1039">            g.setColor(Color.WHITE);</span>
-<span class="fc" id="L1040">            g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 36));</span>
-<span class="fc" id="L1041">            String title = &quot;F1 2D&quot;;</span>
-<span class="fc" id="L1042">            int titleWidth = g.getFontMetrics().stringWidth(title);</span>
-<span class="fc" id="L1043">            g.drawString(title, (getWidth() - titleWidth) / 2, getHeight() / 3);</span>
-<span class="fc" id="L1044">        }</span>
+<span class="fc" id="L1040">            g.setColor(Color.WHITE);</span>
+<span class="fc" id="L1041">            g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 36));</span>
+<span class="fc" id="L1042">            String title = &quot;F1 2D&quot;;</span>
+<span class="fc" id="L1043">            int titleWidth = g.getFontMetrics().stringWidth(title);</span>
+<span class="fc" id="L1044">            g.drawString(title, (getWidth() - titleWidth) / 2, getHeight() / 3);</span>
+<span class="fc" id="L1045">        }</span>
 
-<span class="fc" id="L1046">        public JButton getRaceButton() {return raceButton;}</span>
-<span class="fc" id="L1047">        public JButton getQualyButton() {return qualyButton;}</span>
+<span class="fc" id="L1047">        public JButton getRaceButton() {return raceButton;}</span>
+<span class="fc" id="L1048">        public JButton getQualyButton() {return qualyButton;}</span>
     }
     
     //Main per executar el joc
     public static void main(String[] args) 
     {
-<span class="fc" id="L1053">        double scaleFactor = 4.0;</span>
-<span class="fc" id="L1054">        BufferedImage largeMap = null;</span>
-<span class="fc" id="L1055">        BufferedImage collisionMap = null;</span>
+<span class="fc" id="L1054">        double scaleFactor = 4.0;</span>
+<span class="fc" id="L1055">        BufferedImage largeMap = null;</span>
+<span class="fc" id="L1056">        BufferedImage collisionMap = null;</span>
 
-<span class="fc" id="L1057">        largeMap = loadImage(&quot;/track/monaco.jpg&quot;, scaleFactor);</span>
-<span class="fc" id="L1058">        collisionMap = loadImage(&quot;/track/monacoCollision.jpg&quot;, scaleFactor);</span>
+<span class="fc" id="L1058">        largeMap = loadImage(&quot;/track/monaco.jpg&quot;, scaleFactor);</span>
+<span class="fc" id="L1059">        collisionMap = loadImage(&quot;/track/monacoCollision.jpg&quot;, scaleFactor);</span>
 
         // Crear el cotxe i el controlador
-<span class="fc" id="L1061">        Car car = new Car(880, 1780, 267, 0, 30, -5, 0.2, 0.5, largeMap.getHeight() - 150, largeMap.getWidth() - 200);</span>
-<span class="fc" id="L1062">        CarController controller = new CarController(car);</span>
+<span class="fc" id="L1062">        Car car = new Car(880, 1780, 267, 0, 30, -5, 0.2, 0.5, largeMap.getHeight() - 150, largeMap.getWidth() - 200);</span>
+<span class="fc" id="L1063">        CarController controller = new CarController(car);</span>
 
         // Crear i mostrar la finestra del joc
-<span class="fc" id="L1065">        JFrame frame = createGame(controller, largeMap, collisionMap);</span>
-<span class="fc" id="L1066">        frame.setVisible(true);</span>
-<span class="fc" id="L1067">    }</span>
+<span class="fc" id="L1066">        JFrame frame = createGame(controller, largeMap, collisionMap);</span>
+<span class="fc" id="L1067">        frame.setVisible(true);</span>
+<span class="fc" id="L1068">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
